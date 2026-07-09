@@ -1,0 +1,18 @@
+{
+  "name": "justFeast Concert Delivery Platform",
+  "short_name": "justFeast",
+  "description": "Premium seat-side food and drinks delivery for concerts, festivals, and stadiums.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#09090b",
+  "theme_color": "#f43f5e",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "https://img.icons8.com/neon/512/delivery-limitation.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
