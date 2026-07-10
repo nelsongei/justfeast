@@ -42,6 +42,7 @@ Route::post('/orders/{id}/status', [OrderController::class, 'updateStatus']);
 // Runner Operations
 Route::get('/runner/deliveries', [RunnerController::class, 'index']);
 Route::post('/runner/deliveries/{id}/status', [RunnerController::class, 'updateStatus']);
+Route::post('/runner/deliveries/{id}/location', [RunnerController::class, 'updateLocation']);
 Route::post('/runner/deliveries/{id}/verify', [RunnerController::class, 'verifyDelivery']);
 
 // Admin Operations

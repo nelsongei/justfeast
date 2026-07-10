@@ -17,11 +17,15 @@ class Delivery extends Model
         'delivered_time',
         'verification_pin',
         'status',
+        'runner_latitude',
+        'runner_longitude',
+        'arrived_at',
     ];
 
     protected $casts = [
         'pickup_time' => 'datetime',
         'delivered_time' => 'datetime',
+        'arrived_at' => 'datetime',
     ];
 
     public function order(): BelongsTo

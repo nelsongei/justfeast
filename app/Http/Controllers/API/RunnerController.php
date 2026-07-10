@@ -88,4 +88,60 @@ class RunnerController extends Controller
             'delivery' => Delivery::with(['order.items.product', 'order.vendor', 'order.user'])->find($id)
         ]);
     }
+
+    // Update runner's real-time coordinates and check proximity to customer
+    public function updateLocation(Request $request, $id)
+    {
+        $request->validate([
+            'latitude' => 'required|numeric',
+            'longitude' => 'required|numeric',
+        ]);
+
+        $delivery = Delivery::with('order')->findOrFail($id);
+        
+        $delivery->update([
+            'runner_latitude' => $request->latitude,
+            'runner_longitude' => $request->longitude,
+        ]);
+
+        // Calculate distance to customer
+        $destLat = null;
+        $destLng = null;
+
+        $loc = $delivery->order->seat_location;
+        if (isset($loc['type']) && $loc['type'] === 'gps') {
+            $destLat = floatval($loc['latitude']);
+            $destLng = floatval($loc['longitude']);
+        } else {
+            // Map legacy sections to mock coordinates
+            $sec = strtolower($loc['section'] ?? '');
+            if (str_contains($sec, 'vip a')) {
+                $destLat = -1.2276; $destLng = 36.8967;
+            } elseif (str_contains($sec, 'vip b')) {
+                $destLat = -1.2276; $destLng = 36.8979;
+            } elseif (str_contains($sec, 'gen a') || str_contains($sec, 'general a') || str_contains($sec, 'general admission a')) {
+                $destLat = -1.2286; $destLng = 36.8967;
+            } else {
+                $destLat = -1.2286; $destLng = 36.8979; // fallback gen b
+            }
+        }
+
+        // Simple Euclidean distance for close proximity (e.g. within ~10 meters / 0.0001 degrees)
+        $distance = sqrt(pow($request->latitude - $destLat, 2) + pow($request->longitude - $destLng, 2));
+        
+        $reached = ($distance < 0.00015); // threshold (approx 15 meters)
+
+        if ($reached && !$delivery->arrived_at) {
+            $delivery->update([
+                'arrived_at' => now(),
+            ]);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'delivery' => $delivery,
+            'distance' => $distance,
+            'reached' => $reached || ($delivery->arrived_at !== null)
+        ]);
+    }
 }

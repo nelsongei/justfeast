@@ -15,6 +15,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Leaflet Map CSS/JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- QR Code Generator -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+    <!-- HTML5 QR Code Scanner -->
+    <script src="https://unpkg.com/html5-qrcode"></script>
 
     <script>
         tailwind.config = {
@@ -190,8 +197,8 @@
                                     <i class="fas fa-burger text-[#2D3748] text-xl"></i>
                                 </div>
                                 <div class="space-y-1">
-                                    <h3 class="text-sm font-black text-white">Concert Seat Delivery</h3>
-                                    <p class="text-[10px] text-zinc-400 leading-relaxed font-medium">Get food, drinks, and snacks delivered directly to your stadium seat during the concert!</p>
+                                    <h3 class="text-sm font-black text-white">Concert Location Delivery</h3>
+                                    <p class="text-[10px] text-zinc-400 leading-relaxed font-medium">Get food, drinks, and snacks delivered directly to your location during the concert!</p>
                                 </div>
                                 <div class="space-y-3 text-left">
                                     <div>
@@ -234,15 +241,15 @@
                         <div id="cust-main" class="space-y-5">
                             <!-- Glovo Hero Landing Fold inside simulator phone -->
                             <div id="glovo-hero-fold" class="text-center py-5 px-3 relative overflow-hidden bg-gradient-to-b from-[#FFC244]/15 to-transparent rounded-2xl border border-[#FFC244]/10 mb-2">
-                                <h3 class="text-sm font-black text-white leading-tight">What shall we deliver to your seat?</h3>
-                                <p class="text-[8px] text-zinc-400 mt-1 max-w-[200px] mx-auto leading-relaxed">Skip the stadium queues. Order snacks delivered directly to your row!</p>
+                                <h3 class="text-sm font-black text-white leading-tight">What shall we deliver to you?</h3>
+                                <p class="text-[8px] text-zinc-400 mt-1 max-w-[200px] mx-auto leading-relaxed">Skip the stadium queues. Order snacks delivered directly to your location!</p>
                                 
                                 <!-- Address search capsule -->
                                 <div onclick="openSeatModal()" class="mt-3 flex items-center bg-white rounded-full border border-[#E2E8F0] shadow-md p-1 hover:border-[#00A082] transition duration-200 cursor-pointer group">
                                     <span class="pl-2 pr-1 text-[#00A082] text-xs"><i class="fas fa-location-dot"></i></span>
                                     <div class="flex-1 text-left min-w-0">
-                                        <p class="text-[7px] uppercase tracking-wider text-zinc-400 font-bold">Delivery Seating</p>
-                                        <p class="text-[9px] font-black text-[#2D3748] truncate" id="selected-seat-hero">Select Seating Coordinates...</p>
+                                        <p class="text-[7px] uppercase tracking-wider text-zinc-400 font-bold">Delivery Location</p>
+                                        <p class="text-[9px] font-black text-[#2D3748] truncate" id="selected-seat-hero">Select Delivery Location...</p>
                                     </div>
                                     <span class="bg-[#00A082] text-white px-3 py-1 rounded-full text-[8px] font-black">Select</span>
                                 </div>
@@ -257,19 +264,19 @@
                                 <button onclick="logoutCustomer()" class="text-zinc-500 hover:text-zinc-400 text-xs"><i class="fas fa-sign-out-alt"></i> Logout</button>
                             </div>
 
-                            <!-- STEP A: SEAT CONFIGURATION -->
+                            <!-- STEP A: LOCATION CONFIGURATION -->
                             <div class="space-y-2">
                                 <div class="flex justify-between items-center">
-                                    <label class="block text-xs font-bold text-zinc-400 uppercase tracking-wider">Configure Seat Location</label>
+                                    <label class="block text-xs font-bold text-zinc-400 uppercase tracking-wider">Configure Delivery Location</label>
                                     <span id="seat-status-pill" class="text-[10px] bg-brand-orange/20 text-brand-orange px-2 py-0.5 rounded-full font-semibold border border-brand-pink/20">Not Set</span>
                                 </div>
 
                                 <button onclick="openSeatModal()" class="w-full py-3 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-between px-4 hover:border-brand-rose transition">
                                     <div class="flex items-center gap-3">
-                                        <i class="fas fa-chair text-brand-rose text-sm"></i>
+                                        <i class="fas fa-map-location-dot text-brand-rose text-sm"></i>
                                         <div class="text-left">
-                                            <p class="text-xs font-bold" id="selected-seat-label">Select Seating Coordinates</p>
-                                            <p class="text-[10px] text-zinc-500" id="selected-seat-sub">Tap to open Kasarani Stadium Map</p>
+                                            <p class="text-xs font-bold" id="selected-seat-label">Configure Delivery Location</p>
+                                            <p class="text-[10px] text-zinc-500" id="selected-seat-sub">Tap to pin location on map</p>
                                         </div>
                                     </div>
                                     <i class="fas fa-chevron-right text-zinc-600 text-xs"></i>
@@ -315,7 +322,7 @@
                         <div id="cust-tracker" class="hidden flex flex-col h-full justify-between py-2">
                             <div class="text-center">
                                 <h3 class="text-base font-black text-[#2D3748] mb-0.5">Live Delivery Radar</h3>
-                                <p class="text-[10px] text-zinc-500">Fast Seat Delivery — Kasarani Stadium Arena</p>
+                                <p class="text-[10px] text-zinc-500">Fast Location Delivery — Kasarani Stadium Arena</p>
                             </div>
  
                             <!-- Simulated radar animation -->
@@ -334,7 +341,14 @@
                             <div class="bg-[#F7F9FA] border border-[#E2E8F0] p-4 rounded-xl text-center space-y-1.5 relative overflow-hidden">
                                 <span class="text-[9px] uppercase tracking-widest text-zinc-500 font-bold">Secure Delivery PIN</span>
                                 <h4 class="text-3xl font-black text-[#00A082] tracking-widest" id="tracker-pin">----</h4>
-                                <p class="text-[10px] text-zinc-500">Share this secret PIN with the runner when they arrive at your seat to confirm delivery.</p>
+                                <p class="text-[10px] text-zinc-500">Share this secret PIN with the runner when they arrive at your location to confirm delivery.</p>
+                            </div>
+
+                            <!-- QR Verification Code Block (Generates dynamically on arrival) -->
+                            <div id="tracker-qr-container" class="hidden bg-white border border-[#E2E8F0] p-4 rounded-xl text-center space-y-2 flex flex-col items-center justify-center">
+                                <span class="text-[9px] uppercase tracking-widest text-[#00A082] font-black"><i class="fas fa-qrcode mr-1"></i> Scan to Verify Delivery</span>
+                                <canvas id="tracker-qr-canvas" class="w-32 h-32 border border-zinc-100 p-1 bg-white"></canvas>
+                                <p class="text-[9px] text-zinc-500 font-medium leading-relaxed">Let the runner scan this QR code or type your PIN to complete the delivery.</p>
                             </div>
  
                             <!-- Live timeline tracker checklist -->
@@ -377,7 +391,7 @@
                         </div>
                         <div class="border-t border-zinc-800/80 pt-3 space-y-3">
                             <div class="flex justify-between items-center text-xs">
-                                <span class="text-zinc-400">Seat location:</span>
+                                <span class="text-zinc-400">Delivery location:</span>
                                 <span class="font-bold text-white" id="cart-location-text">Not configured!</span>
                             </div>
                             <div class="flex justify-between items-center">
@@ -412,91 +426,50 @@
                                     <button onclick="confirmMpesaSimulation()" class="py-2.5 bg-[#00A082] hover:bg-[#008A70] text-white rounded-full text-[10px] font-bold transition duration-200 shadow-md shadow-[#00A082]/10 cursor-pointer">Pay Now</button>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- Stadium Interactive SVG Map Modal Overlay -->
-                    <div id="stadium-modal-overlay" class="hidden absolute inset-0 bg-black/90 z-50 flex flex-col p-4">
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="text-xs font-bold text-white"><i class="fas fa-map-marked-alt text-brand-rose mr-1.5"></i> Stadium Seat Selector</span>
+                        </div>                    <!-- Stadium Interactive SVG Map Modal Overlay -->
+                    <div id="stadium-modal-overlay" class="hidden absolute inset-0 bg-black/95 z-50 flex flex-col p-4">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-xs font-bold text-white"><i class="fas fa-map-marked-alt text-brand-rose mr-1.5"></i> Select Your Location</span>
                             <button onclick="closeSeatModal()" class="text-zinc-500 hover:text-zinc-300 text-sm"><i class="fas fa-times"></i></button>
                         </div>
 
-                        <!-- Kasarani Stadium Map Grid SVG (Highly interactive!) -->
-                        <div class="flex-1 bg-zinc-950 rounded-xl border border-zinc-900 p-2 flex flex-col justify-between">
-                            <div class="text-center py-1">
-                                <p class="text-[9px] text-zinc-500 uppercase tracking-widest font-bold">Click an arena section to select</p>
-                            </div>
+                        <!-- VIEW 2: GPS Pin View -->
+                        <div id="modal-gps-selector-view" class="flex-1 bg-zinc-950 rounded-xl border border-zinc-900 p-2.5 flex flex-col justify-between overflow-y-auto">
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[9px] text-zinc-500 uppercase font-black tracking-wider">Drop location pin on map</span>
+                                    <button type="button" onclick="getCurrentGPSLocation()" class="text-[9px] bg-brand-rose/20 text-brand-rose px-2.5 py-1 rounded-full font-bold border border-brand-rose/30 hover:bg-brand-rose/30 transition">
+                                        <i class="fas fa-location-crosshairs mr-1"></i> Use My GPS
+                                    </button>
+                                </div>
 
-                            <!-- Kasarani Arena Interactive SVG Map Layout -->
-                            <div class="relative w-full flex-1 flex items-center justify-center py-2">
-                                <svg viewBox="0 0 300 300" class="w-full max-w-[240px] h-auto">
-                                    <!-- Spotlight animations -->
-                                    <polygon points="150,60 50,300 250,300" fill="url(#grad-spot)" class="spotlight pointer-events-none opacity-20" />
+                                <!-- Leaflet Map Container -->
+                                <div id="modal-leaflet-map" class="h-44 w-full rounded-xl bg-zinc-900 border border-zinc-800 z-10 relative"></div>
 
-                                    <!-- Definitions for Gradients -->
-                                    <defs>
-                                        <radialGradient id="grad-spot" cx="50%" cy="0%" r="80%">
-                                            <stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.6"/>
-                                            <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
-                                        </radialGradient>
-                                    </defs>
-
-                                    <!-- Center Concert Stage -->
-                                    <rect x="110" y="120" width="80" height="40" rx="4" fill="#18181b" stroke="#8b5cf6" stroke-width="1.5" />
-                                    <text x="150" y="145" fill="#8b5cf6" font-size="10" font-weight="bold" text-anchor="middle">STAGE 🎸</text>
-
-                                    <!-- Seating Quadrant Sections (Interactive) -->
-                                    <!-- 1. VIP A (Top Left) -->
-                                    <path d="M 40,80 A 130,130 0 0,1 130,20 L 130,70 A 80,80 0 0,0 80,105 Z"
-                                          id="svg-vip-a" onclick="selectSectionSvg('VIP Section A')"
-                                          class="fill-zinc-900 stroke-zinc-800 stroke-2 hover:fill-brand-rose/20 cursor-pointer transition" />
-                                    <text x="75" y="55" fill="#a1a1aa" font-size="8" font-weight="bold" pointer-events="none">VIP A</text>
-
-                                    <!-- 2. VIP B (Top Right) -->
-                                    <path d="M 170,20 A 130,130 0 0,1 260,80 L 220,105 A 80,80 0 0,0 170,70 Z"
-                                          id="svg-vip-b" onclick="selectSectionSvg('VIP Section B')"
-                                          class="fill-zinc-900 stroke-zinc-800 stroke-2 hover:fill-brand-rose/20 cursor-pointer transition" />
-                                    <text x="225" y="55" fill="#a1a1aa" font-size="8" font-weight="bold" pointer-events="none">VIP B</text>
-
-                                    <!-- 3. General A (Bottom Left) -->
-                                    <path d="M 40,220 A 130,130 0 0,0 130,280 L 130,230 A 80,80 0 0,1 80,195 Z"
-                                          id="svg-gen-a" onclick="selectSectionSvg('General Admission A')"
-                                          class="fill-zinc-900 stroke-zinc-800 stroke-2 hover:fill-brand-orange/20 cursor-pointer transition" />
-                                    <text x="75" y="245" fill="#a1a1aa" font-size="8" font-weight="bold" pointer-events="none">GEN A</text>
-
-                                    <!-- 4. General B (Bottom Right) -->
-                                    <path d="M 170,280 A 130,130 0 0,0 260,220 L 220,195 A 80,80 0 0,1 170,230 Z"
-                                          id="svg-gen-b" onclick="selectSectionSvg('General Admission B')"
-                                          class="fill-zinc-900 stroke-zinc-800 stroke-2 hover:fill-brand-orange/20 cursor-pointer transition" />
-                                    <text x="225" y="245" fill="#a1a1aa" font-size="8" font-weight="bold" pointer-events="none">GEN B</text>
-                                </svg>
-                            </div>
-
-                            <!-- Custom coordinate inputs -->
-                            <div class="space-y-2.5 p-2 bg-zinc-900 rounded-lg">
-                                <div class="grid grid-cols-3 gap-2">
+                                <!-- Latitude / Longitude Display -->
+                                <div class="grid grid-cols-2 gap-2">
                                     <div>
-                                        <label class="block text-[8px] font-bold text-zinc-500 uppercase">Section</label>
-                                        <input type="text" id="seat-sec-input" class="w-full px-2 py-1 rounded bg-zinc-950 border border-zinc-800 text-xs font-bold text-brand-rose" readonly value="VIP Section A">
+                                        <label class="block text-[8px] font-bold text-zinc-500 uppercase">Latitude</label>
+                                        <input type="text" id="gps-lat-input" class="w-full px-2.5 py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-bold text-white" value="-1.22810000" readonly>
                                     </div>
                                     <div>
-                                        <label class="block text-[8px] font-bold text-zinc-500 uppercase">Row</label>
-                                        <select id="seat-row-input" class="w-full px-2 py-1 rounded bg-zinc-950 border border-zinc-800 text-xs font-bold text-white focus:outline-none">
-                                            <option>Row 05</option><option selected>Row 12</option><option>Row 18</option><option>Row 24</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label class="block text-[8px] font-bold text-zinc-500 uppercase">Seat</label>
-                                        <select id="seat-num-input" class="w-full px-2 py-1 rounded bg-zinc-950 border border-zinc-800 text-xs font-bold text-white focus:outline-none">
-                                            <option>Seat 04</option><option>Seat 12</option><option selected>Seat 18</option><option>Seat 27</option>
-                                        </select>
+                                        <label class="block text-[8px] font-bold text-zinc-500 uppercase">Longitude</label>
+                                        <input type="text" id="gps-lng-input" class="w-full px-2.5 py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-bold text-white" value="36.89730000" readonly>
                                     </div>
                                 </div>
-                                <button onclick="saveSeatCoordinates()" class="w-full py-2 bg-brand-rose text-white rounded-lg text-[10px] font-bold hover:bg-brand-rose transition shadow">
-                                    Confirm Seat Coordinates
-                                </button>
+
+                                <!-- Description Input -->
+                                <div>
+                                    <label class="block text-[8px] font-bold text-zinc-500 uppercase mb-1">Landmarks & Clothing Description</label>
+                                    <textarea id="gps-desc-input" placeholder="e.g. Near general entrance gate, wearing a yellow t-shirt and white hat." class="w-full px-2.5 py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs text-white focus:outline-none focus:border-brand-rose h-12 resize-none"></textarea>
+                                </div>
                             </div>
+
+                            <button onclick="saveGPSCoordinates()" class="w-full py-2.5 bg-brand-rose text-white rounded-lg text-[10px] font-bold hover:bg-brand-rose/95 transition shadow mt-3">
+                                Confirm GPS Pin Location
+                            </button>
+                        </div>
+                    </div>>
                         </div>
                     </div>
 
@@ -604,14 +577,14 @@
                                     </div>
                                 </div>
 
-                                <!-- Seat Navigation Guide (Interactive stadium guide map!) -->
+                                <!-- GPS Location Navigation Guide -->
                                 <div id="runner-map-guide" class="hidden space-y-2 bg-zinc-900/40 p-4 rounded-xl border border-zinc-900">
-                                    <h4 class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Stadium Seat Finder Navigation</h4>
+                                    <h4 class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">GPS Location Pin Navigation</h4>
 
                                     <div class="h-28 bg-zinc-950 rounded-lg border border-zinc-800 flex items-center justify-center relative overflow-hidden">
                                         <!-- Mini stage mapping visual representation -->
                                         <div class="absolute top-1 bg-zinc-900 border border-zinc-800 px-2 py-0.5 rounded text-[8px] text-zinc-400 font-bold">KASARANI KITCHEN STALLS</div>
-                                        <div class="absolute bottom-2 bg-brand-rose px-2 py-1 rounded text-[8px] text-white font-bold" id="runner-target-section-tag">VIP A - ROW 12 - SEAT 18</div>
+                                        <div class="absolute bottom-2 bg-brand-rose px-2 py-1 rounded text-[8px] text-white font-bold" id="runner-target-section-tag">GPS TARGET LOCATION</div>
 
                                         <!-- Dashboard dashed navigation routing path -->
                                         <svg viewBox="0 0 100 40" class="w-24 h-auto pointer-events-none">
@@ -620,13 +593,35 @@
                                             <circle cx="90" cy="30" r="3" fill="#10b981" />
                                         </svg>
                                     </div>
-                                    <p class="text-[9px] text-zinc-500"><i class="fas fa-info-circle mr-1"></i> Proceed to Vendor kitchen, pickup order, and navigate via VIP gates to the seat coordinates listed.</p>
+                                    <p class="text-[9px] text-zinc-500"><i class="fas fa-info-circle mr-1"></i> Proceed to Vendor kitchen, pickup order, and navigate to the location coordinates listed.</p>
                                 </div>
                             </div>
 
                             <!-- Delivery verification secure section -->
                             <div id="runner-verification-box" class="hidden mt-4 bg-zinc-900 border border-zinc-800 p-4 rounded-2xl space-y-3">
                                 <h4 class="text-xs font-bold text-white text-center">Handover Verification</h4>
+                                
+                                <!-- QR Scanner Trigger / View -->
+                                <div class="space-y-2">
+                                    <button type="button" onclick="toggleRunnerQRScanner()" class="w-full py-2 bg-brand-rose/20 text-brand-rose rounded-lg text-xs font-bold border border-brand-rose/30 hover:bg-brand-rose/30 transition flex items-center justify-center gap-1.5">
+                                        <i class="fas fa-camera"></i> Scan Customer QR Code
+                                    </button>
+                                    <div id="runner-qr-reader-container" class="hidden rounded-xl overflow-hidden border border-zinc-800 bg-black">
+                                        <div id="runner-qr-reader" class="w-full"></div>
+                                    </div>
+                                    
+                                    <!-- Simulator Helper Button -->
+                                    <button type="button" onclick="simulateQRScan()" class="w-full py-1.5 bg-zinc-800 text-zinc-300 rounded-lg text-[9px] font-bold border border-zinc-700 hover:bg-zinc-700 transition flex items-center justify-center gap-1">
+                                        <i class="fas fa-wand-magic-sparkles text-brand-rose"></i> [Simulate QR Scan]
+                                    </button>
+                                </div>
+
+                                <div class="relative flex py-1 items-center">
+                                    <div class="flex-grow border-t border-zinc-800"></div>
+                                    <span class="flex-shrink mx-2 text-[8px] text-zinc-500 font-bold uppercase">Or Enter PIN</span>
+                                    <div class="flex-grow border-t border-zinc-800"></div>
+                                </div>
+
                                 <div>
                                     <label class="block text-[8px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Enter Customer Verification PIN</label>
                                     <input type="text" id="runner-pin-input" placeholder="Enter 4-Digit PIN" class="w-full text-center py-2.5 rounded-lg glass-input font-bold tracking-widest text-lg text-white" maxlength="4">
@@ -745,10 +740,18 @@
         let vendors = [];
         let basket = [];
         let activeOrder = null;
+        let hasBeepedForArrival = false;
         let selectedSeat = null;
         let congestionMode = false;
         let selectedCustomerCategory = 'all';
- 
+
+        // Runner movement simulation state
+        let runnerMovementInterval = null;
+        let runnerLat = -1.2281;
+        let runnerLng = 36.8973;
+        let runnerStartLat = -1.2281;
+        let runnerStartLng = 36.8973;
+
         let pollingInterval = null;
         let audioCtx = null;
 
@@ -806,15 +809,27 @@
             if (savedSeat) {
                 try {
                     selectedSeat = JSON.parse(savedSeat);
-                    const { section, row, seat } = selectedSeat;
-                    document.getElementById('selected-seat-label').textContent = section;
-                    document.getElementById('selected-seat-sub').textContent = `${row} — ${seat}`;
-                    document.getElementById('seat-status-pill').textContent = "Configured";
-                    document.getElementById('seat-status-pill').className = "text-[10px] bg-brand-emerald/20 text-brand-emerald px-2 py-0.5 rounded-full font-semibold border border-brand-emerald/30";
-                    
-                    const locationText = `${section}, ${row}, ${seat}`;
-                    document.getElementById('cart-location-text').textContent = locationText;
-                    document.getElementById('selected-seat-hero').textContent = locationText;
+                    if (selectedSeat.type === 'gps') {
+                        const { latitude, longitude, description } = selectedSeat;
+                        document.getElementById('selected-seat-label').textContent = "GPS Location Pin";
+                        document.getElementById('selected-seat-sub').textContent = `${latitude.toFixed(5)}, ${longitude.toFixed(5)}${description ? ' — ' + description : ''}`;
+                        document.getElementById('seat-status-pill').textContent = "Configured";
+                        document.getElementById('seat-status-pill').className = "text-[10px] bg-brand-emerald/20 text-brand-emerald px-2 py-0.5 rounded-full font-semibold border border-brand-emerald/30";
+                        
+                        const locationText = `GPS Pin: ${description || (latitude.toFixed(4) + ', ' + longitude.toFixed(4))}`;
+                        document.getElementById('cart-location-text').textContent = locationText;
+                        document.getElementById('selected-seat-hero').textContent = locationText;
+                    } else {
+                        const { section, row, seat } = selectedSeat;
+                        document.getElementById('selected-seat-label').textContent = section;
+                        document.getElementById('selected-seat-sub').textContent = `${row} — ${seat}`;
+                        document.getElementById('seat-status-pill').textContent = "Configured";
+                        document.getElementById('seat-status-pill').className = "text-[10px] bg-brand-emerald/20 text-brand-emerald px-2 py-0.5 rounded-full font-semibold border border-brand-emerald/30";
+                        
+                        const locationText = `${section}, ${row}, ${seat}`;
+                        document.getElementById('cart-location-text').textContent = locationText;
+                        document.getElementById('selected-seat-hero').textContent = locationText;
+                    }
                 } catch (e) {}
             }
  
@@ -1020,9 +1035,24 @@
                             <div class="flex-shrink-0">
                                 ${out 
                                     ? `<span class="text-[8px] bg-zinc-900 border border-zinc-800 text-zinc-600 px-2 py-1 rounded-full font-bold">Out</span>`
-                                    : `<button onclick="addToBasket(${p.id}, '${p.name}', ${p.price}, ${vendor.id})" class="w-7 h-7 rounded-full bg-[#FFC244] hover:bg-[#E0A325] text-[#2D3748] flex items-center justify-center font-black transition-all shadow-sm border border-[#E0A325] cursor-pointer">
-                                            <i class="fas fa-plus text-[10px]"></i>
-                                       </button>`
+                                    : (() => {
+                                        const bItem = basket.find(item => item.id === p.id);
+                                        if (bItem && bItem.quantity > 0) {
+                                            return `
+                                            <div class="flex items-center bg-[#FFC244] rounded-full h-7 px-1 border border-[#E0A325] shadow-sm">
+                                                <button onclick="adjustQty(${p.id}, -1)" class="w-5 h-5 rounded-full bg-white hover:bg-zinc-100 flex items-center justify-center font-black text-[9px] text-[#2D3748] transition border-0 cursor-pointer"><i class="fas fa-minus text-[7px]"></i></button>
+                                                <span class="px-2 text-[9px] font-black text-[#2D3748] min-w-[12px] text-center">${bItem.quantity}</span>
+                                                <button onclick="adjustQty(${p.id}, 1)" class="w-5 h-5 rounded-full bg-white hover:bg-zinc-100 flex items-center justify-center font-black text-[9px] text-[#2D3748] transition border-0 cursor-pointer"><i class="fas fa-plus text-[7px]"></i></button>
+                                            </div>
+                                            `;
+                                        } else {
+                                            return `
+                                            <button onclick="addToBasket(${p.id}, '${p.name}', ${p.price}, ${vendor.id})" class="w-7 h-7 rounded-full bg-[#FFC244] hover:bg-[#E0A325] text-[#2D3748] flex items-center justify-center font-black transition-all shadow-sm border border-[#E0A325] cursor-pointer">
+                                                <i class="fas fa-plus text-[10px]"></i>
+                                            </button>
+                                            `;
+                                        }
+                                      })()
                                 }
                             </div>
                         </div>
@@ -1036,12 +1066,69 @@
             });
         }
 
+        function showConfirmModal(title, message, confirmText, cancelText) {
+            return new Promise((resolve) => {
+                const phoneBody = document.getElementById('customer-phone-body');
+                const overlay = document.createElement('div');
+                overlay.className = "absolute inset-0 bg-black/85 backdrop-blur-sm z-[9999] flex items-center justify-center p-3 transition-all duration-300";
+                
+                const card = document.createElement('div');
+                card.className = "bg-[#1C1C24] rounded-3xl p-4 max-w-[240px] w-full text-center space-y-4 shadow-2xl border border-zinc-800/80 transform scale-95 opacity-0 transition-all duration-300";
+                
+                card.innerHTML = `
+                    <div class="w-10 h-10 bg-brand-orange/20 text-brand-orange rounded-2xl flex items-center justify-center mx-auto text-base border border-brand-orange/30">
+                        <i class="fas fa-triangle-exclamation"></i>
+                    </div>
+                    <div class="space-y-1">
+                        <h3 class="text-xs font-black text-white">${title}</h3>
+                        <p class="text-[9px] text-zinc-400 leading-relaxed">${message}</p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 pt-1">
+                        <button id="confirm-modal-cancel" class="py-2 bg-zinc-900 hover:bg-zinc-800 text-zinc-450 rounded-xl text-[10px] font-bold transition border border-zinc-800 cursor-pointer">
+                            ${cancelText}
+                        </button>
+                        <button id="confirm-modal-ok" class="py-2 bg-brand-rose hover:bg-brand-rose/90 text-white rounded-xl text-[10px] font-bold transition shadow-lg shadow-brand-rose/10 cursor-pointer border-0">
+                            ${confirmText}
+                        </button>
+                    </div>
+                `;
+                
+                overlay.appendChild(card);
+                phoneBody.appendChild(overlay);
+                
+                // Trigger animation
+                setTimeout(() => {
+                    card.classList.remove('scale-95', 'opacity-0');
+                    card.classList.add('scale-100', 'opacity-100');
+                }, 10);
+                
+                const cleanup = (value) => {
+                    card.classList.remove('scale-100', 'opacity-100');
+                    card.classList.add('scale-95', 'opacity-0');
+                    overlay.classList.add('opacity-0');
+                    setTimeout(() => {
+                        overlay.remove();
+                    }, 300);
+                    resolve(value);
+                };
+                
+                overlay.querySelector('#confirm-modal-cancel').addEventListener('click', () => cleanup(false));
+                overlay.querySelector('#confirm-modal-ok').addEventListener('click', () => cleanup(true));
+            });
+        }
+
         // Add to basket logic
-        function addToBasket(id, name, price, vendorId) {
+        async function addToBasket(id, name, price, vendorId) {
             playSoundNotification('beep');
             // justFeast orders must be from one vendor at a time (standard logic)
             if (basket.length > 0 && basket[0].vendorId !== vendorId) {
-                alert("You can only order from one vendor at a time. Clearing basket!");
+                const confirm = await showConfirmModal(
+                    "Switch Vendor?",
+                    "To keep delivery fast, you can only order from one vendor stall at a time. Adding this item will clear your current basket.",
+                    "Clear & Add",
+                    "Cancel"
+                );
+                if (!confirm) return;
                 basket = [];
             }
 
@@ -1053,6 +1140,7 @@
             }
 
             renderBasketTray();
+            renderCustomerVendors();
         }
 
         // Render current basket drawer inside customer phone
@@ -1101,11 +1189,13 @@
                 }
             }
             renderBasketTray();
+            renderCustomerVendors();
         }
 
         function clearBasket() {
             basket = [];
             renderBasketTray();
+            renderCustomerVendors();
         }
 
         // Custom simulated phone logins & Verification callbacks
@@ -1229,8 +1319,96 @@
         }
  
         // SVG Stadium Seat Selector Functions
+        // Seating Mode & GPS Coordinates State
+        let leafletMap = null;
+        let leafletMarker = null;
+        let activeSeatingMode = 'gps'; // 'seat' or 'gps'
+
+        function setSeatingMode(mode) {
+            activeSeatingMode = mode;
+            const tabSeat = document.getElementById('modal-tab-seat');
+            const tabGps = document.getElementById('modal-tab-gps');
+            const viewSeat = document.getElementById('modal-seat-selector-view');
+            const viewGps = document.getElementById('modal-gps-selector-view');
+
+            if (mode === 'seat') {
+                tabSeat.className = "flex-1 py-2 rounded-lg text-center bg-brand-rose text-white shadow shadow-brand-rose/25 transition-all";
+                tabGps.className = "flex-1 py-2 rounded-lg text-center text-zinc-400 hover:text-white transition-all";
+                viewSeat.classList.remove('hidden');
+                viewGps.classList.add('hidden');
+            } else {
+                tabGps.className = "flex-1 py-2 rounded-lg text-center bg-brand-rose text-white shadow shadow-brand-rose/25 transition-all";
+                tabSeat.className = "flex-1 py-2 rounded-lg text-center text-zinc-400 hover:text-white transition-all";
+                viewSeat.classList.add('hidden');
+                viewGps.classList.remove('hidden');
+                
+                // Initialize map if not done yet
+                initLeafletMap();
+            }
+        }
+
+        function initLeafletMap() {
+            setTimeout(() => {
+                const center = [-1.2281, 36.8973];
+                if (!leafletMap) {
+                    leafletMap = L.map('modal-leaflet-map').setView(center, 16);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        maxZoom: 19,
+                        attribution: '© OpenStreetMap contributors'
+                    }).addTo(leafletMap);
+
+                    // Create a draggable marker
+                    leafletMarker = L.marker(center, { draggable: true }).addTo(leafletMap);
+
+                    // Update coordinates inputs when marker is dragged
+                    leafletMarker.on('dragend', function (e) {
+                        const position = leafletMarker.getLatLng();
+                        document.getElementById('gps-lat-input').value = position.lat.toFixed(8);
+                        document.getElementById('gps-lng-input').value = position.lng.toFixed(8);
+                    });
+
+                    // Update marker when map is clicked
+                    leafletMap.on('click', function (e) {
+                        leafletMarker.setLatLng(e.latlng);
+                        document.getElementById('gps-lat-input').value = e.latlng.lat.toFixed(8);
+                        document.getElementById('gps-lng-input').value = e.latlng.lng.toFixed(8);
+                    });
+                } else {
+                    leafletMap.invalidateSize();
+                }
+            }, 150);
+        }
+
+        function getCurrentGPSLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        document.getElementById('gps-lat-input').value = lat.toFixed(8);
+                        document.getElementById('gps-lng-input').value = lng.toFixed(8);
+
+                        if (leafletMap && leafletMarker) {
+                            const newLatLng = new L.LatLng(lat, lng);
+                            leafletMarker.setLatLng(newLatLng);
+                            leafletMap.setView(newLatLng, 17);
+                        }
+                        playSoundNotification('success');
+                    },
+                    (error) => {
+                        alert("Error getting location: " + error.message + ". Center map marker used instead.");
+                    }
+                );
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+
         function openSeatModal() {
             document.getElementById('stadium-modal-overlay').classList.remove('hidden');
+            if (activeSeatingMode === 'gps') {
+                initLeafletMap();
+            }
         }
  
         function closeSeatModal() {
@@ -1264,7 +1442,7 @@
             const row = document.getElementById('seat-row-input').value;
             const seat = document.getElementById('seat-num-input').value;
  
-            selectedSeat = { section, row, seat };
+            selectedSeat = { type: 'seat', section, row, seat };
             localStorage.setItem('justfeast_selected_seat', JSON.stringify(selectedSeat));
  
             document.getElementById('selected-seat-label').textContent = `${section}`;
@@ -1280,6 +1458,33 @@
             playSoundNotification('success');
             closeSeatModal();
         }
+
+        function saveGPSCoordinates() {
+            const lat = parseFloat(document.getElementById('gps-lat-input').value);
+            const lng = parseFloat(document.getElementById('gps-lng-input').value);
+            const desc = document.getElementById('gps-desc-input').value.trim();
+
+            selectedSeat = {
+                type: 'gps',
+                latitude: lat,
+                longitude: lng,
+                description: desc
+            };
+
+            localStorage.setItem('justfeast_selected_seat', JSON.stringify(selectedSeat));
+
+            document.getElementById('selected-seat-label').textContent = "GPS Location Pin";
+            document.getElementById('selected-seat-sub').textContent = `${lat.toFixed(5)}, ${lng.toFixed(5)}${desc ? ' — ' + desc : ''}`;
+            document.getElementById('seat-status-pill').textContent = "Configured";
+            document.getElementById('seat-status-pill').className = "text-[10px] bg-brand-emerald/20 text-brand-emerald px-2 py-0.5 rounded-full font-semibold border border-brand-emerald/30";
+
+            const locationText = `GPS Pin: ${desc || (lat.toFixed(4) + ', ' + lng.toFixed(4))}`;
+            document.getElementById('cart-location-text').textContent = locationText;
+            document.getElementById('selected-seat-hero').textContent = locationText;
+
+            playSoundNotification('success');
+            closeSeatModal();
+        }
  
         // Checkout Cart Trigger
         function checkoutOrder() {
@@ -1289,7 +1494,7 @@
             }
  
             if (!selectedSeat) {
-                alert("Please configure your Stadium Seat coordinates on the Kasarani map first!");
+                alert("Please configure your delivery location on the map first!");
                 openSeatModal();
                 return;
             }
@@ -1403,6 +1608,8 @@
 
         function resetTrackerDemo() {
             activeOrder = null;
+            hasBeepedForArrival = false;
+            document.getElementById('tracker-qr-container').classList.add('hidden');
             document.getElementById('cust-tracker').classList.add('hidden');
             document.getElementById('cust-main').classList.remove('hidden');
         }
@@ -1493,6 +1700,33 @@
             // Secret PIN displayed
             if (order.delivery) {
                 document.getElementById('tracker-pin').textContent = order.delivery.verification_pin;
+
+                if (order.delivery.arrived_at) {
+                    // Show QR Code container
+                    const qrContainer = document.getElementById('tracker-qr-container');
+                    if (qrContainer.classList.contains('hidden')) {
+                        qrContainer.classList.remove('hidden');
+                        // Generate QR Code dynamically
+                        const canvas = document.getElementById('tracker-qr-canvas');
+                        new QRious({
+                            element: canvas,
+                            value: `justfeast-delivery-verify:${order.delivery.id}:${order.delivery.verification_pin}`,
+                            size: 128
+                        });
+                    }
+
+                    // Play beep alert if not beeped yet
+                    if (!hasBeepedForArrival) {
+                        hasBeepedForArrival = true;
+                        playSoundNotification('alert');
+                        setTimeout(() => playSoundNotification('beep'), 300);
+                        setTimeout(() => playSoundNotification('success'), 600);
+                    }
+                } else {
+                    document.getElementById('tracker-qr-container').classList.add('hidden');
+                }
+            } else {
+                document.getElementById('tracker-qr-container').classList.add('hidden');
             }
 
             const stepCreated = document.getElementById('step-created');
@@ -1669,6 +1903,11 @@
                 `;
                 verifyBox.classList.add('hidden');
                 mapGuide.classList.add('hidden');
+                
+                if (runnerMovementInterval) {
+                    clearInterval(runnerMovementInterval);
+                    runnerMovementInterval = null;
+                }
                 return;
             }
 
@@ -1677,8 +1916,20 @@
             verifyBox.classList.remove('hidden');
             mapGuide.classList.remove('hidden');
 
+            const loc = activeDel.order.seat_location;
+            let destText = "";
+            let guideText = "";
+            
+            if (loc.type === 'gps') {
+                destText = `GPS: ${parseFloat(loc.latitude).toFixed(5)}, ${parseFloat(loc.longitude).toFixed(5)}`;
+                guideText = `GPS Drop Pin: "${loc.description || 'No description provided'}"`;
+            } else {
+                destText = `${loc.section}, Row ${loc.row}, Seat ${loc.seat}`;
+                guideText = `${loc.section} - ROW ${loc.row} - SEAT ${loc.seat}`;
+            }
+
             // Render route guide coordinates text
-            document.getElementById('runner-target-section-tag').textContent = `${activeDel.order.seat_location.section} - ROW ${activeDel.order.seat_location.row} - SEAT ${activeDel.order.seat_location.seat}`;
+            document.getElementById('runner-target-section-tag').textContent = guideText;
 
             const card = document.createElement('div');
             card.className = 'bg-zinc-900 border border-zinc-800 p-4 rounded-2xl space-y-3 shadow-lg';
@@ -1689,7 +1940,26 @@
             } else if (activeDel.status === 'picked_up') {
                 statusBtn = `<button onclick="updateRunnerDelivery(${activeDel.id}, 'en_route')" class="w-full py-2 bg-brand-rose hover:bg-brand-rose text-white rounded-lg text-xs font-bold transition">Start Navigation En-Route</button>`;
             } else {
-                statusBtn = `<span class="text-[10px] text-brand-emerald text-center block font-bold"><i class="fas fa-truck mr-1"></i> Navigation Active - Handover PIN</span>`;
+                statusBtn = `<span class="text-[10px] text-brand-emerald text-center block font-bold animate-pulse"><i class="fas fa-location-arrow mr-1"></i> Delivering — Proximity Alert Active</span>`;
+            }
+
+            let liveTrackingHtml = '';
+            if (activeDel.status === 'en_route') {
+                liveTrackingHtml = `
+                    <div id="runner-live-tracking-panel" class="mt-3.5 p-2.5 bg-zinc-950 rounded-xl border border-zinc-900 space-y-2">
+                        <div class="flex justify-between text-[9px] text-zinc-500">
+                            <span>Current Lat/Lng:</span>
+                            <span id="runner-current-coords-lbl" class="font-bold text-white">${runnerLat.toFixed(5)}, ${runnerLng.toFixed(5)}</span>
+                        </div>
+                        <div class="flex justify-between text-[9px] text-zinc-500">
+                            <span>Distance Remaining:</span>
+                            <span id="runner-distance-lbl" class="font-bold text-brand-orange">Calculating...</span>
+                        </div>
+                        <div class="w-full bg-zinc-900 rounded-full h-1.5 overflow-hidden">
+                            <div id="runner-progress-bar" class="bg-brand-rose h-1.5 rounded-full transition-all" style="width: 0%"></div>
+                        </div>
+                    </div>
+                `;
             }
 
             card.innerHTML = `
@@ -1698,19 +1968,104 @@
                     <span class="text-[9px] bg-brand-rose/20 text-brand-rose px-2 py-0.5 rounded-full font-bold uppercase">${activeDel.status}</span>
                 </div>
 
-                <div class="space-y-1 py-2 border-y border-zinc-900 text-xs">
+                <div class="space-y-1.5 py-2 border-y border-zinc-900 text-xs">
                     <p class="text-zinc-500">Pickup Location:</p>
                     <p class="font-bold text-white text-xs">${activeDel.order.vendor.business_name} Stall</p>
 
-                    <p class="text-zinc-500 pt-1.5">Destination coordinates:</p>
-                    <p class="font-extrabold text-brand-orange text-xs">${activeDel.order.seat_location.section}, Row ${activeDel.order.seat_location.row}, Seat ${activeDel.order.seat_location.seat}</p>
+                    <p class="text-zinc-500 pt-1">Destination coordinates:</p>
+                    <p class="font-extrabold text-brand-orange text-xs">${destText}</p>
+                    
+                    ${liveTrackingHtml}
                 </div>
 
-                <div class="pt-1.5">
+                <div class="pt-1">
                     ${statusBtn}
                 </div>
             `;
             container.appendChild(card);
+
+            // Movement simulation driver
+            if (activeDel.status === 'en_route') {
+                let targetLat = -1.2281;
+                let targetLng = 36.8973;
+
+                if (loc.type === 'gps') {
+                    targetLat = parseFloat(loc.latitude);
+                    targetLng = parseFloat(loc.longitude);
+                } else {
+                    const sec = (loc.section || '').toLowerCase();
+                    if (sec.includes('vip a')) {
+                        targetLat = -1.2276; targetLng = 36.8967;
+                    } else if (sec.includes('vip b')) {
+                        targetLat = -1.2276; targetLng = 36.8979;
+                    } else if (sec.includes('gen a') || sec.includes('general a')) {
+                        targetLat = -1.2286; targetLng = 36.8967;
+                    } else {
+                        targetLat = -1.2286; targetLng = 36.8979;
+                    }
+                }
+
+                if (!runnerMovementInterval) {
+                    runnerLat = -1.2281;
+                    runnerLng = 36.8973;
+                    runnerStartLat = -1.2281;
+                    runnerStartLng = 36.8973;
+
+                    const totalDistance = Math.sqrt(Math.pow(targetLat - runnerStartLat, 2) + Math.pow(targetLng - runnerStartLng, 2));
+
+                    runnerMovementInterval = setInterval(async () => {
+                        // Move 20% closer on each tick
+                        runnerLat += (targetLat - runnerLat) * 0.20;
+                        runnerLng += (targetLng - runnerLng) * 0.20;
+
+                        const currentRemainingDistance = Math.sqrt(Math.pow(targetLat - runnerLat, 2) + Math.pow(targetLng - runnerLng, 2));
+                        const progress = totalDistance > 0 ? Math.min(100, Math.round(((totalDistance - currentRemainingDistance) / totalDistance) * 100)) : 100;
+
+                        try {
+                            const locRes = await fetch(`/api/runner/deliveries/${activeDel.id}/location`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ latitude: runnerLat, longitude: runnerLng })
+                            });
+
+                            if (locRes.ok) {
+                                const locData = await locRes.json();
+                                if (locData.reached || progress >= 96) {
+                                    clearInterval(runnerMovementInterval);
+                                    runnerMovementInterval = null;
+                                    runnerLat = targetLat;
+                                    runnerLng = targetLng;
+
+                                    await fetch(`/api/runner/deliveries/${activeDel.id}/location`, {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ latitude: targetLat, longitude: targetLng })
+                                    });
+
+                                    // Beep notification when runner arrives!
+                                    playSoundNotification('alert');
+                                    setTimeout(() => playSoundNotification('success'), 300);
+                                    
+                                    // Live reload UI
+                                    syncRealTimeEngine();
+                                }
+                            }
+                        } catch (e) { console.error(e); }
+
+                        const coordsLbl = document.getElementById('runner-current-coords-lbl');
+                        const distLbl = document.getElementById('runner-distance-lbl');
+                        const pBar = document.getElementById('runner-progress-bar');
+                        if (coordsLbl) coordsLbl.textContent = `${runnerLat.toFixed(5)}, ${runnerLng.toFixed(5)}`;
+                        if (distLbl) distLbl.textContent = `${(currentRemainingDistance * 111000).toFixed(1)} meters`;
+                        if (pBar) pBar.style.width = `${progress}%`;
+                    }, 1500);
+                }
+            } else {
+                if (runnerMovementInterval) {
+                    clearInterval(runnerMovementInterval);
+                    runnerMovementInterval = null;
+                }
+            }
         }
 
         async function updateRunnerDelivery(delId, status) {
@@ -1764,6 +2119,83 @@
                                 alert(err.message);
                             }
                         } catch (e) { console.error(e); }
+                    }
+                }
+        }
+
+        let html5QrcodeScanner = null;
+
+        function toggleRunnerQRScanner() {
+            const container = document.getElementById('runner-qr-reader-container');
+            if (container.classList.contains('hidden')) {
+                container.classList.remove('hidden');
+                
+                html5QrcodeScanner = new Html5Qrcode("runner-qr-reader");
+                html5QrcodeScanner.start(
+                    { facingMode: "environment" },
+                    {
+                        fps: 10,
+                        qrbox: { width: 180, height: 180 }
+                    },
+                    (decodedText, decodedResult) => {
+                        if (decodedText.startsWith("justfeast-delivery-verify:")) {
+                            const parts = decodedText.split(":");
+                            const pin = parts[2];
+                            document.getElementById('runner-pin-input').value = pin;
+                            playSoundNotification('success');
+                            
+                            stopRunnerQRScanner();
+                            verifyRunnerDelivery();
+                        } else {
+                            alert("Invalid QR Code scanned!");
+                        }
+                    },
+                    (errorMessage) => {}
+                ).catch((err) => {
+                    console.error("Unable to start scanner:", err);
+                    alert("Camera access failed. Please enter the PIN manually or use the Simulate QR Scan button.");
+                    container.classList.add('hidden');
+                });
+            } else {
+                stopRunnerQRScanner();
+            }
+        }
+
+        function stopRunnerQRScanner() {
+            const container = document.getElementById('runner-qr-reader-container');
+            container.classList.add('hidden');
+            if (html5QrcodeScanner) {
+                html5QrcodeScanner.stop().then(() => {
+                    html5QrcodeScanner = null;
+                }).catch(err => console.error(err));
+            }
+        }
+
+        async function simulateQRScan() {
+            playSoundNotification('beep');
+            
+            const runnerUserRes = await fetch('/api/auth/login-as', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: activeRunnerUser })
+            });
+
+            if (runnerUserRes.ok) {
+                const runnerData = await runnerUserRes.json();
+                const runnerUser = runnerData.user;
+
+                const dRes = await fetch(`/api/runner/deliveries?user_id=${runnerUser.id}`);
+                if (dRes.ok) {
+                    const deliveries = await dRes.json();
+                    if (deliveries.length > 0) {
+                        const activeDel = deliveries[0];
+                        const pin = activeDel.verification_pin;
+                        document.getElementById('runner-pin-input').value = pin;
+                        
+                        alert(`[SIMULATION] Scanned QR Code containing payload: "justfeast-delivery-verify:${activeDel.id}:${pin}". PIN has been autofilled.`);
+                        verifyRunnerDelivery();
+                    } else {
+                        alert("No active deliveries found to scan!");
                     }
                 }
             }
