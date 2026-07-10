@@ -322,7 +322,7 @@
                         <div id="cust-tracker" class="hidden flex flex-col h-full justify-between py-2">
                             <div class="text-center">
                                 <h3 class="text-base font-black text-[#2D3748] mb-0.5">Live Delivery Radar</h3>
-                                <p class="text-[10px] text-zinc-500">Fast Location Delivery — Kasarani Stadium Arena</p>
+                                <p class="text-[10px] text-zinc-500">Fast Location Delivery — Uhuru Gardens Event Park</p>
                             </div>
  
                             <!-- Simulated radar animation -->
@@ -450,11 +450,11 @@
                                 <div class="grid grid-cols-2 gap-2">
                                     <div>
                                         <label class="block text-[8px] font-bold text-zinc-500 uppercase">Latitude</label>
-                                        <input type="text" id="gps-lat-input" class="w-full px-2.5 py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-bold text-white" value="-1.22810000" readonly>
+                                        <input type="text" id="gps-lat-input" class="w-full px-2.5 py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-bold text-white" value="-1.32588000" readonly>
                                     </div>
                                     <div>
                                         <label class="block text-[8px] font-bold text-zinc-500 uppercase">Longitude</label>
-                                        <input type="text" id="gps-lng-input" class="w-full px-2.5 py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-bold text-white" value="36.89730000" readonly>
+                                        <input type="text" id="gps-lng-input" class="w-full px-2.5 py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-bold text-white" value="36.79941000" readonly>
                                     </div>
                                 </div>
 
@@ -583,7 +583,7 @@
 
                                     <div class="h-28 bg-zinc-950 rounded-lg border border-zinc-800 flex items-center justify-center relative overflow-hidden">
                                         <!-- Mini stage mapping visual representation -->
-                                        <div class="absolute top-1 bg-zinc-900 border border-zinc-800 px-2 py-0.5 rounded text-[8px] text-zinc-400 font-bold">KASARANI KITCHEN STALLS</div>
+                                        <div class="absolute top-1 bg-zinc-900 border border-zinc-800 px-2 py-0.5 rounded text-[8px] text-zinc-400 font-bold">UHURU GARDENS KITCHEN STALLS</div>
                                         <div class="absolute bottom-2 bg-brand-rose px-2 py-1 rounded text-[8px] text-white font-bold" id="runner-target-section-tag">GPS TARGET LOCATION</div>
 
                                         <!-- Dashboard dashed navigation routing path -->
@@ -663,7 +663,7 @@
                     </div>
                 </div>
 
-                <!-- Interactive heatmaps mapping seating quadrants (Kasarani Arena) -->
+                <!-- Interactive heatmaps mapping seating quadrants (Uhuru Gardens Arena) -->
                 <div class="bg-zinc-900/30 border border-zinc-900 p-4 rounded-2xl space-y-3 mb-5">
                     <h3 class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider"><i class="fas fa-fire text-brand-orange mr-1.5"></i> Stadium Order Heatmap</h3>
 
@@ -747,10 +747,10 @@
 
         // Runner movement simulation state
         let runnerMovementInterval = null;
-        let runnerLat = -1.2281;
-        let runnerLng = 36.8973;
-        let runnerStartLat = -1.2281;
-        let runnerStartLng = 36.8973;
+        let runnerLat = -1.32588;
+        let runnerLng = 36.79941;
+        let runnerStartLat = -1.32588;
+        let runnerStartLng = 36.79941;
 
         let pollingInterval = null;
         let audioCtx = null;
@@ -1349,7 +1349,7 @@
 
         function initLeafletMap() {
             setTimeout(() => {
-                const center = [-1.2281, 36.8973];
+                const center = [-1.32588, 36.79941];
                 if (!leafletMap) {
                     leafletMap = L.map('modal-leaflet-map').setView(center, 16);
                     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -1986,8 +1986,8 @@
 
             // Movement simulation driver
             if (activeDel.status === 'en_route') {
-                let targetLat = -1.2281;
-                let targetLng = 36.8973;
+                let targetLat = -1.32588;
+                let targetLng = 36.79941;
 
                 if (loc.type === 'gps') {
                     targetLat = parseFloat(loc.latitude);
@@ -1995,21 +1995,21 @@
                 } else {
                     const sec = (loc.section || '').toLowerCase();
                     if (sec.includes('vip a')) {
-                        targetLat = -1.2276; targetLng = 36.8967;
+                        targetLat = -1.32538; targetLng = 36.79881;
                     } else if (sec.includes('vip b')) {
-                        targetLat = -1.2276; targetLng = 36.8979;
+                        targetLat = -1.32538; targetLng = 36.80001;
                     } else if (sec.includes('gen a') || sec.includes('general a')) {
-                        targetLat = -1.2286; targetLng = 36.8967;
+                        targetLat = -1.32638; targetLng = 36.79881;
                     } else {
-                        targetLat = -1.2286; targetLng = 36.8979;
+                        targetLat = -1.32638; targetLng = 36.80001;
                     }
                 }
 
                 if (!runnerMovementInterval) {
-                    runnerLat = -1.2281;
-                    runnerLng = 36.8973;
-                    runnerStartLat = -1.2281;
-                    runnerStartLng = 36.8973;
+                    runnerLat = -1.32588;
+                    runnerLng = 36.79941;
+                    runnerStartLat = -1.32588;
+                    runnerStartLng = 36.79941;
 
                     const totalDistance = Math.sqrt(Math.pow(targetLat - runnerStartLat, 2) + Math.pow(targetLng - runnerStartLng, 2));
 

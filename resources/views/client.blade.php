@@ -386,7 +386,7 @@
                                 <div>
                                     <i class="fas fa-music text-3xl mb-2"></i>
                                     <p class="text-xs font-black uppercase tracking-widest">Live Stage</p>
-                                    <p class="text-[10px] font-bold opacity-70">Kasarani Arena</p>
+                                    <p class="text-[10px] font-bold opacity-70">Uhuru Gardens Arena</p>
                                 </div>
                             </div>
                             <div
@@ -639,7 +639,7 @@
                 class="lg:col-span-5 glass-card rounded-[34px] p-6 text-center flex flex-col justify-between space-y-6">
                 <div><p class="text-[10px] uppercase tracking-[.2em] text-[#05A357] font-black">Runner radar</p>
                     <h3 class="text-2xl font-black tracking-tight">Location delivery active</h3>
-                    <p class="text-xs text-zinc-500 font-bold">Kasarani Stadium Arena</p></div>
+                    <p class="text-xs text-zinc-500 font-bold">Uhuru Gardens Event Park</p></div>
                 <div
                     class="relative w-48 h-48 mx-auto flex items-center justify-center bg-[#F6F7F2] rounded-full border border-[#E7E8DD] overflow-hidden">
                     <div class="radar-sweep"></div>
@@ -901,11 +901,11 @@
                 <div class="grid grid-cols-2 gap-2">
                     <div>
                         <label class="block text-[8px] font-bold text-zinc-500 uppercase">Latitude</label>
-                        <input type="text" id="gps-lat-input" class="w-full px-2 py-1.5 rounded bg-white border border-[#E2E8F0] text-[10px] font-mono font-bold text-zinc-700" readonly value="-1.22810000">
+                        <input type="text" id="gps-lat-input" class="w-full px-2 py-1.5 rounded bg-white border border-[#E2E8F0] text-[10px] font-mono font-bold text-zinc-700" readonly value="-1.32588000">
                     </div>
                     <div>
                         <label class="block text-[8px] font-bold text-zinc-500 uppercase">Longitude</label>
-                        <input type="text" id="gps-lng-input" class="w-full px-2 py-1.5 rounded bg-white border border-[#E2E8F0] text-[10px] font-mono font-bold text-zinc-700" readonly value="36.89730000">
+                        <input type="text" id="gps-lng-input" class="w-full px-2 py-1.5 rounded bg-white border border-[#E2E8F0] text-[10px] font-mono font-bold text-zinc-700" readonly value="36.79941000">
                     </div>
                 </div>
                 <div>
@@ -1589,7 +1589,7 @@
 
     function initLeafletMap() {
         setTimeout(() => {
-            const center = [-1.2281, 36.8973];
+            const center = [-1.32588, 36.79941];
             if (!leafletMap) {
                 leafletMap = L.map('modal-leaflet-map').setView(center, 16);
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {

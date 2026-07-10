@@ -74,9 +74,9 @@ class DatabaseSeeder extends Seeder
 
         // 2. Create Venue
         $venue = Venue::create([
-            'name' => 'Kasarani Stadium Arena',
+            'name' => 'Uhuru Gardens Event Park',
             'map_data' => [
-                'coordinates' => '1.2294° S, 36.8906° E',
+                'coordinates' => '1.3259° S, 36.7994° E',
                 'sections_count' => 4,
             ],
             'seating_layout' => [
@@ -195,7 +195,7 @@ class DatabaseSeeder extends Seeder
         // Choma Zone Menu
         Product::create([
             'vendor_id' => $vendor3->id,
-            'name' => 'Kasarani Premium Nyama Choma (Quarter Goat)',
+            'name' => 'Uhuru Gardens Premium Nyama Choma (Quarter Goat)',
             'description' => 'Slow wood-fired tender goat meat seasoned to perfection, served with fresh kachumbari.',
             'price' => 950.00,
             'image_url' => '/images/nyama_choma.png',

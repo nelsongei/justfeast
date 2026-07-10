@@ -303,7 +303,7 @@
                         <h4 class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Stadium Seat Finder Navigation</h4>
 
                         <div class="h-32 bg-zinc-950 rounded-lg border border-zinc-800/80 flex items-center justify-center relative overflow-hidden">
-                            <div class="absolute top-1 bg-zinc-900 border border-zinc-800 px-2 py-0.5 rounded text-[8px] text-zinc-400 font-bold">KASARANI KITCHEN STALLS</div>
+                            <div class="absolute top-1 bg-zinc-900 border border-zinc-800 px-2 py-0.5 rounded text-[8px] text-zinc-400 font-bold">UHURU GARDENS KITCHEN STALLS</div>
                             <div class="absolute bottom-2 bg-brand-rose px-2 py-1 rounded text-[8px] text-white font-bold" id="runner-target-section-tag">VIP A - ROW 12 - SEAT 18</div>
 
                             <svg viewBox="0 0 100 40" class="w-24 h-auto pointer-events-none">
