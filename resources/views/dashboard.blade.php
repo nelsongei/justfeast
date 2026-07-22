@@ -125,8 +125,8 @@
     <!-- Header Navigation -->
     <header class="border-b border-zinc-900 bg-zinc-950/80 backdrop-blur-md sticky top-0 z-40 px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
         <div class="flex items-center gap-3">
-            <div class="bg-gradient-to-br from-brand-rose to-brand-orange w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-brand-rose/20">
-                <span class="font-extrabold text-xl tracking-tighter text-white">G</span>
+            <div class="bg-white w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-brand-rose/20 overflow-hidden">
+                <img src="{{ asset('images/logo/jm.png') }}" alt="justFeast Logo" class="h-8 w-auto object-contain">
             </div>
             <div>
                 <h1 class="text-xl font-bold tracking-tight bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent flex items-center gap-2">
@@ -166,8 +166,8 @@
             <div id="col-customer" class="xl:col-span-1 glass-card p-5 rounded-3xl border border-zinc-800 flex flex-col h-[780px] relative overflow-hidden">
                 <div class="pb-3 border-b border-zinc-800 mb-4 flex items-center justify-between">
                     <div class="flex items-center gap-2">
-                        <div class="bg-[#FFC244] w-7 h-7 rounded-lg flex items-center justify-center border border-[#E0A325] shadow-sm">
-                            <span class="font-extrabold text-xs text-[#2D3748]">jF</span>
+                        <div class="bg-white w-7 h-7 rounded-lg flex items-center justify-center border border-zinc-200 shadow-sm overflow-hidden">
+                            <img src="{{ asset('images/logo/jm.png') }}" alt="justFeast Logo" class="h-5 w-auto object-contain">
                         </div>
                         <div>
                             <h2 class="text-xs font-black text-white">justFeast</h2>
@@ -193,8 +193,8 @@
                             <!-- Auth Screen -->
                             <div id="cust-auth" class="w-full bg-[#1C1C24] border border-zinc-800 rounded-3xl p-5 text-center space-y-5 relative shadow-2xl">
                                 <button onclick="closeAuthModal()" class="absolute top-3 right-3 text-zinc-500 hover:text-zinc-300 text-xs"><i class="fas fa-times"></i></button>
-                                <div class="w-12 h-12 bg-[#FFC244] rounded-2xl flex items-center justify-center mx-auto shadow-lg shadow-[#FFC244]/15 border border-[#E0A325]">
-                                    <i class="fas fa-burger text-[#2D3748] text-xl"></i>
+                                <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center mx-auto shadow-lg shadow-zinc-150/15 border border-zinc-200 overflow-hidden">
+                                    <img src="{{ asset('images/logo/jm.png') }}" alt="justFeast Logo" class="h-9 w-auto object-contain">
                                 </div>
                                 <div class="space-y-1">
                                     <h3 class="text-sm font-black text-white">Concert Location Delivery</h3>

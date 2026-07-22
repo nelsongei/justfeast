@@ -285,7 +285,9 @@
         {{-- ── Login Form ──────────────────────────────────────────────────── --}}
         <div class="form-card">
             <div class="logo">
-                <div class="logo-icon">🍔</div>
+                <div class="logo-icon" style="overflow: hidden; background: white; border: 1px solid var(--border);">
+                    <img src="{{ asset('images/logo/jm.png') }}" alt="justFeast Logo" style="width: 100%; height: 100%; object-fit: contain; padding: 4px; border-radius: 9px;">
+                </div>
                 <div class="logo-text">Just<span>Feast</span></div>
             </div>
 

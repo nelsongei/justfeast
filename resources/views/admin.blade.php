@@ -198,7 +198,9 @@ tbody td{padding:1.1rem 1.5rem;vertical-align:middle}
 {{-- ── Sidebar ── --}}
 <aside class="sidebar">
   <div class="sidebar-logo">
-    <div class="icon">🍔</div>
+    <div class="icon" style="overflow: hidden; background: white; box-shadow: none;">
+      <img src="{{ asset('images/logo/jm.png') }}" alt="justFeast Logo" style="width: 100%; height: 100%; object-fit: contain; padding: 4px; border-radius: 12px;">
+    </div>
     <span>Just<em>Feast</em></span>
   </div>
 

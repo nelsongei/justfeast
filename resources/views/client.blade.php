@@ -12,10 +12,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
           rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <!-- Leaflet.js and QRious libraries for GPS map pinning and secure QR codes -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <script>
         tailwind.config = {
@@ -237,6 +239,7 @@
             background-image: radial-gradient(rgba(5, 163, 87, .12) 1px, transparent 1px);
             background-size: 14px 14px;
         }
+
         .vendor-showcase-card {
             transform: translateZ(0);
         }
@@ -283,10 +286,11 @@
     <!-- App Header -->
     <header class="jf-card rounded-[28px] px-4 md:px-6 py-4 mb-5 flex items-center justify-between sticky top-3 z-40">
         <div class="flex items-center gap-3">
-            <div class="w-11 h-11 rounded-2xl bg-[#111827] text-[#FFC244] flex items-center justify-center shadow-card">
-                <i class="fas fa-bowl-food text-lg"></i>
+            <div class="w-11 h-11 rounded-2xl bg-white flex items-center justify-center shadow-card overflow-hidden">
+                <img src="{{ asset('images/logo/jm.png') }}" alt="justFeast Logo" class="h-9 w-auto object-contain">
             </div>
             <div>
+                //Todo 
                 <h1 class="text-xl font-black tracking-tight leading-none">just<span class="text-[#05A357]">Feast</span>
                 </h1>
                 <p class="text-[10px] text-zinc-500 font-bold mt-1" id="live-event-banner">Loading active event...</p>
@@ -455,8 +459,10 @@
                     <div class="flex justify-between items-start gap-3">
                         <div>
                             <p class="text-[10px] uppercase tracking-widest font-black text-zinc-400">Your location</p>
-                            <h3 class="text-sm font-black mt-1" id="selected-seat-label">Configure Delivery Location</h3>
-                            <p class="text-[11px] text-zinc-500 mt-1" id="selected-seat-sub">Tap to pin your location on map</p>
+                            <h3 class="text-sm font-black mt-1" id="selected-seat-label">Configure Delivery
+                                Location</h3>
+                            <p class="text-[11px] text-zinc-500 mt-1" id="selected-seat-sub">Tap to pin your location on
+                                map</p>
                         </div>
                         <span id="seat-status-pill"
                               class="text-[9px] bg-zinc-100 text-zinc-500 px-2.5 py-1 rounded-full font-black border border-zinc-200">Not Set</span>
@@ -582,12 +588,16 @@
                             </div>
                             <button onclick="checkoutOrder()"
                                     class="w-full py-4 bg-[#111827] hover:bg-[#05A357] text-white rounded-full text-xs font-black shadow-card flex items-center justify-center gap-2">
-                                <span class="inline-flex items-center justify-center bg-white px-2 rounded-full h-8 w-14 overflow-hidden">
-                                    <img src="{{ asset('images/logo/mpesa.png') }}" alt="M-Pesa" class="h-6 w-auto object-contain scale-110">
+                                <span
+                                    class="inline-flex items-center justify-center bg-white px-2 rounded-full h-8 w-14 overflow-hidden">
+                                    <img src="{{ asset('images/logo/mpesa.png') }}" alt="M-Pesa"
+                                         class="h-6 w-auto object-contain scale-110">
                                 </span>
                                 <span class="text-white/30 text-xs">|</span>
-                                <span class="inline-flex items-center justify-center bg-white px-2 rounded-full h-8 w-14 overflow-hidden">
-                                    <img src="{{ asset('images/logo/Faraja.png') }}" alt="Faraja" class="h-6 w-auto object-contain scale-110">
+                                <span
+                                    class="inline-flex items-center justify-center bg-white px-2 rounded-full h-8 w-14 overflow-hidden">
+                                    <img src="{{ asset('images/logo/Faraja.png') }}" alt="Faraja"
+                                         class="h-6 w-auto object-contain scale-110">
                                 </span>
                                 <span>Order &amp; Pay</span>
                             </button>
@@ -631,7 +641,8 @@
                         <span class="text-sm font-black text-zinc-400">Runner en-route</span></div>
                 </div>
                 <div class="bg-[#05A357]/8 border border-[#05A357]/15 p-4 rounded-2xl text-xs text-zinc-600 font-bold">
-                    <i class="fas fa-circle-info mr-1 text-[#05A357]"></i> Stay near your pinned location. The runner will
+                    <i class="fas fa-circle-info mr-1 text-[#05A357]"></i> Stay near your pinned location. The runner
+                    will
                     ask for your delivery PIN before handover.
                 </div>
             </div>
@@ -657,10 +668,13 @@
                 </div>
 
                 <!-- QR Verification Code Block (Generates dynamically on arrival) -->
-                <div id="tracker-qr-container" class="hidden bg-white border border-[#E7E8DD] p-4 rounded-[26px] text-center space-y-2 flex flex-col items-center justify-center">
-                    <span class="text-[9px] uppercase tracking-widest text-[#05A357] font-black"><i class="fas fa-qrcode mr-1"></i> Scan to Verify Delivery</span>
+                <div id="tracker-qr-container"
+                     class="hidden bg-white border border-[#E7E8DD] p-4 rounded-[26px] text-center space-y-2 flex flex-col items-center justify-center">
+                    <span class="text-[9px] uppercase tracking-widest text-[#05A357] font-black"><i
+                            class="fas fa-qrcode mr-1"></i> Scan to Verify Delivery</span>
                     <canvas id="tracker-qr-canvas" class="w-32 h-32 border border-zinc-100 p-1 bg-white"></canvas>
-                    <p class="text-[9.5px] text-zinc-500 font-medium leading-relaxed">Let the runner scan this QR code or type your PIN to complete the delivery.</p>
+                    <p class="text-[9.5px] text-zinc-500 font-medium leading-relaxed">Let the runner scan this QR code
+                        or type your PIN to complete the delivery.</p>
                 </div>
                 <button onclick="resetTrackerDemo()"
                         class="text-xs bg-[#F6F7F2] hover:bg-[#E7E8DD] text-[#111827] px-4 py-3 rounded-full font-black mx-auto">
@@ -683,19 +697,23 @@
         <div class="border-t border-[#E7E8DD] pt-3 space-y-3">
             <div class="flex justify-between items-center text-xs"><span
                     class="text-zinc-500 font-black">Delivery location:</span><span class="font-black"
-                                                                                id="cart-location-text">Not configured</span>
+                                                                                    id="cart-location-text">Not configured</span>
             </div>
             <div class="flex justify-between items-center"><span
                     class="text-xs text-zinc-500 font-black">Total:</span><span
                     class="text-xl font-black text-[#05A357]" id="cart-tray-total">Ksh 0</span></div>
             <button onclick="checkoutOrder()"
                     class="w-full py-4 bg-[#111827] hover:bg-[#05A357] text-white rounded-full text-xs font-black flex items-center justify-center gap-2">
-                <span class="inline-flex items-center justify-center bg-white px-2 rounded-full h-8 w-14 overflow-hidden">
-                    <img src="{{ asset('images/logo/mpesa.png') }}" alt="M-Pesa" class="h-6 w-auto object-contain scale-110">
+                <span
+                    class="inline-flex items-center justify-center bg-white px-2 rounded-full h-8 w-14 overflow-hidden">
+                    <img src="{{ asset('images/logo/mpesa.png') }}" alt="M-Pesa"
+                         class="h-6 w-auto object-contain scale-110">
                 </span>
                 <span class="text-white/30 text-xs">|</span>
-                <span class="inline-flex items-center justify-center bg-white px-2 rounded-full h-8 w-14 overflow-hidden">
-                    <img src="{{ asset('images/logo/Faraja.png') }}" alt="Faraja" class="h-6 w-auto object-contain scale-110">
+                <span
+                    class="inline-flex items-center justify-center bg-white px-2 rounded-full h-8 w-14 overflow-hidden">
+                    <img src="{{ asset('images/logo/Faraja.png') }}" alt="Faraja"
+                         class="h-6 w-auto object-contain scale-110">
                 </span>
                 <span>Order &amp; Pay</span>
             </button>
@@ -708,8 +726,9 @@
     <div class="max-w-[1480px] mx-auto px-5 md:px-8 py-12 grid grid-cols-1 md:grid-cols-12 gap-8">
         <div class="md:col-span-5 space-y-4">
             <div class="flex items-center gap-3">
-                <div class="w-11 h-11 rounded-2xl bg-[#FFC244] text-[#111827] flex items-center justify-center"><i
-                        class="fas fa-bowl-food"></i></div>
+                <div class="w-11 h-11 rounded-2xl bg-white flex items-center justify-center overflow-hidden">
+                    <img src="{{ asset('images/logo/jm.png') }}" alt="justFeast Logo" class="h-9 w-auto object-contain">
+                </div>
                 <h2 class="text-2xl font-black">just<span class="text-[#05A357]">Feast</span></h2></div>
             <p class="text-sm text-white/55 leading-relaxed max-w-md">Live event food ordering for concerts, stadiums
                 and festivals. Vendors sell more, attendees miss less, runners deliver to the exact location.</p>
@@ -717,7 +736,8 @@
         <div class="md:col-span-2 space-y-3"><h4 class="text-[11px] font-black uppercase tracking-widest text-white/40">
                 For attendees</h4><a href="#vendors" class="block text-sm text-white/65 hover:text-[#FFC244]">Browse
                 vendors</a>
-            <button onclick="openSeatModal()" class="block text-sm text-white/65 hover:text-[#FFC244]">Delivery map</button>
+            <button onclick="openSeatModal()" class="block text-sm text-white/65 hover:text-[#FFC244]">Delivery map
+            </button>
             <a href="#how-it-works" class="block text-sm text-white/65 hover:text-[#FFC244]">How it works</a></div>
         <div class="md:col-span-2 space-y-3"><h4 class="text-[11px] font-black uppercase tracking-widest text-white/40">
                 For events</h4><a href="#" class="block text-sm text-white/65 hover:text-[#FFC244]">Vendor
@@ -727,8 +747,10 @@
                 Payments</h4>
             <div class="bg-white/5 border border-white/10 rounded-3xl p-4 space-y-3">
                 <div class="flex items-center gap-3">
-                    <img src="{{ asset('images/logo/mpesa.png') }}" alt="M-Pesa" class="h-7 w-auto object-contain" onerror="this.style.display='none'">
-                    <img src="{{ asset('images/logo/Faraja.png') }}" alt="Faraja" class="h-7 w-auto object-contain" onerror="this.style.display='none'">
+                    <img src="{{ asset('images/logo/mpesa.png') }}" alt="M-Pesa" class="h-7 w-auto object-contain"
+                         onerror="this.style.display='none'">
+                    <img src="{{ asset('images/logo/Faraja.png') }}" alt="Faraja" class="h-7 w-auto object-contain"
+                         onerror="this.style.display='none'">
                 </div>
                 <p class="text-xs text-white/50 leading-relaxed">Secure STK Push checkout and delivery PIN
                     verification for safer handovers.</p>
@@ -752,18 +774,23 @@
 <!-- M-Pesa STK Simulator Overlay -->
 <div id="mpesa-simulation-overlay"
      class="hidden fixed inset-0 bg-[#2D3748]/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="w-full max-w-[380px] bg-white rounded-[32px] shadow-2xl border border-[#E2E8F0] phone-buzz overflow-hidden">
+    <div
+        class="w-full max-w-[380px] bg-white rounded-[32px] shadow-2xl border border-[#E2E8F0] phone-buzz overflow-hidden">
 
         {{-- Modal header with M-Pesa + Faraja branding --}}
         <div class="bg-[#00A082] px-6 py-4 flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <span class="inline-flex items-center justify-center bg-white px-2 rounded-full h-8 w-14 overflow-hidden">
-                    <img src="{{ asset('images/logo/mpesa.png') }}" alt="M-Pesa" class="h-6 w-auto object-contain scale-110"
+                <span
+                    class="inline-flex items-center justify-center bg-white px-2 rounded-full h-8 w-14 overflow-hidden">
+                    <img src="{{ asset('images/logo/mpesa.png') }}" alt="M-Pesa"
+                         class="h-6 w-auto object-contain scale-110"
                          onerror="this.outerHTML='<span class=\'text-[#00A082] font-black text-[9px]\'>M-PESA</span>'">
                 </span>
                 <span class="text-white/30">|</span>
-                <span class="inline-flex items-center justify-center bg-white px-2 rounded-full h-8 w-14 overflow-hidden">
-                    <img src="{{ asset('images/logo/Faraja.png') }}" alt="Faraja" class="h-6 w-auto object-contain scale-110"
+                <span
+                    class="inline-flex items-center justify-center bg-white px-2 rounded-full h-8 w-14 overflow-hidden">
+                    <img src="{{ asset('images/logo/Faraja.png') }}" alt="Faraja"
+                         class="h-6 w-auto object-contain scale-110"
                          onerror="this.outerHTML='<span class=\'text-[#00A082] font-black text-[9px]\'>Faraja</span>'">
                 </span>
             </div>
@@ -819,8 +846,8 @@
                 class="fas fa-times"></i></button>
         <div class="text-center space-y-6">
             <div
-                class="w-16 h-16 bg-[#FFC244] rounded-2xl flex items-center justify-center mx-auto shadow-xl shadow-[#FFC244]/15 border border-[#E0A325]">
-                <i class="fas fa-burger text-[#2D3748] text-3xl"></i>
+                class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mx-auto shadow-xl shadow-zinc-100/15 border border-zinc-200 overflow-hidden">
+                <img src="{{ asset('images/logo/jm.png') }}" alt="justFeast Logo" class="h-12 w-auto object-contain">
             </div>
             <div class="space-y-2">
                 <h2 class="text-xl font-black text-[#2D3748]">Concert Seat Delivery</h2>
@@ -884,36 +911,46 @@
      class="hidden fixed inset-0 bg-white/95 z-50 flex flex-col p-4 max-w-md mx-auto shadow-2xl border border-[#E2E8F0]">
     <div class="flex justify-between items-center mb-3">
         <span class="text-xs font-bold text-[#2D3748]"><i class="fas fa-map-marked-alt text-[#00A082] mr-1.5"></i> Select Delivery Location</span>
-        <button onclick="closeSeatModal()" class="text-zinc-500 hover:text-zinc-800 text-sm"><i class="fas fa-times"></i></button>
+        <button onclick="closeSeatModal()" class="text-zinc-500 hover:text-zinc-800 text-sm"><i
+                class="fas fa-times"></i></button>
     </div>
 
     <!-- View B: GPS Selector Map -->
     <div id="modal-gps-selector-view" class="flex-grow flex flex-col justify-between">
         <div class="space-y-3 flex-grow flex flex-col">
-            <button type="button" onclick="getCurrentGPSLocation()" class="w-full py-2 bg-[#05A357] hover:bg-[#047A43] text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shadow shadow-[#05A357]/20">
+            <button type="button" onclick="getCurrentGPSLocation()"
+                    class="w-full py-2 bg-[#05A357] hover:bg-[#047A43] text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shadow shadow-[#05A357]/20">
                 <i class="fas fa-location-crosshairs"></i> Use Current GPS Location
             </button>
 
             <!-- Map Container -->
-            <div id="modal-leaflet-map" class="w-full flex-grow min-h-[220px] rounded-2xl border border-[#E2E8F0] overflow-hidden bg-zinc-100 z-10"></div>
+            <div id="modal-leaflet-map"
+                 class="w-full flex-grow min-h-[220px] rounded-2xl border border-[#E2E8F0] overflow-hidden bg-zinc-100 z-10"></div>
 
             <div class="space-y-2 bg-[#F7F9FA] p-3 rounded-2xl border border-[#E2E8F0]">
                 <div class="grid grid-cols-2 gap-2">
                     <div>
                         <label class="block text-[8px] font-bold text-zinc-500 uppercase">Latitude</label>
-                        <input type="text" id="gps-lat-input" class="w-full px-2 py-1.5 rounded bg-white border border-[#E2E8F0] text-[10px] font-mono font-bold text-zinc-700" readonly value="-1.32588000">
+                        <input type="text" id="gps-lat-input"
+                               class="w-full px-2 py-1.5 rounded bg-white border border-[#E2E8F0] text-[10px] font-mono font-bold text-zinc-700"
+                               readonly value="-1.32588000">
                     </div>
                     <div>
                         <label class="block text-[8px] font-bold text-zinc-500 uppercase">Longitude</label>
-                        <input type="text" id="gps-lng-input" class="w-full px-2 py-1.5 rounded bg-white border border-[#E2E8F0] text-[10px] font-mono font-bold text-zinc-700" readonly value="36.79941000">
+                        <input type="text" id="gps-lng-input"
+                               class="w-full px-2 py-1.5 rounded bg-white border border-[#E2E8F0] text-[10px] font-mono font-bold text-zinc-700"
+                               readonly value="36.79941000">
                     </div>
                 </div>
                 <div>
-                    <label class="block text-[8px] font-bold text-zinc-500 uppercase">Landmark / Clothing Description</label>
-                    <input type="text" id="gps-desc-input" placeholder="e.g. Red jacket, near Gate 4 entrance" class="w-full px-2 py-1.5 rounded bg-white border border-[#E2E8F0] text-[10px] font-semibold text-zinc-700 placeholder-zinc-400 focus:outline-none focus:border-[#00A082]">
+                    <label class="block text-[8px] font-bold text-zinc-500 uppercase">Landmark / Clothing
+                        Description</label>
+                    <input type="text" id="gps-desc-input" placeholder="e.g. Red jacket, near Gate 4 entrance"
+                           class="w-full px-2 py-1.5 rounded bg-white border border-[#E2E8F0] text-[10px] font-semibold text-zinc-700 placeholder-zinc-400 focus:outline-none focus:border-[#00A082]">
                 </div>
             </div>
-            <button onclick="saveGPSCoordinates()" class="w-full py-3 bg-[#FFC244] hover:bg-[#E0A325] text-[#2D3748] rounded-full text-xs font-black shadow-md shadow-[#FFC244]/15 border border-[#E0A325] transition mt-2">
+            <button onclick="saveGPSCoordinates()"
+                    class="w-full py-3 bg-[#FFC244] hover:bg-[#E0A325] text-[#2D3748] rounded-full text-xs font-black shadow-md shadow-[#FFC244]/15 border border-[#E0A325] transition mt-2">
                 Save Location Pin
             </button>
         </div>
@@ -993,7 +1030,7 @@
                     const desc = selectedSeat.description || '';
                     document.getElementById('selected-seat-label').textContent = "GPS Location Pin";
                     document.getElementById('selected-seat-sub').textContent = `${lat.toFixed(5)}, ${lng.toFixed(5)}${desc ? ' — ' + desc : ''}`;
-                    
+
                     const locationText = `GPS Pin: ${desc || (lat.toFixed(4) + ', ' + lng.toFixed(4))}`;
                     document.getElementById('cart-location-text').textContent = locationText;
                     document.getElementById('desktop-cart-location-text').textContent = locationText;
@@ -1304,10 +1341,10 @@
         return new Promise((resolve) => {
             const overlay = document.createElement('div');
             overlay.className = "fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 transition-all duration-300";
-            
+
             const card = document.createElement('div');
             card.className = "bg-white rounded-[32px] p-6 max-w-sm w-full text-center space-y-5 shadow-2xl border border-zinc-100 transform scale-95 opacity-0 transition-all duration-300";
-            
+
             card.innerHTML = `
                 <div class="w-12 h-12 bg-[#FFC244]/15 text-[#e6a920] rounded-full flex items-center justify-center mx-auto text-xl">
                     <i class="fas fa-triangle-exclamation"></i>
@@ -1325,16 +1362,16 @@
                     </button>
                 </div>
             `;
-            
+
             overlay.appendChild(card);
             document.body.appendChild(overlay);
-            
+
             // Trigger animation
             setTimeout(() => {
                 card.classList.remove('scale-95', 'opacity-0');
                 card.classList.add('scale-100', 'opacity-100');
             }, 10);
-            
+
             const cleanup = (value) => {
                 card.classList.remove('scale-100', 'opacity-100');
                 card.classList.add('scale-95', 'opacity-0');
@@ -1344,7 +1381,7 @@
                 }, 300);
                 resolve(value);
             };
-            
+
             overlay.querySelector('#confirm-modal-cancel').addEventListener('click', () => cleanup(false));
             overlay.querySelector('#confirm-modal-ok').addEventListener('click', () => cleanup(true));
         });
@@ -1540,12 +1577,14 @@
         localStorage.removeItem('justfeast_vendor_user');
         localStorage.removeItem('justfeast_runner_user');
         localStorage.removeItem('justfeast_client_user');
-        
+
         const form = document.createElement('form');
         form.method = 'POST';
         form.action = '{{ route("logout") }}';
         const csrf = document.createElement('input');
-        csrf.type = 'hidden'; csrf.name = '_token'; csrf.value = '{{ csrf_token() }}';
+        csrf.type = 'hidden';
+        csrf.name = '_token';
+        csrf.value = '{{ csrf_token() }}';
         form.appendChild(csrf);
         document.body.appendChild(form);
         form.submit();
@@ -1597,7 +1636,7 @@
                     attribution: '© OpenStreetMap contributors'
                 }).addTo(leafletMap);
 
-                leafletMarker = L.marker(center, { draggable: true }).addTo(leafletMap);
+                leafletMarker = L.marker(center, {draggable: true}).addTo(leafletMap);
 
                 leafletMarker.on('dragend', function (e) {
                     const pos = leafletMarker.getLatLng();
@@ -1741,7 +1780,7 @@
     }
 
     function selectPayTab(method) {
-        const mpesaTab  = document.getElementById('pay-mpesa-tab');
+        const mpesaTab = document.getElementById('pay-mpesa-tab');
         const farajaTab = document.getElementById('pay-faraja-tab');
         if (method === 'mpesa') {
             mpesaTab.classList.add('border-[#00A082]', 'bg-[#00A082]/5');
@@ -2080,7 +2119,7 @@
                         } else {
                             return `<button onclick="addToBasket(${p.id}, '${safeName}', ${p.price}, ${vendor.id})" class="h-11 px-4 rounded-full bg-[#FFC244] hover:bg-[#111827] text-[#111827] hover:text-white flex items-center justify-center font-black transition-all shadow-card border border-[#efb52e] text-xs gap-2 cursor-pointer"><i class="fas fa-plus"></i> Add</button>`;
                         }
-                      })()}
+                    })()}
                                 </div>
                             </div>
                         </article>`;
