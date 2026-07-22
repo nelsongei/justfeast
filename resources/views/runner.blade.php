@@ -262,7 +262,7 @@
                     <span class="text-2xl">🏃</span>
                     <div>
                         <h4 class="text-xs font-bold text-[#2D3748]" id="runner-name-label">Mike Runner</h4>
-                        <p class="text-[9px] text-zinc-500 uppercase font-bold" id="live-event-banner">Farewell Concert</p>
+                        <p class="text-[9px] text-zinc-500 uppercase font-bold" id="live-event-banner">Rhema Feast 2026</p>
                     </div>
                 </div>
                 <button onclick="logoutRunner()" class="text-xs text-zinc-500 hover:text-zinc-700 font-bold"><i class="fas fa-sign-out-alt"></i> Logout</button>

@@ -91,7 +91,7 @@ class DatabaseSeeder extends Seeder
 
         // 3. Create active event
         $event = Event::create([
-            'name' => 'Sauti Sol Live: The Farewell Concert',
+            'name' => 'Rhema Feast 2026',
             'venue_id' => $venue->id,
             'start_time' => now(),
             'end_time' => now()->addHours(6),
@@ -219,8 +219,8 @@ class DatabaseSeeder extends Seeder
         ]);
         Product::create([
             'vendor_id' => $vendor3->id,
-            'name' => 'Ice Cold Tusker Lager (500ml Can)',
-            'description' => 'Strictly for adults. Kenya\'s iconic local lager, served ice-cold to beat the concert heat.',
+            'name' => 'Ice Cold Passion Fruit Juice (500ml Can)',
+            'description' => '100% natural freshly squeezed local passion fruit juice, served ice-cold to beat the heat.',
             'price' => 350.00,
             'image_url' => '/images/nyama_choma.png',
             'stock_status' => 'in_stock',

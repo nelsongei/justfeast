@@ -907,7 +907,7 @@
         // Helper to get simulated product category
         function getProductCategory(p) {
             const name = p.name.toLowerCase();
-            if (name.includes('beer') || name.includes('lager') || name.includes('coca') || name.includes('coke') || name.includes('soda') || name.includes('drink') || name.includes('water')) {
+            if (name.includes('beer') || name.includes('lager') || name.includes('coca') || name.includes('coke') || name.includes('soda') || name.includes('drink') || name.includes('water') || name.includes('juice')) {
                 return 'drinks';
             }
             if (name.includes('fries') || name.includes('churros') || name.includes('nachos') || name.includes('chips') || name.includes('onion rings')) {

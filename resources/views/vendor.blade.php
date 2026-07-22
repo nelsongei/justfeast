@@ -257,7 +257,7 @@
                         <span class="text-2xl">🥩</span>
                         <div class="text-left">
                             <h4 class="text-xs font-bold text-[#2D3748]">Choma Zone</h4>
-                            <p class="text-[9px] text-zinc-500 uppercase tracking-wider font-semibold">Nyama Choma & cold Tusker</p>
+                            <p class="text-[9px] text-zinc-500 uppercase tracking-wider font-semibold">Nyama Choma & Passion Juice</p>
                         </div>
                     </div>
                     <i class="fas fa-chevron-right text-zinc-400 text-xs"></i>

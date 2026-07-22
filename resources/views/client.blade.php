@@ -290,7 +290,6 @@
                 <img src="{{ asset('images/logo/jm.png') }}" alt="justFeast Logo" class="h-9 w-auto object-contain">
             </div>
             <div>
-                //Todo 
                 <h1 class="text-xl font-black tracking-tight leading-none">just<span class="text-[#05A357]">Feast</span>
                 </h1>
                 <p class="text-[10px] text-zinc-500 font-bold mt-1" id="live-event-banner">Loading active event...</p>
@@ -1119,7 +1118,7 @@
 
     function getProductCategory(p) {
         const name = p.name.toLowerCase();
-        if (name.includes('beer') || name.includes('lager') || name.includes('coca') || name.includes('coke') || name.includes('soda') || name.includes('drink') || name.includes('water')) {
+        if (name.includes('beer') || name.includes('lager') || name.includes('coca') || name.includes('coke') || name.includes('soda') || name.includes('drink') || name.includes('water') || name.includes('juice')) {
             return 'drinks';
         }
         if (name.includes('fries') || name.includes('churros') || name.includes('nachos') || name.includes('chips') || name.includes('onion rings')) {
