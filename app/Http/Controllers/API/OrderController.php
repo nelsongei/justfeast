@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\Vendor;
 use App\Models\User;
 use App\Models\Delivery;
+use App\Services\IntaSendService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -118,7 +119,15 @@ class OrderController extends Controller
         return response()->json($order);
     }
 
-    // Simulate M-Pesa STK Push Payment
+    /**
+     * Initiate M-Pesa STK Push via IntaSend.
+     *
+     * POST /api/orders/{id}/pay
+     * Body: { "phone": "0712345678", "email": "user@example.com", "name": "John Doe" }
+     *
+     * Returns 202 Accepted with the IntaSend invoice_id.
+     * The order payment_status stays 'pending' until the webhook confirms payment.
+     */
     public function pay(Request $request, $id)
     {
         $order = Order::findOrFail($id);
@@ -127,22 +136,116 @@ class OrderController extends Controller
             return response()->json([
                 'status' => 'success',
                 'message' => 'Order has already been paid!',
-                'order' => $order
+                'order' => $order,
             ]);
         }
 
-        $phone = $request->input('phone', '0712345678');
+        $request->validate([
+            'phone' => 'required|string|min:9',
+            'email' => 'nullable|email',
+            'name'  => 'nullable|string|max:100',
+        ]);
 
-        // Transition status directly to simulate callback success
+        // Parse name into first/last
+        $fullName  = trim($request->input('name', 'Customer'));
+        $nameParts = explode(' ', $fullName, 2);
+        $firstName = $nameParts[0];
+        $lastName  = $nameParts[1] ?? '-';
+
+        $email = $request->input('email', 'noreply@justfeast.com');
+        $phone = IntaSendService::formatPhone($request->phone);
+
+        $intaSend = new IntaSendService();
+        $result = $intaSend->initiateSTKPush($order, $phone, $email, $firstName, $lastName);
+
+        if (!$result['success']) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => $result['message'],
+            ], 422);
+        }
+
+        // Store the IntaSend invoice ID for tracking/webhook matching
+        $order->update([
+            'intasend_invoice_id' => $result['invoice_id'],
+            'intasend_ref'        => 'order-' . $order->id,
+        ]);
+
+        return response()->json([
+            'status'     => 'success',
+            'message'    => 'M-Pesa STK Push sent to ' . $request->phone . '. Please check your phone and enter your PIN to complete payment.',
+            'invoice_id' => $result['invoice_id'],
+            'order'      => Order::with('items.product')->find($id),
+        ], 202);
+    }
+
+    /**
+     * Test / Sandbox direct payment approval.
+     */
+    public function testPay(Request $request, $id)
+    {
+        $order = Order::findOrFail($id);
         $order->update([
             'payment_status' => 'paid',
-            'order_status' => 'accepted' // Moves to Vendor queue!
+            'order_status'   => 'accepted',
         ]);
 
         return response()->json([
             'status' => 'success',
-            'message' => 'STK Push sent successfully to ' . $phone . '. Transaction verified!',
-            'order' => Order::with('items.product')->find($id)
+            'message' => 'Payment approved successfully!',
+            'order' => $order
+        ]);
+    }
+
+    /**
+     * Poll the IntaSend payment status for a given order.
+     *
+     * GET /api/orders/{id}/payment-status
+     *
+     * Returns the current IntaSend state (PENDING, PROCESSING, COMPLETE, FAILED).
+     * The frontend can poll this endpoint after initiating payment.
+     */
+    public function checkPaymentStatus($id)
+    {
+        $order = Order::findOrFail($id);
+
+        if ($order->payment_status === 'paid') {
+            return response()->json([
+                'status'         => 'success',
+                'payment_status' => 'paid',
+                'intasend_state' => 'COMPLETE',
+                'order_status'   => $order->order_status,
+            ]);
+        }
+
+        if (!$order->intasend_invoice_id) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'No payment has been initiated for this order.',
+            ], 400);
+        }
+
+        $intaSend = new IntaSendService();
+        $result = $intaSend->checkPaymentStatus($order->intasend_invoice_id);
+
+        // If IntaSend confirms complete, update the order proactively
+        // (acts as a fallback if webhook was missed)
+        if ($result['success'] && $result['state'] === 'COMPLETE' && $order->payment_status !== 'paid') {
+            $order->update([
+                'payment_status' => 'paid',
+                'order_status'   => 'accepted',
+            ]);
+        }
+
+        if ($result['success'] && $result['state'] === 'FAILED' && $order->payment_status !== 'failed') {
+            $order->update(['payment_status' => 'failed']);
+        }
+
+        return response()->json([
+            'status'         => $result['success'] ? 'success' : 'error',
+            'payment_status' => $order->fresh()->payment_status,
+            'intasend_state' => $result['state'],
+            'order_status'   => $order->fresh()->order_status,
         ]);
     }
 

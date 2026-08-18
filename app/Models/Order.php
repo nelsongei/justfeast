@@ -20,6 +20,8 @@ class Order extends Model
         'total_amount',
         'payment_status',
         'order_status',
+        'intasend_invoice_id',
+        'intasend_ref',
     ];
 
     protected $casts = [

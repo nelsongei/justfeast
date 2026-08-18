@@ -9,6 +9,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- IntaSend Payment WebSDK -->
+    <script src="https://unpkg.com/intasend-inlinejs-sdk@3.0.2/build/intasend-inline.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
           rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -50,11 +52,11 @@
             --jf-green: #05A357;
             --jf-green-dark: #047A43;
             --jf-yellow: #FFC244;
-            --jf-ink: #111827;
-            --jf-muted: #667085;
-            --jf-border: #E7E8DD;
+            --jf-ink: #0F172A;
+            --jf-muted: #64748B;
+            --jf-border: #E2E8F0;
             --jf-cream: #FFF8E7;
-            --jf-cloud: #F6F7F2;
+            --jf-cloud: #F8FAFC;
         }
 
         * {
@@ -63,24 +65,27 @@
 
         body {
             font-family: 'Outfit', sans-serif;
-            background: radial-gradient(circle at top left, rgba(255, 194, 68, .35), transparent 32rem),
-            radial-gradient(circle at 85% 18%, rgba(5, 163, 87, .18), transparent 32rem),
-            linear-gradient(180deg, #FFFDF4 0%, #F8FAF4 48%, #FFFFFF 100%);
-            color: var(--jf-ink);
+            background: #F8FAF4;
+            color: #111827;
+            min-height: 100vh;
         }
 
         ::-webkit-scrollbar {
-            width: 7px;
-            height: 7px;
+            width: 8px;
+            height: 8px;
         }
 
         ::-webkit-scrollbar-track {
-            background: #F8FAF4;
+            background: #F1F5F9;
         }
 
         ::-webkit-scrollbar-thumb {
-            background: #C9D1BE;
-            border-radius: 100px;
+            background: #CBD5E1;
+            border-radius: 999px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94A3B8;
         }
 
         .no-scrollbar::-webkit-scrollbar {
@@ -97,104 +102,121 @@
         }
 
         button:active {
-            transform: scale(.98);
+            transform: scale(.97);
         }
 
         .app-shell {
             max-width: 1480px;
             margin: 0 auto;
-            padding: 18px;
+            padding: 20px;
         }
 
         .jf-card {
-            background: rgba(255, 255, 255, .86);
-            border: 1px solid rgba(231, 232, 221, .95);
-            box-shadow: 0 10px 30px rgba(17, 24, 39, .07);
-            backdrop-filter: blur(14px);
+            background: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            box-shadow: 0 10px 30px rgba(17, 24, 39, 0.05);
         }
 
         .hero-panel {
-            background: linear-gradient(135deg, rgba(17, 24, 39, .96), rgba(4, 122, 67, .92)),
-            radial-gradient(circle at 75% 25%, rgba(255, 194, 68, .45), transparent 18rem);
+            background: #05A357;
             position: relative;
             overflow: hidden;
+            box-shadow: 0 20px 40px -10px rgba(5, 163, 87, 0.3);
         }
 
-        .hero-panel:before {
+        .hero-panel::before {
             content: '';
             position: absolute;
             inset: -20%;
-            background: radial-gradient(circle at 76% 32%, rgba(255, 194, 68, .34), transparent 15rem),
-            linear-gradient(115deg, transparent 0 47%, rgba(255, 255, 255, .06) 47% 49%, transparent 49% 100%);
+            background: 
+                radial-gradient(circle at 75% 30%, rgba(255, 194, 68, 0.25), transparent 18rem),
+                linear-gradient(120deg, transparent 0% 46%, rgba(255, 255, 255, 0.07) 47% 49%, transparent 50% 100%);
             pointer-events: none;
         }
 
         .floating-food {
-            animation: floaty 5s ease-in-out infinite;
+            animation: floaty 4.8s ease-in-out infinite;
+            backdrop-filter: blur(10px);
         }
 
         .floating-food:nth-child(2) {
-            animation-delay: .7s;
+            animation-delay: .8s;
         }
 
         .floating-food:nth-child(3) {
-            animation-delay: 1.25s;
+            animation-delay: 1.6s;
         }
 
         @keyframes floaty {
             0%, 100% {
-                transform: translateY(0) rotate(-2deg);
+                transform: translateY(0) rotate(-1.5deg);
             }
             50% {
-                transform: translateY(-13px) rotate(3deg);
+                transform: translateY(-14px) rotate(2.5deg);
             }
         }
 
         .stadium-bowl {
-            background: radial-gradient(ellipse at center, rgba(255, 194, 68, .96) 0 18%, transparent 19%),
-            repeating-radial-gradient(ellipse at center, rgba(255, 255, 255, .20) 0 9px, rgba(255, 255, 255, .05) 10px 18px, transparent 19px 28px);
+            background: 
+                radial-gradient(ellipse at center, rgba(255, 194, 68, 0.95) 0 20%, transparent 21%),
+                repeating-radial-gradient(ellipse at center, rgba(255, 255, 255, 0.22) 0 10px, rgba(255, 255, 255, 0.06) 11px 20px, transparent 21px 30px);
         }
 
         .search-dock {
-            box-shadow: 0 18px 50px rgba(17, 24, 39, .12);
+            box-shadow: 0 20px 50px -10px rgba(15, 23, 42, 0.18);
         }
 
         .category-active {
-            background: #111827 !important;
-            color: #fff !important;
-            border-color: #111827 !important;
-            box-shadow: 0 10px 24px rgba(17, 24, 39, .16);
+            background: #05A357 !important;
+            color: #FFFFFF !important;
+            border-color: #05A357 !important;
+            box-shadow: 0 8px 24px -4px rgba(5, 163, 87, 0.35);
+            transform: translateY(-2px);
         }
 
         .category-pill {
-            background: #fff;
+            background: #FFFFFF;
             border: 1px solid var(--jf-border);
-            color: #111827;
+            color: var(--jf-ink);
+            transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .category-pill:hover {
             border-color: var(--jf-green);
-            transform: translateY(-1px);
+            color: var(--jf-green-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px -4px rgba(5, 163, 87, 0.15);
+        }
+
+        .product-card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .product-card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px -12px rgba(15, 23, 42, 0.12), 0 0 0 2px rgba(5, 163, 87, 0.2);
         }
 
         .seat-map-mini {
-            background-image: linear-gradient(rgba(17, 24, 39, .045) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(17, 24, 39, .045) 1px, transparent 1px);
-            background-size: 18px 18px;
-            background-color: #FBFDF8;
+            background-image: 
+                linear-gradient(rgba(15, 23, 42, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(15, 23, 42, 0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+            background-color: #FDFEFA;
         }
 
         .glass-card {
-            background: rgba(255, 255, 255, .9) !important;
+            background: rgba(255, 255, 255, 0.92) !important;
             border: 1px solid var(--jf-border) !important;
-            box-shadow: 0 10px 30px rgba(17, 24, 39, .08) !important;
-            color: #111827 !important;
+            box-shadow: 0 14px 35px -8px rgba(15, 23, 42, 0.09) !important;
+            color: #0F172A !important;
+            backdrop-filter: blur(14px);
         }
 
         .radar-sweep {
             position: absolute;
             inset: 0;
-            background: conic-gradient(from 0deg at 50% 50%, rgba(5, 163, 87, .22), transparent 125deg);
+            background: conic-gradient(from 0deg at 50% 50%, rgba(5, 163, 87, 0.28), transparent 130deg);
             animation: spin 2.2s linear infinite;
         }
 
@@ -206,11 +228,11 @@
 
         @keyframes pulse-ring {
             0% {
-                transform: scale(.8);
-                opacity: .7;
+                transform: scale(0.85);
+                opacity: 0.8;
             }
             100% {
-                transform: scale(1.35);
+                transform: scale(1.4);
                 opacity: 0;
             }
         }
@@ -224,10 +246,10 @@
                 transform: translate(0, 0) rotate(0deg);
             }
             20%, 60% {
-                transform: translate(-2px, 1px) rotate(-1deg);
+                transform: translate(-3px, 2px) rotate(-1.5deg);
             }
             40%, 80% {
-                transform: translate(2px, -1px) rotate(1deg);
+                transform: translate(3px, -2px) rotate(1.5deg);
             }
         }
 
@@ -236,20 +258,31 @@
         }
 
         .stadium-grid {
-            background-image: radial-gradient(rgba(5, 163, 87, .12) 1px, transparent 1px);
-            background-size: 14px 14px;
+            background-image: radial-gradient(rgba(5, 163, 87, .15) 1px, transparent 1px);
+            background-size: 16px 16px;
         }
 
         .vendor-showcase-card {
             transform: translateZ(0);
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .vendor-showcase-card:hover {
-            transform: translateY(-2px);
+            transform: translateY(-3px);
+            box-shadow: 0 24px 50px -12px rgba(15, 23, 42, 0.12);
         }
 
         .vendor-showcase-card button {
             border-radius: 999px !important;
+        }
+
+        .btn-glow {
+            box-shadow: 0 10px 25px -5px rgba(5, 163, 87, 0.4);
+        }
+
+        .btn-glow:hover {
+            box-shadow: 0 14px 30px -4px rgba(5, 163, 87, 0.55);
+            transform: translateY(-1px);
         }
 
         @media (max-width: 640px) {
@@ -284,33 +317,40 @@
 
 <div class="app-shell relative z-10">
     <!-- App Header -->
-    <header class="jf-card rounded-[28px] px-4 md:px-6 py-4 mb-5 flex items-center justify-between sticky top-3 z-40">
-        <div class="flex items-center gap-3">
-            <div class="w-11 h-11 rounded-2xl bg-white flex items-center justify-center shadow-card overflow-hidden">
-                <img src="{{ asset('images/logo/jm.png') }}" alt="justFeast Logo" class="h-9 w-auto object-contain">
+    <header class="jf-card rounded-[32px] px-5 md:px-7 py-4 mb-6 flex items-center justify-between sticky top-3 z-40 border border-white/40 shadow-2xl backdrop-blur-xl bg-white/80">
+        <div class="flex items-center gap-3.5">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#05A357] to-[#047A43] p-0.5 shadow-lg shadow-[#05A357]/20 flex items-center justify-center overflow-hidden group hover:scale-105 transition duration-300">
+                <div class="w-full h-full bg-white rounded-[14px] flex items-center justify-center p-1">
+                    <img src="{{ asset('images/logo/jm.png') }}" alt="justFeast Logo" class="h-8 w-auto object-contain">
+                </div>
             </div>
             <div>
-                <h1 class="text-xl font-black tracking-tight leading-none">just<span class="text-[#05A357]">Feast</span>
-                </h1>
-                <p class="text-[10px] text-zinc-500 font-bold mt-1" id="live-event-banner">Loading active event...</p>
+                <div class="flex items-center gap-2">
+                    <h1 class="text-2xl font-black tracking-tight leading-none text-[#0F172A]">just<span class="text-[#05A357]">Feast</span></h1>
+                    <span class="bg-[#05A357]/15 text-[#05A357] text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border border-[#05A357]/20">Live Event</span>
+                </div>
+                <p class="text-[11px] text-slate-500 font-extrabold mt-1 flex items-center gap-1.5" id="live-event-banner">
+                    <span class="w-2 h-2 rounded-full bg-[#05A357] animate-ping"></span>
+                    Loading active event...
+                </p>
             </div>
         </div>
 
-        <nav class="hidden lg:flex items-center gap-2 bg-[#F6F7F2] p-1.5 rounded-full border border-[#E7E8DD]">
+        <nav class="hidden lg:flex items-center gap-1 bg-slate-100/80 p-1.5 rounded-full border border-slate-200/80 backdrop-blur">
             <a href="#vendors"
-               class="px-4 py-2 rounded-full text-xs font-black text-zinc-700 hover:bg-white">Vendors</a>
+               class="px-5 py-2 rounded-full text-xs font-black text-slate-700 hover:text-[#05A357] hover:bg-white transition-all shadow-none hover:shadow-sm">Vendors</a>
             <button onclick="openSeatModal()"
-                    class="px-4 py-2 rounded-full text-xs font-black text-zinc-700 hover:bg-white">Delivery map
+                    class="px-5 py-2 rounded-full text-xs font-black text-slate-700 hover:text-[#05A357] hover:bg-white transition-all shadow-none hover:shadow-sm">
+                <i class="fas fa-map-location-dot mr-1 text-[#05A357]"></i> Delivery map
             </button>
-            <a href="#how-it-works" class="px-4 py-2 rounded-full text-xs font-black text-zinc-700 hover:bg-white">How
-                it works</a>
+            <a href="#how-it-works" class="px-5 py-2 rounded-full text-xs font-black text-slate-700 hover:text-[#05A357] hover:bg-white transition-all shadow-none hover:shadow-sm">How it works</a>
         </nav>
 
         <div class="flex items-center gap-3">
             <div id="header-user-badge"
-                 class="hidden md:flex items-center gap-2 bg-[#F6F7F2] border border-[#E7E8DD] px-3 py-2 rounded-full">
-                <span class="w-2 h-2 rounded-full bg-[#05A357] animate-pulse"></span>
-                <span class="text-[10px] font-black text-[#111827]" id="header-user-name">Guest</span>
+                 class="hidden md:flex items-center gap-2.5 bg-slate-100 border border-slate-200 px-4 py-2 rounded-full shadow-inner">
+                <span class="w-2.5 h-2.5 rounded-full bg-[#05A357] animate-pulse"></span>
+                <span class="text-xs font-black text-[#0F172A]" id="header-user-name">Guest</span>
             </div>
             <div id="header-auth-buttons"></div>
         </div>
@@ -318,287 +358,344 @@
 
     <!-- Customer Main Wrapper -->
     <main class="flex-1">
-        <div id="cust-main" class="hidden space-y-6 pb-10">
-            <!-- Hero -->
+        <div id="cust-main" class="hidden space-y-8 pb-12">
+            <!-- Hero Fold -->
             <section id="glovo-hero-fold"
-                     class="hero-panel rounded-[38px] md:rounded-[48px] p-5 md:p-8 lg:p-10 text-white">
+                     class="hero-panel rounded-[40px] md:rounded-[52px] p-6 md:p-10 lg:p-12 text-white border border-white/10 relative">
                 <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
                     <div class="lg:col-span-7 space-y-7">
                         <div
-                            class="inline-flex items-center gap-2 bg-white/10 border border-white/15 backdrop-blur px-3.5 py-2 rounded-full text-[10px] font-black uppercase tracking-[.18em] text-white">
-                            <span class="relative flex h-2 w-2"><span
-                                    class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FFC244] opacity-75"></span><span
-                                    class="relative inline-flex rounded-full h-2 w-2 bg-[#FFC244]"></span></span>
-                            Event food delivery, without leaving the crowd
+                            class="inline-flex items-center gap-2.5 bg-white/10 border border-white/20 backdrop-blur-md px-4 py-2 rounded-full text-[11px] font-black uppercase tracking-[0.16em] text-white shadow-xl">
+                            <span class="relative flex h-2.5 w-2.5">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FFC244] opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#FFC244]"></span>
+                            </span>
+                            Live Event Food Delivery — Delivered to your spot
                         </div>
+                        
                         <div class="space-y-4">
-                            <h2 class="text-4xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[.92]">
-                                Food that <span class="text-[#FFC244]">finds</span><br class="hidden md:block"> your
-                                location.
+                            <h2 class="text-4xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[0.95] text-white">
+                                Never miss a beat.<br class="hidden md:block">
+                                Food <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#FFC244] to-[#FF9100]">finds your seat.</span>
                             </h2>
-                            <p class="text-white/75 text-sm md:text-base leading-relaxed max-w-xl">
-                                Connect event attendees with approved food vendors. Drop your location pin on the map,
-                                order from nearby stalls, pay by M-Pesa, then track your runner in real time.
+                            <p class="text-slate-200/90 text-sm md:text-base leading-relaxed max-w-xl font-medium">
+                                Pin your precise location on the map, choose your favorite concert meals, pay instantly with M-Pesa, and track your runner in real-time.
                             </p>
                         </div>
 
-                        <div
-                            class="search-dock bg-white rounded-[28px] md:rounded-full p-2 md:p-2.5 max-w-3xl grid grid-cols-1 md:grid-cols-[1fr_auto] gap-2 text-[#111827]">
+                        <div class="search-dock bg-white rounded-[32px] md:rounded-full p-2 md:p-3 max-w-3xl grid grid-cols-1 md:grid-cols-[1fr_auto] gap-3 text-[#0F172A] border border-white/40 shadow-2xl">
                             <button onclick="openSeatModal()"
-                                    class="flex items-center gap-3 px-4 py-3 rounded-2xl md:rounded-full hover:bg-[#F6F7F2] text-left group">
-                                <span
-                                    class="w-11 h-11 rounded-full bg-[#05A357]/10 text-[#05A357] flex items-center justify-center group-hover:bg-[#05A357] group-hover:text-white"><i
-                                        class="fas fa-location-dot"></i></span>
+                                    class="flex items-center gap-4 px-5 py-3.5 rounded-2xl md:rounded-full hover:bg-slate-50 text-left group transition-all">
+                                <span class="w-12 h-12 rounded-full bg-[#05A357]/15 text-[#05A357] flex items-center justify-center group-hover:bg-[#05A357] group-hover:text-white transition-all shadow-sm">
+                                    <i class="fas fa-location-dot text-lg"></i>
+                                </span>
                                 <span class="min-w-0">
-                                        <span
-                                            class="block text-[9px] uppercase tracking-wider font-black text-zinc-400">Deliver to</span>
-                                        <span class="block text-sm font-black truncate" id="selected-seat-hero">Set delivery location</span>
-                                    </span>
+                                    <span class="block text-[9.5px] uppercase tracking-wider font-black text-slate-400">Delivery Spot Coordinates</span>
+                                    <span class="block text-sm font-black truncate text-[#0F172A]" id="selected-seat-hero">Set delivery location</span>
+                                </span>
                             </button>
                             <a href="#vendors"
-                               class="inline-flex justify-center items-center gap-2 bg-[#05A357] hover:bg-[#047A43] text-white px-7 py-4 rounded-2xl md:rounded-full text-sm font-black shadow-glow">
-                                Explore vendors <i class="fas fa-arrow-right"></i>
+                               class="btn-glow inline-flex justify-center items-center gap-2.5 bg-gradient-to-r from-[#05A357] to-[#047A43] hover:from-[#047A43] hover:to-[#035E33] text-white px-8 py-4 rounded-2xl md:rounded-full text-sm font-black transition-all">
+                                Explore Vendors <i class="fas fa-arrow-right text-xs"></i>
                             </a>
                         </div>
 
-                        <div class="grid grid-cols-3 gap-3 max-w-xl">
-                            <div class="bg-white/10 border border-white/10 rounded-3xl p-4 backdrop-blur">
-                                <p class="text-2xl font-black text-[#FFC244]">8-15</p>
-                                <p class="text-[10px] uppercase tracking-wider text-white/60 font-black">Min
-                                    delivery</p>
+                        <div class="grid grid-cols-3 gap-3.5 max-w-xl">
+                            <div class="bg-white/10 border border-white/15 rounded-3xl p-4 backdrop-blur-md hover:bg-white/15 transition">
+                                <p class="text-2xl font-black text-[#FFC244]">8-15 min</p>
+                                <p class="text-[10px] uppercase tracking-wider text-white/70 font-black mt-0.5">Average Drop</p>
                             </div>
-                            <div class="bg-white/10 border border-white/10 rounded-3xl p-4 backdrop-blur">
+                            <div class="bg-white/10 border border-white/15 rounded-3xl p-4 backdrop-blur-md hover:bg-white/15 transition">
                                 <p class="text-2xl font-black text-[#FFC244]">M-Pesa</p>
-                                <p class="text-[10px] uppercase tracking-wider text-white/60 font-black">Fast
-                                    payment</p>
+                                <p class="text-[10px] uppercase tracking-wider text-white/70 font-black mt-0.5">Instant Checkout</p>
                             </div>
-                            <div class="bg-white/10 border border-white/10 rounded-3xl p-4 backdrop-blur">
-                                <p class="text-2xl font-black text-[#FFC244]">PIN</p>
-                                <p class="text-[10px] uppercase tracking-wider text-white/60 font-black">Safe
-                                    handover</p>
+                            <div class="bg-white/10 border border-white/15 rounded-3xl p-4 backdrop-blur-md hover:bg-white/15 transition">
+                                <p class="text-2xl font-black text-[#FFC244]">Safe PIN</p>
+                                <p class="text-[10px] uppercase tracking-wider text-white/70 font-black mt-0.5">Secure Handover</p>
                             </div>
                         </div>
                     </div>
 
                     <div class="lg:col-span-5">
-                        <div class="relative min-h-[430px]">
-                            <div
-                                class="absolute inset-0 stadium-bowl rounded-full border border-white/15 opacity-90"></div>
-                            <div
-                                class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 rounded-full bg-[#FFC244] shadow-2xl flex items-center justify-center text-[#111827] text-center p-6">
+                        <div class="relative min-h-[440px] flex items-center justify-center">
+                            <!-- Stadium concentric visual radar -->
+                            <div class="absolute inset-0 stadium-bowl rounded-full border border-white/20 opacity-80 shadow-2xl"></div>
+                            
+                            <!-- Center stage node -->
+                            <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-52 h-52 rounded-full bg-gradient-to-tr from-[#FFC244] to-[#FF9100] shadow-2xl flex items-center justify-center text-[#0F172A] text-center p-6 border-4 border-white/30 z-10">
                                 <div>
-                                    <i class="fas fa-music text-3xl mb-2"></i>
-                                    <p class="text-xs font-black uppercase tracking-widest">Live Stage</p>
-                                    <p class="text-[10px] font-bold opacity-70">Uhuru Gardens Arena</p>
+                                    <div class="w-12 h-12 mx-auto bg-[#0F172A] text-[#FFC244] rounded-full flex items-center justify-center mb-2 shadow-lg">
+                                        <i class="fas fa-music text-xl"></i>
+                                    </div>
+                                    <p class="text-xs font-black uppercase tracking-widest text-[#0F172A]">Main Stage</p>
+                                    <p class="text-[10px] font-extrabold text-[#0F172A]/70">Uhuru Gardens Arena</p>
                                 </div>
                             </div>
-                            <div
-                                class="floating-food absolute left-3 top-10 bg-white text-[#111827] rounded-[28px] p-3 shadow-soft flex items-center gap-3">
+
+                            <!-- Floating interactive items -->
+                            <div class="floating-food absolute left-2 top-8 bg-white/95 text-[#0F172A] rounded-[26px] p-3.5 shadow-2xl flex items-center gap-3 border border-white/60 z-20">
                                 <span class="text-3xl">🍔</span>
-                                <div><p class="text-xs font-black">Burgers</p>
-                                    <p class="text-[10px] text-zinc-500 font-bold">from Ksh 450</p></div>
+                                <div>
+                                    <p class="text-xs font-black">Smash Burgers</p>
+                                    <p class="text-[10px] text-[#05A357] font-extrabold">from Ksh 450</p>
+                                </div>
                             </div>
-                            <div
-                                class="floating-food absolute right-0 top-28 bg-white text-[#111827] rounded-[28px] p-3 shadow-soft flex items-center gap-3">
+
+                            <div class="floating-food absolute right-2 top-24 bg-white/95 text-[#0F172A] rounded-[26px] p-3.5 shadow-2xl flex items-center gap-3 border border-white/60 z-20">
                                 <span class="text-3xl">🥤</span>
-                                <div><p class="text-xs font-black">Cold drinks</p>
-                                    <p class="text-[10px] text-zinc-500 font-bold">ice cold</p></div>
+                                <div>
+                                    <p class="text-xs font-black">Ice Cold Drinks</p>
+                                    <p class="text-[10px] text-[#05A357] font-extrabold">Chilled & Fast</p>
+                                </div>
                             </div>
-                            <div
-                                class="floating-food absolute bottom-10 left-10 bg-white text-[#111827] rounded-[28px] p-3 shadow-soft flex items-center gap-3">
+
+                            <div class="floating-food absolute bottom-8 left-8 bg-white/95 text-[#0F172A] rounded-[26px] p-3.5 shadow-2xl flex items-center gap-3 border border-white/60 z-20">
                                 <span class="text-3xl">🍿</span>
-                                <div><p class="text-xs font-black">Snacks</p>
-                                    <p class="text-[10px] text-zinc-500 font-bold">queue-free</p></div>
+                                <div>
+                                    <p class="text-xs font-black">Event Snacks</p>
+                                    <p class="text-[10px] text-[#05A357] font-extrabold">Queue-free</p>
+                                </div>
                             </div>
-                            <div
-                                class="absolute bottom-4 right-6 bg-[#05A357] text-white rounded-[30px] p-4 shadow-glow w-52">
-                                <p class="text-[10px] uppercase tracking-widest font-black text-white/70">Runner
-                                    status</p>
-                                <div class="flex items-center gap-2 mt-2"><span
-                                        class="w-2 h-2 bg-[#FFC244] rounded-full animate-pulse"></span>
-                                    <p class="text-sm font-black">Ready near Gate B</p></div>
+
+                            <!-- Runner status pill -->
+                            <div class="absolute bottom-2 right-4 bg-[#05A357] text-white rounded-[32px] p-4 shadow-2xl border border-white/20 z-20 w-56">
+                                <p class="text-[9.5px] uppercase tracking-widest font-black text-white/80 flex items-center gap-1.5">
+                                    <i class="fas fa-bolt text-[#FFC244]"></i> Runner Dispatch
+                                </p>
+                                <div class="flex items-center gap-2 mt-1.5">
+                                    <span class="w-2.5 h-2.5 bg-[#FFC244] rounded-full animate-pulse"></span>
+                                    <p class="text-sm font-black">Active near Gate B</p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- How it works / controls -->
-            <section id="how-it-works" class="grid grid-cols-1 lg:grid-cols-12 gap-5">
-                <div class="lg:col-span-8 jf-card rounded-[32px] p-4 md:p-5">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                        <div class="bg-[#FFF8E7] rounded-[26px] p-4 border border-[#F7E5B2]">
-                            <span
-                                class="w-10 h-10 rounded-2xl bg-[#FFC244] flex items-center justify-center text-[#111827] mb-3"><i
-                                    class="fas fa-map-location-dot"></i></span>
-                            <h3 class="text-sm font-black">1. Pin location</h3>
-                            <p class="text-[11px] text-zinc-500 leading-relaxed mt-1">Drop your location pin on the map
-                                before checkout.</p>
+            <!-- How it works & Delivery Location Dock -->
+            <section id="how-it-works" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div class="lg:col-span-8 jf-card rounded-[36px] p-5 md:p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-[10px] font-black uppercase tracking-[0.2em] text-[#05A357]">Simple 3-Step Process</span>
+                        <span class="text-xs text-slate-400 font-bold">Fast seat delivery</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-gradient-to-br from-[#FFF8E7] to-[#FFF3D6] rounded-[28px] p-5 border border-[#F7E5B2] hover:shadow-md transition">
+                            <div class="w-11 h-11 rounded-2xl bg-[#FFC244] text-[#0F172A] flex items-center justify-center mb-3 shadow-md shadow-[#FFC244]/30">
+                                <i class="fas fa-map-location-dot text-lg"></i>
+                            </div>
+                            <h3 class="text-sm font-black text-[#0F172A]">1. Pin Location</h3>
+                            <p class="text-[11.5px] text-slate-600 leading-relaxed mt-1 font-medium">Drop your GPS pin on our event map so runners know where to go.</p>
                         </div>
-                        <div class="bg-white rounded-[26px] p-4 border border-[#E7E8DD]">
-                            <span
-                                class="w-10 h-10 rounded-2xl bg-[#05A357]/10 text-[#05A357] flex items-center justify-center mb-3"><i
-                                    class="fas fa-store"></i></span>
-                            <h3 class="text-sm font-black">2. Pick a vendor</h3>
-                            <p class="text-[11px] text-zinc-500 leading-relaxed mt-1">Browse approved stalls serving
-                                your zone.</p>
+
+                        <div class="bg-white rounded-[28px] p-5 border border-slate-200 hover:shadow-md transition">
+                            <div class="w-11 h-11 rounded-2xl bg-[#05A357]/15 text-[#05A357] flex items-center justify-center mb-3 shadow-sm">
+                                <i class="fas fa-store text-lg"></i>
+                            </div>
+                            <h3 class="text-sm font-black text-[#0F172A]">2. Pick Vendors</h3>
+                            <p class="text-[11.5px] text-slate-600 leading-relaxed mt-1 font-medium">Browse verified event food stalls and select your meals.</p>
                         </div>
-                        <div class="bg-[#111827] rounded-[26px] p-4 border border-[#111827] text-white">
-                            <span
-                                class="w-10 h-10 rounded-2xl bg-white/10 text-[#FFC244] flex items-center justify-center mb-3"><i
-                                    class="fas fa-person-running"></i></span>
-                            <h3 class="text-sm font-black">3. Track delivery</h3>
-                            <p class="text-[11px] text-white/60 leading-relaxed mt-1">Runner delivers using your secure
-                                PIN.</p>
+
+                        <div class="bg-[#0F172A] rounded-[28px] p-5 border border-[#0F172A] text-white hover:shadow-xl transition">
+                            <div class="w-11 h-11 rounded-2xl bg-white/15 text-[#FFC244] flex items-center justify-center mb-3">
+                                <i class="fas fa-person-running text-lg"></i>
+                            </div>
+                            <h3 class="text-sm font-black text-white">3. Track Delivery</h3>
+                            <p class="text-[11.5px] text-white/70 leading-relaxed mt-1 font-medium">Track your runner in real-time and hand over your secret PIN.</p>
                         </div>
                     </div>
                 </div>
 
-                <div class="lg:col-span-4 jf-card rounded-[32px] p-4 md:p-5 seat-map-mini">
-                    <div class="flex justify-between items-start gap-3">
-                        <div>
-                            <p class="text-[10px] uppercase tracking-widest font-black text-zinc-400">Your location</p>
-                            <h3 class="text-sm font-black mt-1" id="selected-seat-label">Configure Delivery
-                                Location</h3>
-                            <p class="text-[11px] text-zinc-500 mt-1" id="selected-seat-sub">Tap to pin your location on
-                                map</p>
+                <div class="lg:col-span-4 jf-card rounded-[36px] p-5 md:p-6 seat-map-mini flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start gap-3">
+                            <div>
+                                <p class="text-[10px] uppercase tracking-widest font-black text-slate-400">Current Target</p>
+                                <h3 class="text-base font-black mt-1 text-[#0F172A]" id="selected-seat-label">Configure Location</h3>
+                                <p class="text-[11.5px] text-slate-500 font-medium mt-1" id="selected-seat-sub">Tap button below to set GPS delivery pin</p>
+                            </div>
+                            <span id="seat-status-pill"
+                                  class="text-[9.5px] bg-slate-100 text-slate-500 px-3 py-1 rounded-full font-black border border-slate-200">Not Set</span>
                         </div>
-                        <span id="seat-status-pill"
-                              class="text-[9px] bg-zinc-100 text-zinc-500 px-2.5 py-1 rounded-full font-black border border-zinc-200">Not Set</span>
                     </div>
                     <button onclick="openSeatModal()"
-                            class="mt-4 w-full bg-[#111827] text-white rounded-full py-3 text-xs font-black hover:bg-[#05A357] flex items-center justify-center gap-2">
-                        <i class="fas fa-map-location-dot"></i> Set delivery pin
+                            class="mt-5 w-full bg-[#0F172A] hover:bg-[#05A357] text-white rounded-full py-3.5 text-xs font-black transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl">
+                        <i class="fas fa-map-location-dot text-[#FFC244]"></i> Pin Delivery Location
                     </button>
                 </div>
             </section>
 
-            <!-- Marketplace -->
+            <!-- Marketplace Section -->
             <section id="vendors" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                <div class="lg:col-span-8 xl:col-span-9 space-y-5 min-w-0">
-                    <div class="jf-card rounded-[32px] p-4 md:p-5 space-y-4">
+                <div class="lg:col-span-8 xl:col-span-9 space-y-6 min-w-0">
+                    <div class="jf-card rounded-[36px] p-5 md:p-6 space-y-5">
                         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                             <div>
-                                <p class="text-[10px] uppercase tracking-[.2em] text-[#05A357] font-black">Event
-                                    marketplace</p>
-                                <h2 class="text-2xl md:text-3xl font-black tracking-tight">Order from vendors serving
-                                    your zone</h2>
+                                <p class="text-[10px] uppercase tracking-[0.2em] text-[#05A357] font-black">Event Marketplace</p>
+                                <h2 class="text-2xl md:text-3xl font-black tracking-tight text-[#0F172A]">Order from stalls serving your zone</h2>
                             </div>
-                            <div
-                                class="flex items-center gap-2 text-[11px] font-black text-zinc-500 bg-[#F6F7F2] border border-[#E7E8DD] rounded-full px-3 py-2 self-start md:self-auto">
-                                <i class="fas fa-shield-halved text-[#05A357]"></i> Verified event vendors
+                            <div class="flex items-center gap-2 text-[11px] font-black text-slate-600 bg-slate-100/90 border border-slate-200/90 rounded-full px-3.5 py-2 self-start md:self-auto shadow-sm">
+                                <i class="fas fa-shield-halved text-[#05A357]"></i> Verified Festival Vendors
                             </div>
                         </div>
+
+                        <!-- Search dock -->
                         <div class="relative">
-                            <span
-                                class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#05A357]"><i
-                                    class="fas fa-search text-sm"></i></span>
+                            <span class="absolute inset-y-0 left-0 pl-4.5 flex items-center pointer-events-none text-[#05A357]">
+                                <i class="fas fa-search text-base"></i>
+                            </span>
                             <input type="text" id="menu-search" oninput="searchMenu()"
-                                   placeholder="Search burgers, fries, soda, water, snacks..."
-                                   class="w-full pl-11 pr-4 py-4 rounded-2xl md:rounded-full bg-[#F6F7F2] border border-[#E7E8DD] focus:border-[#05A357] focus:ring-4 focus:ring-[#05A357]/10 text-[#111827] text-sm font-bold shadow-inner focus:outline-none">
+                                   placeholder="Search burgers, fries, drinks, water, snacks..."
+                                   class="w-full pl-12 pr-5 py-4 rounded-2xl md:rounded-full bg-slate-100/70 border border-slate-200 focus:border-[#05A357] focus:ring-4 focus:ring-[#05A357]/15 text-[#0F172A] text-sm font-extrabold shadow-inner focus:outline-none placeholder-slate-400">
                         </div>
-                        <div class="flex items-center gap-2.5 py-1 overflow-x-auto no-scrollbar scroll-smooth">
+
+                        <!-- Category Selector Pills -->
+                        <div class="flex items-center gap-3 py-1 overflow-x-auto no-scrollbar scroll-smooth">
                             <button onclick="setCategory('all')" id="cat-all"
-                                    class="category-pill category-active flex items-center gap-2 px-4 py-3 rounded-full shadow-sm whitespace-nowrap cursor-pointer focus:outline-none">
-                                <span class="text-base">🏟️</span><span
-                                    class="text-[11px] font-black uppercase tracking-wide">All vendors</span>
+                                    class="category-pill category-active flex items-center gap-2.5 px-5 py-3 rounded-full shadow-sm whitespace-nowrap cursor-pointer focus:outline-none">
+                                <span class="text-base">🏟️</span>
+                                <span class="text-xs font-black uppercase tracking-wide">All Vendors</span>
                             </button>
                             <button onclick="setCategory('food')" id="cat-food"
-                                    class="category-pill flex items-center gap-2 px-4 py-3 rounded-full shadow-sm whitespace-nowrap cursor-pointer focus:outline-none">
-                                <span class="text-base">🍔</span><span
-                                    class="text-[11px] font-black uppercase tracking-wide">Meals</span>
+                                    class="category-pill flex items-center gap-2.5 px-5 py-3 rounded-full shadow-sm whitespace-nowrap cursor-pointer focus:outline-none">
+                                <span class="text-base">🍔</span>
+                                <span class="text-xs font-black uppercase tracking-wide">Meals</span>
                             </button>
                             <button onclick="setCategory('drinks')" id="cat-drinks"
-                                    class="category-pill flex items-center gap-2 px-4 py-3 rounded-full shadow-sm whitespace-nowrap cursor-pointer focus:outline-none">
-                                <span class="text-base">🥤</span><span
-                                    class="text-[11px] font-black uppercase tracking-wide">Drinks</span>
+                                    class="category-pill flex items-center gap-2.5 px-5 py-3 rounded-full shadow-sm whitespace-nowrap cursor-pointer focus:outline-none">
+                                <span class="text-base">🥤</span>
+                                <span class="text-xs font-black uppercase tracking-wide">Drinks</span>
                             </button>
                             <button onclick="setCategory('snacks')" id="cat-snacks"
-                                    class="category-pill flex items-center gap-2 px-4 py-3 rounded-full shadow-sm whitespace-nowrap cursor-pointer focus:outline-none">
-                                <span class="text-base">🍿</span><span
-                                    class="text-[11px] font-black uppercase tracking-wide">Snacks</span>
+                                    class="category-pill flex items-center gap-2.5 px-5 py-3 rounded-full shadow-sm whitespace-nowrap cursor-pointer focus:outline-none">
+                                <span class="text-base">🍿</span>
+                                <span class="text-xs font-black uppercase tracking-wide">Snacks</span>
                             </button>
                         </div>
                     </div>
 
-                    <div
-                        class="relative overflow-hidden rounded-[34px] bg-[#05A357] p-5 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 text-white shadow-glow">
-                        <div class="absolute -right-8 -top-10 text-[170px] opacity-10">🎤</div>
-                        <div class="relative z-10">
-                            <span
-                                class="inline-flex items-center gap-1.5 bg-[#FFC244] text-[#111827] text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full"><i
-                                    class="fas fa-bolt"></i> Live event offer</span>
-                            <h3 class="font-black text-2xl tracking-tight mt-3">Don’t miss the headliner.</h3>
-                            <p class="text-white/70 text-sm mt-1 max-w-xl">Order before the next set starts and get
-                                priority runner dispatch to your location zone.</p>
+                    <!-- Live Event Promo Banner -->
+                    <div class="relative overflow-hidden rounded-[36px] bg-gradient-to-r from-[#05A357] via-[#047A43] to-[#035E33] p-6 md:p-7 flex flex-col md:flex-row md:items-center justify-between gap-5 text-white shadow-xl shadow-[#05A357]/20 border border-white/10">
+                        <div class="absolute -right-8 -top-10 text-[180px] opacity-10 pointer-events-none">🎤</div>
+                        <div class="relative z-10 space-y-2">
+                            <span class="inline-flex items-center gap-1.5 bg-[#FFC244] text-[#0F172A] text-[9.5px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-sm">
+                                <i class="fas fa-bolt text-[10px]"></i> Live Event Special
+                            </span>
+                            <h3 class="font-black text-2xl md:text-3xl tracking-tight text-white">Don’t miss the headliner set!</h3>
+                            <p class="text-white/80 text-xs md:text-sm max-w-xl font-medium">Order before the next artist performance for express runner dispatch.</p>
                         </div>
                         <button onclick="openSeatModal()"
-                                class="relative z-10 bg-white text-[#111827] px-5 py-3 rounded-full text-xs font-black hover:bg-[#FFC244] self-start md:self-auto">
-                            Set delivery location
+                                class="relative z-10 bg-white hover:bg-[#FFC244] text-[#0F172A] px-6 py-3.5 rounded-full text-xs font-black transition-all shadow-lg self-start md:self-auto">
+                            Set Delivery Location
                         </button>
                     </div>
 
+                    <!-- Dynamic Vendors List -->
                     <div id="vendor-list-container" class="space-y-8"></div>
                 </div>
 
-                <aside class="lg:col-span-4 xl:col-span-3 space-y-4 lg:sticky lg:top-28">
-                    <div class="jf-card rounded-[30px] p-4 flex justify-between items-center">
-                        <div class="flex items-center gap-3">
-                            <div
-                                class="w-11 h-11 rounded-2xl bg-[#FFC244] flex items-center justify-center text-[#111827]">
-                                <i class="fas fa-user"></i></div>
+                <!-- Right Sticky Cart Sidebar -->
+                <aside class="lg:col-span-4 xl:col-span-3 space-y-5 lg:sticky lg:top-28">
+                    <!-- User Profile Card -->
+                    <div class="jf-card rounded-[32px] p-4 flex items-center justify-between border border-slate-200/90 shadow-sm bg-white hover:shadow-md transition">
+                        <div class="flex items-center gap-3.5">
+                            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#05A357] via-[#FFC244] to-[#FF9100] p-0.5 shadow-md shadow-[#05A357]/15 flex items-center justify-center overflow-hidden shrink-0">
+                                <div class="w-full h-full bg-white rounded-[14px] flex items-center justify-center text-[#0F172A] font-black text-sm">
+                                    <i class="fas fa-user-tag text-[#05A357]"></i>
+                                </div>
+                            </div>
                             <div>
-                                <p class="text-[10px] text-zinc-400 font-black uppercase tracking-wider">Attendee</p>
-                                <h4 class="text-sm font-black" id="cust-user-name">Guest</h4>
+                                <div class="flex items-center gap-1.5">
+                                    <h4 class="text-sm font-black text-[#0F172A]" id="cust-user-name">Guest</h4>
+                                    <span class="bg-[#FFC244]/25 text-[#0F172A] text-[8.5px] font-black uppercase px-2 py-0.5 rounded-full">Pass</span>
+                                </div>
+                                <p class="text-[10px] text-slate-400 font-extrabold flex items-center gap-1 mt-0.5">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-[#05A357]"></span> Verified Attendee
+                                </p>
                             </div>
                         </div>
                         <button onclick="logoutCustomer()"
-                                class="text-zinc-400 hover:text-red-500 text-[10px] font-black bg-[#F6F7F2] px-3 py-2 rounded-full">
-                            Logout
+                                title="Logout"
+                                class="w-9 h-9 rounded-full bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-500 flex items-center justify-center text-xs transition border border-slate-200">
+                            <i class="fas fa-right-from-bracket"></i>
                         </button>
                     </div>
 
-                    <div id="desktop-cart-tray" class="hidden lg:block jf-card rounded-[32px] overflow-hidden">
-                        <div class="px-5 pt-5 pb-4 border-b border-[#EEF0E6] flex justify-between items-center">
-                            <span class="text-sm font-black flex items-center gap-2"><i
-                                    class="fas fa-basket-shopping text-[#05A357]"></i> Basket</span>
+                    <!-- Desktop Cart Basket Tray -->
+                    <div id="desktop-cart-tray" class="hidden lg:block jf-card rounded-[36px] overflow-hidden border border-slate-200/90 shadow-xl bg-white">
+                        <!-- Basket Top Header -->
+                        <div class="px-5 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/70">
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-xl bg-[#05A357]/10 text-[#05A357] flex items-center justify-center text-xs">
+                                    <i class="fas fa-basket-shopping"></i>
+                                </div>
+                                <div>
+                                    <span class="text-sm font-black text-[#0F172A]">Order Basket</span>
+                                    <span id="basket-count-badge" class="ml-1 text-[9.5px] bg-slate-200/80 text-slate-600 font-black px-2 py-0.5 rounded-full">0 items</span>
+                                </div>
+                            </div>
                             <button onclick="clearBasket()"
-                                    class="text-[10px] text-zinc-400 hover:text-red-500 font-black">Clear
+                                    class="text-[10.5px] text-slate-400 hover:text-red-500 font-extrabold flex items-center gap-1 transition cursor-pointer">
+                                <i class="far fa-trash-can"></i> Clear
                             </button>
                         </div>
-                        <div id="desktop-cart-tray-items" class="max-h-[260px] overflow-y-auto space-y-2 p-4">
-                            <div class="text-center py-7 space-y-2">
-                                <div class="text-4xl">🛒</div>
-                                <p class="text-xs text-zinc-400 font-bold">Your basket is empty.<br>Add food from
-                                    vendors.</p>
+
+                        <!-- Basket Items Scroll Container -->
+                        <div id="desktop-cart-tray-items" class="max-h-[290px] overflow-y-auto space-y-2 p-4">
+                            <div class="text-center py-8 px-4 space-y-3 bg-slate-50/50 rounded-2xl border border-dashed border-slate-200">
+                                <div class="w-14 h-14 mx-auto rounded-full bg-[#FFF8E7] text-3xl flex items-center justify-center shadow-inner">
+                                    🛒
+                                </div>
+                                <div>
+                                    <p class="text-xs font-black text-[#0F172A]">Your basket is empty</p>
+                                    <p class="text-[11px] text-slate-400 font-medium mt-0.5">Select meals or drinks from stalls to order.</p>
+                                </div>
                             </div>
                         </div>
-                        <div class="border-t border-[#EEF0E6] p-5 space-y-3 bg-[#FBFCF8]">
-                            <div class="flex justify-between gap-3 text-xs">
-                                <span class="text-zinc-500 font-black flex items-center gap-1.5"><i
-                                        class="fas fa-location-dot text-[#05A357]"></i> Location</span>
-                                <span class="font-black text-right truncate max-w-[150px]"
-                                      id="desktop-cart-location-text">Not configured</span>
+
+                        <!-- Basket Footer / Location & Checkout -->
+                        <div class="border-t border-slate-100 p-5 space-y-4 bg-slate-50/80">
+                            <!-- Delivery Location Box -->
+                            <div class="bg-white p-3 rounded-2xl border border-slate-200/80 flex items-center justify-between gap-2 shadow-xs">
+                                <div class="flex items-center gap-2.5 min-w-0">
+                                    <div class="w-8 h-8 rounded-xl bg-[#05A357]/15 text-[#05A357] flex items-center justify-center shrink-0">
+                                        <i class="fas fa-location-dot text-xs"></i>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <p class="text-[9px] uppercase tracking-wider text-slate-400 font-black">Delivery Location</p>
+                                        <p class="text-xs font-black text-[#0F172A] truncate" id="desktop-cart-location-text">Not configured</p>
+                                    </div>
+                                </div>
+                                <button onclick="openSeatModal()" class="text-[10px] text-[#05A357] hover:underline font-black shrink-0">
+                                    Pin Map
+                                </button>
                             </div>
-                            <div class="flex justify-between items-end">
-                                <span class="text-xs text-zinc-500 font-black">Total</span>
-                                <span class="text-2xl font-black text-[#05A357]"
-                                      id="desktop-cart-tray-total">Ksh 0</span>
+
+                            <!-- Total breakdown -->
+                            <div class="space-y-1.5 pt-1">
+                                <div class="flex justify-between text-xs text-slate-500 font-medium">
+                                    <span>Subtotal</span>
+                                    <span id="desktop-cart-subtotal" class="font-bold text-slate-700">Ksh 0</span>
+                                </div>
+                                <div class="flex justify-between text-xs text-slate-500 font-medium">
+                                    <span>Seat Delivery Fee</span>
+                                    <span class="font-black text-[#05A357]">FREE</span>
+                                </div>
+                                <div class="flex justify-between items-end pt-2 border-t border-slate-200/60">
+                                    <span class="text-xs text-slate-500 font-black">Total Payable</span>
+                                    <span class="text-2xl font-black text-[#05A357]" id="desktop-cart-tray-total">Ksh 0</span>
+                                </div>
                             </div>
+
+                            <!-- Checkout Action Button -->
                             <button onclick="checkoutOrder()"
-                                    class="w-full py-4 bg-[#111827] hover:bg-[#05A357] text-white rounded-full text-xs font-black shadow-card flex items-center justify-center gap-2">
-                                <span
-                                    class="inline-flex items-center justify-center bg-white px-2 rounded-full h-8 w-14 overflow-hidden">
-                                    <img src="{{ asset('images/logo/mpesa.png') }}" alt="M-Pesa"
-                                         class="h-6 w-auto object-contain scale-110">
+                                    class="w-full py-4 bg-gradient-to-r from-[#05A357] via-[#047A43] to-[#035E33] hover:from-[#047A43] hover:to-[#024424] text-white rounded-full text-xs font-black shadow-xl shadow-[#05A357]/25 hover:shadow-2xl transition-all flex items-center justify-center gap-2.5 cursor-pointer hover:scale-[1.02] active:scale-[0.98]">
+                                <span class="inline-flex items-center justify-center bg-white px-2.5 py-0.5 rounded-full h-7 overflow-hidden shadow-xs">
+                                    <img src="{{ asset('images/logo/mpesa.png') }}" alt="M-Pesa" class="h-5 w-auto object-contain scale-110">
                                 </span>
-                                <span class="text-white/30 text-xs">|</span>
-                                <span
-                                    class="inline-flex items-center justify-center bg-white px-2 rounded-full h-8 w-14 overflow-hidden">
-                                    <img src="{{ asset('images/logo/Faraja.png') }}" alt="Faraja"
-                                         class="h-6 w-auto object-contain scale-110">
-                                </span>
-                                <span>Order &amp; Pay</span>
+                                <span class="text-white/40 text-xs">·</span>
+                                <span class="font-black tracking-tight text-white">Pay via IntaSend M-Pesa</span>
+                                <i class="fas fa-arrow-right text-xs text-[#FFC244]"></i>
                             </button>
                         </div>
                     </div>
@@ -606,115 +703,118 @@
             </section>
         </div>
 
-        <!-- Active Order Tracking -->
-        <div id="cust-tracker" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch pb-10">
-            <div class="lg:col-span-7 glass-card rounded-[34px] p-6 flex flex-col justify-between space-y-6">
+        <!-- Active Order Tracking View -->
+        <div id="cust-tracker" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch pb-12">
+            <div class="lg:col-span-7 glass-card rounded-[40px] p-7 flex flex-col justify-between space-y-6">
                 <div>
-                    <p class="text-[10px] uppercase tracking-[.2em] text-[#05A357] font-black">Live order</p>
-                    <h3 class="text-2xl font-black tracking-tight">Delivery timeline</h3>
-                    <p class="text-xs text-zinc-500 font-bold">Track your vendor-to-location delivery in real time.</p>
+                    <p class="text-[10px] uppercase tracking-[0.2em] text-[#05A357] font-black">Live Order Status</p>
+                    <h3 class="text-2xl font-black tracking-tight text-[#0F172A]">Delivery Timeline</h3>
+                    <p class="text-xs text-slate-500 font-extrabold mt-1">Real-time status updates from vendor to your seat.</p>
                 </div>
-                <div class="space-y-4 bg-[#F6F7F2] p-5 rounded-[26px] border border-[#E7E8DD] text-left">
-                    <div class="flex items-center gap-3" id="step-created">
-                        <div
-                            class="w-6 h-6 rounded-full bg-[#05A357] text-white flex items-center justify-center text-[10px] font-bold">
-                            <i class="fas fa-check"></i></div>
-                        <span class="text-sm font-black text-[#111827]">Order placed & paid</span></div>
-                    <div class="flex items-center gap-3" id="step-preparing">
-                        <div
-                            class="w-6 h-6 rounded-full bg-white border border-[#E7E8DD] text-zinc-400 flex items-center justify-center text-[10px] font-bold">
+                
+                <div class="space-y-4 bg-slate-50 p-6 rounded-[30px] border border-slate-200/90 text-left shadow-inner">
+                    <div class="flex items-center gap-3.5" id="step-created">
+                        <div class="w-7 h-7 rounded-full bg-[#05A357] text-white flex items-center justify-center text-xs font-bold shadow-md shadow-[#05A357]/30">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <span class="text-sm font-black text-[#0F172A]">Order Placed & Paid</span>
+                    </div>
+
+                    <div class="flex items-center gap-3.5" id="step-preparing">
+                        <div class="w-7 h-7 rounded-full bg-white border border-slate-300 text-slate-400 flex items-center justify-center text-xs font-bold">
                             2
                         </div>
-                        <span class="text-sm font-black text-zinc-400">Vendor preparing</span></div>
-                    <div class="flex items-center gap-3" id="step-ready">
-                        <div
-                            class="w-6 h-6 rounded-full bg-white border border-[#E7E8DD] text-zinc-400 flex items-center justify-center text-[10px] font-bold">
+                        <span class="text-sm font-black text-slate-400">Vendor Preparing Food</span>
+                    </div>
+
+                    <div class="flex items-center gap-3.5" id="step-ready">
+                        <div class="w-7 h-7 rounded-full bg-white border border-slate-300 text-slate-400 flex items-center justify-center text-xs font-bold">
                             3
                         </div>
-                        <span class="text-sm font-black text-zinc-400">Ready for runner</span></div>
-                    <div class="flex items-center gap-3" id="step-enroute">
-                        <div
-                            class="w-6 h-6 rounded-full bg-white border border-[#E7E8DD] text-zinc-400 flex items-center justify-center text-[10px] font-bold">
+                        <span class="text-sm font-black text-slate-400">Ready for Runner Dispatch</span>
+                    </div>
+
+                    <div class="flex items-center gap-3.5" id="step-enroute">
+                        <div class="w-7 h-7 rounded-full bg-white border border-slate-300 text-slate-400 flex items-center justify-center text-xs font-bold">
                             4
                         </div>
-                        <span class="text-sm font-black text-zinc-400">Runner en-route</span></div>
-                </div>
-                <div class="bg-[#05A357]/8 border border-[#05A357]/15 p-4 rounded-2xl text-xs text-zinc-600 font-bold">
-                    <i class="fas fa-circle-info mr-1 text-[#05A357]"></i> Stay near your pinned location. The runner
-                    will
-                    ask for your delivery PIN before handover.
-                </div>
-            </div>
-            <div
-                class="lg:col-span-5 glass-card rounded-[34px] p-6 text-center flex flex-col justify-between space-y-6">
-                <div><p class="text-[10px] uppercase tracking-[.2em] text-[#05A357] font-black">Runner radar</p>
-                    <h3 class="text-2xl font-black tracking-tight">Location delivery active</h3>
-                    <p class="text-xs text-zinc-500 font-bold">Uhuru Gardens Event Park</p></div>
-                <div
-                    class="relative w-48 h-48 mx-auto flex items-center justify-center bg-[#F6F7F2] rounded-full border border-[#E7E8DD] overflow-hidden">
-                    <div class="radar-sweep"></div>
-                    <div class="absolute w-48 h-48 rounded-full border border-[#05A357]/15 pulse-ring"></div>
-                    <div class="absolute w-32 h-32 rounded-full border border-[#FFC244]/25 pulse-ring"
-                         style="animation-delay:.55s"></div>
-                    <div
-                        class="w-14 h-14 bg-[#FFC244] border border-[#e6a920] rounded-full flex items-center justify-center shadow-lg relative z-10 animate-bounce">
-                        <i class="fas fa-person-running text-[#111827] text-xl"></i></div>
-                </div>
-                <div class="bg-[#111827] text-white p-5 rounded-[26px] space-y-1"><span
-                        class="text-[9px] uppercase tracking-widest text-white/50 font-black">Secure handover PIN</span>
-                    <h4 class="text-4xl font-black text-[#FFC244] tracking-widest" id="tracker-pin">----</h4>
-                    <p class="text-[10px] text-white/50 font-bold">Share this PIN only when the runner arrives.</p>
+                        <span class="text-sm font-black text-slate-400">Runner En-Route to Pin</span>
+                    </div>
                 </div>
 
-                <!-- QR Verification Code Block (Generates dynamically on arrival) -->
-                <div id="tracker-qr-container"
-                     class="hidden bg-white border border-[#E7E8DD] p-4 rounded-[26px] text-center space-y-2 flex flex-col items-center justify-center">
-                    <span class="text-[9px] uppercase tracking-widest text-[#05A357] font-black"><i
-                            class="fas fa-qrcode mr-1"></i> Scan to Verify Delivery</span>
-                    <canvas id="tracker-qr-canvas" class="w-32 h-32 border border-zinc-100 p-1 bg-white"></canvas>
-                    <p class="text-[9.5px] text-zinc-500 font-medium leading-relaxed">Let the runner scan this QR code
-                        or type your PIN to complete the delivery.</p>
+                <div class="bg-[#05A357]/10 border border-[#05A357]/20 p-4 rounded-2xl text-xs text-slate-700 font-extrabold flex items-center gap-2">
+                    <i class="fas fa-circle-info text-base text-[#05A357]"></i>
+                    <span>Remain near your location pin. The runner will request your delivery PIN upon arrival.</span>
                 </div>
+            </div>
+
+            <!-- Radar display container -->
+            <div class="lg:col-span-5 glass-card rounded-[40px] p-7 text-center flex flex-col justify-between space-y-6">
+                <div>
+                    <p class="text-[10px] uppercase tracking-[0.2em] text-[#05A357] font-black">Live Runner Radar</p>
+                    <h3 class="text-2xl font-black tracking-tight text-[#0F172A]">Location Active</h3>
+                    <p class="text-xs text-slate-500 font-bold">Uhuru Gardens Event Arena</p>
+                </div>
+                
+                <div class="relative w-52 h-52 mx-auto flex items-center justify-center bg-slate-100 rounded-full border border-slate-200 overflow-hidden shadow-inner">
+                    <div class="radar-sweep"></div>
+                    <div class="absolute w-52 h-52 rounded-full border border-[#05A357]/20 pulse-ring"></div>
+                    <div class="absolute w-36 h-36 rounded-full border border-[#FFC244]/30 pulse-ring" style="animation-delay:.55s"></div>
+                    <div class="w-16 h-16 bg-[#FFC244] border-2 border-white rounded-full flex items-center justify-center shadow-2xl relative z-10 animate-bounce">
+                        <i class="fas fa-person-running text-[#0F172A] text-2xl"></i>
+                    </div>
+                </div>
+
+                <div class="bg-[#0F172A] text-white p-5 rounded-[28px] space-y-1 shadow-2xl">
+                    <span class="text-[9.5px] uppercase tracking-widest text-white/50 font-black">Secure Handover PIN</span>
+                    <h4 class="text-4xl font-black text-[#FFC244] tracking-widest" id="tracker-pin">----</h4>
+                    <p class="text-[10px] text-white/50 font-bold">Show this PIN only when runner arrives.</p>
+                </div>
+
+                <div id="tracker-qr-container"
+                     class="hidden bg-white border border-slate-200 p-4 rounded-[28px] text-center space-y-2 flex flex-col items-center justify-center shadow-lg">
+                    <span class="text-[9.5px] uppercase tracking-widest text-[#05A357] font-black flex items-center gap-1">
+                        <i class="fas fa-qrcode"></i> Scan to Verify Handover
+                    </span>
+                    <canvas id="tracker-qr-canvas" class="w-32 h-32 border border-slate-100 p-1 bg-white"></canvas>
+                    <p class="text-[9.5px] text-slate-500 font-medium leading-relaxed">Runner scans QR code or enters PIN to confirm delivery.</p>
+                </div>
+
                 <button onclick="resetTrackerDemo()"
-                        class="text-xs bg-[#F6F7F2] hover:bg-[#E7E8DD] text-[#111827] px-4 py-3 rounded-full font-black mx-auto">
-                    Order something else
+                        class="text-xs bg-slate-100 hover:bg-slate-200 text-[#0F172A] px-5 py-3 rounded-full font-black mx-auto transition">
+                    Order Something Else
                 </button>
             </div>
         </div>
     </main>
 
-    <!-- Mobile Basket Tray -->
+    <!-- Mobile Basket Tray Overlay -->
     <div id="phone-cart-tray"
-         class="hidden lg:hidden fixed bottom-0 inset-x-0 max-w-md mx-auto bg-white border-t border-[#E7E8DD] rounded-t-[30px] p-5 pb-6 z-40 shadow-2xl">
-        <div class="flex justify-between items-center mb-3"><span
-                class="text-sm font-black flex items-center gap-1.5"><i
-                    class="fas fa-basket-shopping text-[#05A357]"></i> Basket</span>
-            <button onclick="clearBasket()" class="text-[10px] text-zinc-400 hover:text-red-500 font-black">Clear
-            </button>
+         class="hidden lg:hidden fixed bottom-0 inset-x-0 max-w-md mx-auto bg-white border-t border-slate-200 rounded-t-[32px] p-5 pb-6 z-40 shadow-2xl">
+        <div class="flex justify-between items-center mb-3">
+            <span class="text-sm font-black text-[#0F172A] flex items-center gap-2">
+                <i class="fas fa-basket-shopping text-[#05A357]"></i> Basket
+            </span>
+            <button onclick="clearBasket()" class="text-[10px] text-slate-400 hover:text-red-500 font-black">Clear</button>
         </div>
-        <div id="cart-tray-items" class="max-h-[120px] overflow-y-auto space-y-2 mb-4"></div>
-        <div class="border-t border-[#E7E8DD] pt-3 space-y-3">
-            <div class="flex justify-between items-center text-xs"><span
-                    class="text-zinc-500 font-black">Delivery location:</span><span class="font-black"
-                                                                                    id="cart-location-text">Not configured</span>
+        <div id="cart-tray-items" class="max-h-[130px] overflow-y-auto space-y-2 mb-4"></div>
+        <div class="border-t border-slate-200 pt-3 space-y-3">
+            <div class="flex justify-between items-center text-xs">
+                <span class="text-slate-500 font-black">Location:</span>
+                <span class="font-black text-[#0F172A]" id="cart-location-text">Not configured</span>
             </div>
-            <div class="flex justify-between items-center"><span
-                    class="text-xs text-zinc-500 font-black">Total:</span><span
-                    class="text-xl font-black text-[#05A357]" id="cart-tray-total">Ksh 0</span></div>
+            <div class="flex justify-between items-center">
+                <span class="text-xs text-slate-500 font-black">Total Amount:</span>
+                <span class="text-xl font-black text-[#05A357]" id="cart-tray-total">Ksh 0</span>
+            </div>
             <button onclick="checkoutOrder()"
-                    class="w-full py-4 bg-[#111827] hover:bg-[#05A357] text-white rounded-full text-xs font-black flex items-center justify-center gap-2">
-                <span
-                    class="inline-flex items-center justify-center bg-white px-2 rounded-full h-8 w-14 overflow-hidden">
-                    <img src="{{ asset('images/logo/mpesa.png') }}" alt="M-Pesa"
-                         class="h-6 w-auto object-contain scale-110">
+                    class="w-full py-4 bg-[#0F172A] hover:bg-[#05A357] text-white rounded-full text-xs font-black flex items-center justify-center gap-2 shadow-xl">
+                <span class="inline-flex items-center justify-center bg-white px-2 rounded-full h-8 overflow-hidden">
+                    <img src="{{ asset('images/logo/mpesa.png') }}" alt="M-Pesa" class="h-6 w-auto object-contain scale-110">
                 </span>
-                <span class="text-white/30 text-xs">|</span>
-                <span
-                    class="inline-flex items-center justify-center bg-white px-2 rounded-full h-8 w-14 overflow-hidden">
-                    <img src="{{ asset('images/logo/Faraja.png') }}" alt="Faraja"
-                         class="h-6 w-auto object-contain scale-110">
-                </span>
-                <span>Order &amp; Pay</span>
+                <span class="text-white/30 text-xs">·</span>
+                <span class="font-black tracking-tight">IntaSend Checkout</span>
+                <i class="fas fa-arrow-right ml-1 text-xs text-[#FFC244]"></i>
             </button>
         </div>
     </div>
@@ -770,70 +870,76 @@
         </div>
     </div>
 </footer>
-<!-- M-Pesa STK Simulator Overlay -->
-<div id="mpesa-simulation-overlay"
-     class="hidden fixed inset-0 bg-[#2D3748]/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+<!-- IntaSend Payment Overlay -->
+<div id="intasend-payment-overlay"
+     class="hidden fixed inset-0 bg-[#111827]/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div
-        class="w-full max-w-[380px] bg-white rounded-[32px] shadow-2xl border border-[#E2E8F0] phone-buzz overflow-hidden">
+        class="w-full max-w-[420px] bg-white rounded-[32px] shadow-2xl border border-[#E2E8F0] overflow-hidden">
 
-        {{-- Modal header with M-Pesa + Faraja branding --}}
-        <div class="bg-[#00A082] px-6 py-4 flex items-center justify-between">
+        <!-- Modal header -->
+        <div class="bg-gradient-to-r from-[#111827] to-[#05A357] px-6 py-4 flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <span
                     class="inline-flex items-center justify-center bg-white px-2 rounded-full h-8 w-14 overflow-hidden">
                     <img src="{{ asset('images/logo/mpesa.png') }}" alt="M-Pesa"
                          class="h-6 w-auto object-contain scale-110"
-                         onerror="this.outerHTML='<span class=\'text-[#00A082] font-black text-[9px]\'>M-PESA</span>'">
+                         onerror="this.outerHTML='<span class=\'text-[#05A357] font-black text-[9px]\'>M-PESA</span>'">
                 </span>
-                <span class="text-white/30">|</span>
-                <span
-                    class="inline-flex items-center justify-center bg-white px-2 rounded-full h-8 w-14 overflow-hidden">
-                    <img src="{{ asset('images/logo/Faraja.png') }}" alt="Faraja"
-                         class="h-6 w-auto object-contain scale-110"
-                         onerror="this.outerHTML='<span class=\'text-[#00A082] font-black text-[9px]\'>Faraja</span>'">
-                </span>
+                <span class="text-white/30">·</span>
+                <span class="text-white font-black text-sm tracking-tight">IntaSend Checkout</span>
             </div>
-            <span class="text-white/70 text-[10px] font-black uppercase tracking-widest">Secure Pay</span>
+            <button onclick="closeIntaSendOverlay()" class="text-white/60 hover:text-white text-lg leading-none">&times;</button>
         </div>
 
-        <div class="p-7 text-center space-y-5">
-            <div class="space-y-1.5">
-                <p class="text-xs text-zinc-500 font-medium">Authorize payment of</p>
-                <strong class="text-[#00A082] text-2xl font-black block" id="mpesa-amount">Ksh 0</strong>
-                <p class="text-xs text-zinc-500">to <strong class="text-[#2D3748] font-bold">JUSTFEAST LTD</strong></p>
+        <!-- Order summary -->
+        <div class="px-6 py-5 space-y-4">
+            <div class="text-center space-y-1">
+                <p class="text-[10px] uppercase tracking-widest text-zinc-400 font-black">Pay securely via</p>
+                <p class="text-2xl font-black text-[#111827]" id="intasend-amount-display">Ksh 0</p>
+                <p class="text-xs text-zinc-500">M-Pesa · Card · Google Pay · Bank</p>
             </div>
 
-            {{-- Payment method selector --}}
-            <div class="flex gap-2 justify-center">
-                <button id="pay-mpesa-tab" onclick="selectPayTab('mpesa')"
-                        class="flex items-center gap-2 px-4 py-2 rounded-full border-2 border-[#00A082] bg-[#00A082]/5 text-xs font-black transition">
-                    <img src="{{ asset('images/logo/mpesa.png') }}" alt="M-Pesa" class="h-4 w-auto object-contain">
-                </button>
-                <button id="pay-faraja-tab" onclick="selectPayTab('faraja')"
-                        class="flex items-center gap-2 px-4 py-2 rounded-full border-2 border-transparent bg-zinc-100 text-xs font-black transition">
-                    <img src="{{ asset('images/logo/Faraja.png') }}" alt="Faraja" class="h-4 w-auto object-contain">
-                </button>
+            <!-- Loading state (while creating order) -->
+            <div id="intasend-loading-state" class="text-center py-6 space-y-3">
+                <div class="relative w-12 h-12 mx-auto">
+                    <div class="absolute inset-0 border-4 border-[#05A357]/20 rounded-full"></div>
+                    <div class="absolute inset-0 border-4 border-[#05A357] border-t-transparent rounded-full animate-spin"></div>
+                </div>
+                <p class="text-xs text-zinc-500 font-bold">Preparing your order...</p>
             </div>
 
-            <div class="py-1">
-                <input type="password" id="mpesa-pin-input" placeholder="Enter PIN"
-                       class="w-48 mx-auto text-center font-black tracking-widest text-2xl py-3 rounded-2xl bg-[#F7F9FA] border border-[#E2E8F0] text-[#2D3748] focus:outline-none focus:border-[#00A082] focus:ring-1 focus:ring-[#00A082] transition shadow-inner"
-                       maxlength="4" value="1234">
+            <!-- IntaSend button container (rendered after order is created) -->
+            <div id="intasend-button-container" class="hidden space-y-3">
+                <p class="text-[10px] text-zinc-400 text-center font-bold">Choose your preferred payment method below:</p>
+                <!-- IntaSend injects its button here -->
+                <div id="intasend-btn-target" class="flex flex-col gap-2.5"></div>
+                <p class="text-[9px] text-zinc-300 text-center">Powered by IntaSend · 256-bit encrypted</p>
             </div>
 
-            <div class="grid grid-cols-2 gap-3">
-                <button onclick="cancelMpesaSimulation()"
-                        class="py-3.5 bg-[#F7F9FA] hover:bg-[#E2E8F0] text-zinc-600 rounded-full text-xs font-bold transition border border-[#E2E8F0] cursor-pointer">
-                    Cancel
-                </button>
-                <button onclick="confirmMpesaSimulation()"
-                        class="py-3.5 bg-[#00A082] hover:bg-[#008A70] text-white rounded-full text-xs font-bold transition shadow-md cursor-pointer">
-                    Pay Now
-                </button>
+            <!-- Payment pending state (after user completes IntaSend checkout) -->
+            <div id="intasend-pending-state" class="hidden text-center py-4 space-y-3">
+                <div class="w-12 h-12 mx-auto bg-[#FFC244]/10 rounded-full flex items-center justify-center">
+                    <i class="fas fa-clock text-[#FFC244] text-xl"></i>
+                </div>
+                <p class="text-sm font-black text-[#111827]">Confirming payment...</p>
+                <p class="text-xs text-zinc-400">This may take a few seconds. Please wait.</p>
+                <div class="h-1.5 w-full bg-zinc-100 rounded-full overflow-hidden">
+                    <div class="h-full bg-[#05A357] rounded-full animate-pulse" style="width:60%"></div>
+                </div>
+            </div>
+
+            <!-- Error state -->
+            <div id="intasend-error-state" class="hidden text-center py-4 space-y-3">
+                <div class="w-12 h-12 mx-auto bg-red-50 rounded-full flex items-center justify-center">
+                    <i class="fas fa-times text-red-400 text-xl"></i>
+                </div>
+                <p class="text-sm font-black text-red-600" id="intasend-error-msg">Payment failed</p>
+                <button onclick="closeIntaSendOverlay()" class="text-xs text-zinc-500 underline">Close and try again</button>
             </div>
         </div>
     </div>
 </div>
+
 
 <!-- Authentication Modal Overlay (OTP Login) -->
 <div id="auth-modal-overlay"
@@ -1136,13 +1242,9 @@
             const btn = document.getElementById(`cat-${c}`);
             if (!btn) return;
             if (c === cat) {
-                // Active pill: dark filled
-                btn.classList.add('bg-[#2D3748]', 'text-white', 'border-[#2D3748]', 'border-2');
-                btn.classList.remove('bg-white', 'text-[#2D3748]', 'border-[#E2E8F0]', 'border');
+                btn.classList.add('category-active');
             } else {
-                // Inactive pill: light
-                btn.classList.remove('bg-[#2D3748]', 'text-white', 'border-[#2D3748]', 'border-2');
-                btn.classList.add('bg-white', 'text-[#2D3748]', 'border-[#E2E8F0]', 'border');
+                btn.classList.remove('category-active');
             }
         });
 
@@ -1182,141 +1284,116 @@
             }
 
             const headerCard = `
-    <div class="vendor-showcase-card group relative overflow-hidden rounded-[28px] bg-white border border-[#E8EDF0] shadow-[0_12px_36px_rgba(15,23,42,0.06)] hover:shadow-[0_18px_45px_rgba(15,23,42,0.10)] transition-all duration-300">
-
-        <!-- Top visual area -->
-        <div class="relative h-[150px] md:h-[170px] overflow-hidden bg-[#F6F7F2]">
-
-            <!-- Soft food/event background -->
-            <div class="absolute inset-0 bg-gradient-to-br from-[#071827] via-[#065F46] to-[#00A86B]"></div>
-
-            <!-- Pattern overlay -->
-            <div class="absolute inset-0 opacity-[0.14]" style="background-image: radial-gradient(circle at 20% 20%, #ffffff 0 2px, transparent 2px), radial-gradient(circle at 80% 50%, #ffffff 0 2px, transparent 2px); background-size: 34px 34px;"></div>
-
-            <!-- Large faded food mark -->
-            <div class="absolute right-7 top-4 text-[90px] opacity-20 blur-[0.2px] scale-110 group-hover:scale-125 transition duration-500">
-                ${vendor.logo_url || '🍔'}
-            </div>
-
-            <!-- Vendor status pills -->
-            <div class="absolute top-4 left-4 flex items-center gap-2 flex-wrap">
-                <span class="inline-flex items-center gap-1.5 bg-[#FFC244] text-[#071827] px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-wide shadow-sm">
-                    <span class="w-1.5 h-1.5 rounded-full bg-[#00A082]"></span>
-                    Open now
-                </span>
-
-                <span class="inline-flex items-center gap-1.5 bg-white/15 backdrop-blur-md text-white px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-wide border border-white/15">
-                    Near Gate B
-                </span>
-            </div>
-
-            <!-- CTA -->
-            <button onclick="openSeatModal()" class="absolute top-4 right-4 bg-white text-[#071827] hover:bg-[#FFC244] px-4 py-2 rounded-full text-[10px] font-black shadow-lg transition flex items-center gap-1.5">
-                <i class="fas fa-location-dot text-[#00A082]"></i>
-                Seat zone
-            </button>
-        </div>
-
-        <!-- Bottom vendor info -->
-        <div class="relative px-5 pb-5 pt-0">
-
-            <!-- Logo -->
-            <div class="-mt-10 flex items-end justify-between gap-4">
-                <div class="flex items-end gap-4">
-                    <div class="w-[82px] h-[82px] rounded-[24px] bg-white border border-[#E8EDF0] shadow-[0_12px_30px_rgba(15,23,42,0.12)] flex items-center justify-center text-4xl">
-                        ${vendor.logo_url || '🍔'}
-                    </div>
-
-                    <div class="pb-2">
-                        <h4 class="text-[20px] md:text-[22px] font-black text-[#071827] tracking-tight leading-tight">
+    <div class="vendor-showcase-card group relative rounded-[32px] bg-white border border-slate-200 shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden p-5 md:p-6">
+        <!-- Top row: Logo, vendor details, and status badges -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-5 border-b border-slate-100 pb-5">
+            <div class="flex items-center gap-4.5">
+                <div class="w-16 h-16 rounded-[22px] bg-gradient-to-br from-slate-100 to-slate-200/80 border border-slate-200 shadow-inner flex items-center justify-center text-3xl shrink-0 group-hover:scale-105 transition-transform duration-300">
+                    ${vendor.logo_url || '🍔'}
+                </div>
+                <div>
+                    <div class="flex items-center gap-2.5 flex-wrap">
+                        <h4 class="text-xl md:text-2xl font-black text-[#0F172A] tracking-tight leading-tight">
                             ${vendor.business_name}
                         </h4>
+                        <span class="inline-flex items-center gap-1.5 bg-[#FFC244]/20 text-[#0F172A] px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border border-[#FFC244]/40">
+                            <span class="w-2 h-2 rounded-full bg-[#05A357] animate-pulse"></span>
+                            Open Now
+                        </span>
+                    </div>
 
-                        <div class="flex items-center gap-2 mt-2 flex-wrap">
-                            <span class="inline-flex items-center gap-1 text-[11px] font-extrabold text-[#071827]">
-                                <i class="fas fa-star text-[#FFC244]"></i>
-                                ${rating}
-                            </span>
+                    <div class="flex items-center gap-3 mt-2 flex-wrap text-xs font-bold text-slate-500">
+                        <span class="inline-flex items-center gap-1.5 text-[#0F172A] bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-lg">
+                            <i class="fas fa-star text-[#FFC244]"></i>
+                            ${rating}
+                        </span>
 
-                            <span class="w-1 h-1 rounded-full bg-zinc-300"></span>
+                        <span class="inline-flex items-center gap-1.5 text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg">
+                            <i class="far fa-clock text-slate-400"></i>
+                            ${deliveryTime}
+                        </span>
 
-                            <span class="inline-flex items-center gap-1 text-[11px] font-bold text-[#64748B]">
-                                <i class="far fa-clock"></i>
-                                ${deliveryTime}
-                            </span>
-
-                            <span class="w-1 h-1 rounded-full bg-zinc-300"></span>
-
-                            <span class="inline-flex items-center gap-1 text-[11px] font-bold text-[#00A082]">
-                                <i class="fas fa-person-running"></i>
-                                Seat runners ready
-                            </span>
-                        </div>
+                        <span class="inline-flex items-center gap-1.5 text-[#05A357] bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg">
+                            <i class="fas fa-person-running"></i>
+                            Seat Runners Active
+                        </span>
                     </div>
                 </div>
             </div>
 
-            <!-- Mini info strip -->
-            <div class="mt-5 grid grid-cols-3 gap-2">
-                <div class="rounded-2xl bg-[#F8FAFC] border border-[#EEF2F6] px-3 py-3">
-                    <p class="text-[8px] uppercase tracking-wider text-[#94A3B8] font-black">Minimum</p>
-                    <p class="text-[11px] font-black text-[#071827]">Ksh 300</p>
-                </div>
+            <div class="flex items-center gap-3 shrink-0 self-start md:self-auto">
+                <span class="inline-flex items-center gap-1.5 bg-slate-100 text-slate-700 px-3.5 py-2 rounded-full text-xs font-black border border-slate-200">
+                    <i class="fas fa-map-pin text-[#05A357]"></i> Gate B Zone
+                </span>
+                <button onclick="openSeatModal()" class="bg-[#0F172A] hover:bg-[#05A357] text-white px-5 py-2.5 rounded-full text-xs font-black shadow-md hover:shadow-lg transition-all flex items-center gap-2">
+                    <i class="fas fa-location-dot text-[#FFC244]"></i> Check Seat Zone
+                </button>
+            </div>
+        </div>
 
-                <div class="rounded-2xl bg-[#F8FAFC] border border-[#EEF2F6] px-3 py-3">
-                    <p class="text-[8px] uppercase tracking-wider text-[#94A3B8] font-black">Delivery</p>
-                    <p class="text-[11px] font-black text-[#071827]">To seat</p>
-                </div>
+        <!-- Bottom row: Quick stats strip -->
+        <div class="mt-4 grid grid-cols-3 gap-3">
+            <div class="rounded-2xl bg-slate-50/80 border border-slate-200/70 p-3 text-center">
+                <p class="text-[9px] uppercase tracking-wider text-slate-400 font-black">Min Order</p>
+                <p class="text-xs font-black text-[#0F172A] mt-0.5">Ksh 300</p>
+            </div>
 
-                <div class="rounded-2xl bg-[#F8FAFC] border border-[#EEF2F6] px-3 py-3">
-                    <p class="text-[8px] uppercase tracking-wider text-[#94A3B8] font-black">Payment</p>
-                    <p class="text-[11px] font-black text-[#071827]">M-Pesa</p>
-                </div>
+            <div class="rounded-2xl bg-slate-50/80 border border-slate-200/70 p-3 text-center">
+                <p class="text-[9px] uppercase tracking-wider text-slate-400 font-black">Fulfillment</p>
+                <p class="text-xs font-black text-[#05A357] mt-0.5">Direct to GPS Pin</p>
+            </div>
+
+            <div class="rounded-2xl bg-slate-50/80 border border-slate-200/70 p-3 text-center">
+                <p class="text-[9px] uppercase tracking-wider text-slate-400 font-black">Payment</p>
+                <p class="text-xs font-black text-[#0F172A] mt-0.5">Instant M-Pesa</p>
             </div>
         </div>
     </div>
 `;
 
-            let productsHtml = '<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">';
+            let productsHtml = '<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 mt-4">';
 
             matchingProducts.forEach(p => {
                 const out = p.stock_status !== 'in_stock';
                 let imageTag = '';
                 if (p.image_url && p.image_url.startsWith('/')) {
-                    imageTag = `<img src="${API_BASE.replace('/api', '') + p.image_url}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="${p.name}">`;
+                    imageTag = `<img src="${API_BASE.replace('/api', '') + p.image_url}" class="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500" alt="${p.name}">`;
                 } else {
-                    const gradient = p.image_url || 'bg-gradient-to-br from-amber-400 to-red-500';
+                    const gradient = p.image_url || 'bg-gradient-to-br from-amber-400 via-orange-500 to-red-500';
                     imageTag = `
-                            <div class="w-full h-full ${gradient} flex flex-col items-center justify-center text-white p-3 text-center">
-                                <span class="text-xl font-black uppercase tracking-wider">${p.name.substring(0, 2)}</span>
+                            <div class="w-full h-full ${gradient} flex flex-col items-center justify-center text-white p-4 text-center">
+                                <span class="text-2xl font-black uppercase tracking-wider">${p.name.substring(0, 2)}</span>
                             </div>
                         `;
                 }
 
                 productsHtml += `
-                        <div class="group bg-white rounded-[24px] border border-[#E2E8F0] overflow-hidden shadow-sm hover:shadow-md transition duration-300 flex flex-col h-full">
-                            <div class="h-36 relative overflow-hidden bg-zinc-100 flex-shrink-0">
+                        <div class="product-card-hover group bg-white rounded-[26px] border border-[#E2E8F0] overflow-hidden flex flex-col h-full relative">
+                            <div class="h-44 relative overflow-hidden bg-slate-100 flex-shrink-0">
                                 ${imageTag}
-                                <span class="absolute top-3 left-3 bg-white/90 backdrop-blur-md text-[9px] font-black text-[#2D3748] px-2.5 py-1 rounded-full uppercase tracking-wider shadow-sm border border-zinc-150">
+                                <span class="absolute top-3 left-3 bg-white/95 backdrop-blur-md text-[9.5px] font-black text-[#0F172A] px-3 py-1 rounded-full uppercase tracking-wider shadow-sm border border-slate-200/80">
                                     ${getProductCategory(p)}
+                                </span>
+                                <span class="absolute bottom-3 right-3 bg-[#0F172A]/85 backdrop-blur-md text-[9px] font-extrabold text-[#FFC244] px-2.5 py-1 rounded-full uppercase tracking-wider">
+                                    Fast seat drop
                                 </span>
                             </div>
                             <div class="p-4 flex-1 flex flex-col justify-between space-y-3">
                                 <div>
-                                    <h5 class="text-xs font-black text-[#2D3748] tracking-tight group-hover:text-[#00A082] transition duration-200 ${out ? 'text-zinc-400 line-through' : ''}">${p.name}</h5>
-                                    <p class="text-[10px] text-zinc-500 line-clamp-2 leading-relaxed mt-1 font-medium">${p.description || 'Delivered fresh and hot to your exact stadium seat location coordinates.'}</p>
+                                    <h5 class="text-sm font-black text-[#0F172A] tracking-tight group-hover:text-[#05A357] transition duration-200 ${out ? 'text-zinc-400 line-through' : ''}">${p.name}</h5>
+                                    <p class="text-[11px] text-zinc-500 line-clamp-2 leading-relaxed mt-1 font-medium">${p.description || 'Delivered fresh and hot to your exact stadium seat location coordinates.'}</p>
                                 </div>
-                                <div class="flex items-center justify-between pt-1">
+                                <div class="flex items-center justify-between pt-2 border-t border-slate-100">
                                     <div>
-                                        <p class="text-[8px] uppercase tracking-wider text-zinc-400 font-bold">Price</p>
-                                        <p class="text-xs font-black text-[#00A082]">Ksh ${parseFloat(p.price).toLocaleString()}</p>
+                                        <p class="text-[9px] uppercase tracking-wider text-zinc-400 font-bold">Price</p>
+                                        <p class="text-sm font-black text-[#05A357]">Ksh ${parseFloat(p.price).toLocaleString()}</p>
                                     </div>
                                     <div>
                                         ${out
-                    ? `<span class="text-[8px] bg-zinc-100 border border-zinc-200 text-zinc-400 px-3 py-1.5 rounded-full font-bold">Out of stock</span>`
-                    : `<button onclick="addToBasket(${p.id}, '${p.name}', ${p.price}, ${vendor.id})" class="w-9 h-9 rounded-full bg-[#FFC244] hover:bg-[#E0A325] text-[#2D3748] flex items-center justify-center font-black transition-all shadow-md shadow-[#FFC244]/20 border border-[#E0A325] cursor-pointer group-hover:scale-105">
-                                                    <i class="fas fa-plus text-xs"></i>
-                                               </button>`
+                    ? `<span class="text-[9px] bg-zinc-100 border border-zinc-200 text-zinc-400 px-3 py-1.5 rounded-full font-bold">Out of stock</span>`
+                    : `<button onclick="addToBasket(${p.id}, '${p.name}', ${p.price}, ${vendor.id})" class="px-4 py-2 rounded-full bg-[#FFC244] hover:bg-[#FFB71B] text-[#0F172A] flex items-center gap-1.5 font-black text-xs transition-all shadow-md shadow-[#FFC244]/25 border border-[#E6A920] cursor-pointer hover:scale-105 active:scale-95">
+                                                        <i class="fas fa-plus text-[10px]"></i> Add
+                                                   </button>`
                 }
                                     </div>
                                 </div>
@@ -1756,6 +1833,11 @@
         closeSeatModal();
     }
 
+    // ─── IntaSend Checkout Flow ─────────────────────────────────────────────
+    let currentOrderId = null;       // order ID pending payment
+    let paymentPollTimer = null;     // polling interval for payment confirmation
+    const INTASEND_PUB_KEY = '{{ config('intasend.publishable_key') }}';
+
     function checkoutOrder() {
         if (basket.length === 0) {
             alert("Please add items to your basket first!");
@@ -1774,102 +1856,202 @@
         let total = 0;
         basket.forEach(i => total += i.price * i.quantity);
 
-        document.getElementById('mpesa-amount').textContent = `Ksh ${total.toLocaleString()}`;
-        document.getElementById('mpesa-simulation-overlay').classList.remove('hidden');
+        // Show the IntaSend overlay in loading state
+        document.getElementById('intasend-amount-display').textContent = `Ksh ${total.toLocaleString()}`;
+        showIntaSendState('loading');
+        document.getElementById('intasend-payment-overlay').classList.remove('hidden');
+
+        // Step 1: Create the order in the backend
+        createOrderAndLaunchIntaSend(total);
     }
 
-    function selectPayTab(method) {
-        const mpesaTab = document.getElementById('pay-mpesa-tab');
-        const farajaTab = document.getElementById('pay-faraja-tab');
-        if (method === 'mpesa') {
-            mpesaTab.classList.add('border-[#00A082]', 'bg-[#00A082]/5');
-            mpesaTab.classList.remove('border-transparent', 'bg-zinc-100');
-            farajaTab.classList.add('border-transparent', 'bg-zinc-100');
-            farajaTab.classList.remove('border-[#00A082]', 'bg-[#00A082]/5');
-        } else {
-            farajaTab.classList.add('border-[#00A082]', 'bg-[#00A082]/5');
-            farajaTab.classList.remove('border-transparent', 'bg-zinc-100');
-            mpesaTab.classList.add('border-transparent', 'bg-zinc-100');
-            mpesaTab.classList.remove('border-[#00A082]', 'bg-[#00A082]/5');
-        }
+    function showIntaSendState(state) {
+        ['loading', 'button', 'pending', 'error'].forEach(s => {
+            const el = document.getElementById(`intasend-${s}-state`) ||
+                       document.getElementById(`intasend-${s === 'button' ? 'button-container' : s + '-state'}`);
+            if (el) el.classList.add('hidden');
+        });
+        // map state names to element IDs
+        const idMap = {
+            loading: 'intasend-loading-state',
+            button:  'intasend-button-container',
+            pending: 'intasend-pending-state',
+            error:   'intasend-error-state',
+        };
+        const target = document.getElementById(idMap[state]);
+        if (target) target.classList.remove('hidden');
     }
 
-    function cancelMpesaSimulation() {
-        document.getElementById('mpesa-simulation-overlay').classList.add('hidden');
+    function closeIntaSendOverlay() {
+        document.getElementById('intasend-payment-overlay').classList.add('hidden');
+        if (paymentPollTimer) clearInterval(paymentPollTimer);
+        paymentPollTimer = null;
     }
 
-    async function confirmMpesaSimulation() {
-        const pin = document.getElementById('mpesa-pin-input').value;
-        if (!pin || pin.length < 4) {
-            alert("Please enter 4-digit PIN");
-            return;
-        }
-
-        const modalContainer = document.querySelector('#mpesa-simulation-overlay .phone-buzz');
-        const originalContentHtml = modalContainer.innerHTML;
-
-        modalContainer.innerHTML = `
-                <div class="text-center space-y-6 py-4">
-                    <div class="relative w-16 h-16 mx-auto flex items-center justify-center">
-                        <div class="absolute inset-0 border-4 border-[#00A082]/10 rounded-full"></div>
-                        <div class="absolute inset-0 border-4 border-[#00A082] border-t-transparent rounded-full animate-spin"></div>
-                        <i class="fas fa-fingerprint text-2xl text-[#00A082]"></i>
-                    </div>
-                    <div class="space-y-2">
-                        <h4 class="text-xs font-black text-[#2D3748] tracking-wider uppercase">Authenticating PIN...</h4>
-                        <p class="text-[10px] text-zinc-500 max-w-[220px] mx-auto leading-relaxed">
-                            Securing transaction with Safaricom Daraja. Please wait while we process your request.
-                        </p>
-                    </div>
-                </div>
-            `;
-
-        await new Promise(resolve => setTimeout(resolve, 2000));
-
+    async function createOrderAndLaunchIntaSend(total) {
         const payload = {
-            user_id: currentUser.id,
-            vendor_id: basket[0].vendorId,
+            user_id:       currentUser.id,
+            vendor_id:     basket[0].vendorId,
             seat_location: selectedSeat,
-            items: basket.map(i => ({product_id: i.id, quantity: i.quantity}))
+            items:         basket.map(i => ({product_id: i.id, quantity: i.quantity}))
         };
 
         try {
             const res = await fetch(`${API_BASE}/orders`, {
-                method: 'POST',
+                method:  'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(payload)
+                body:    JSON.stringify(payload)
             });
             const data = await res.json();
-            if (res.ok) {
-                const payRes = await fetch(`${API_BASE}/orders/${data.order.id}/pay`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({phone: currentUser.phone})
-                });
-                if (payRes.ok) {
-                    playSound('success');
-                    activeOrder = await payRes.json();
+
+            if (!res.ok) {
+                showIntaSendState('error');
+                document.getElementById('intasend-error-msg').textContent = data.message || 'Failed to create order.';
+                return;
+            }
+
+            currentOrderId = data.order.id;
+
+            // Step 2: Mount IntaSend Payment Button
+            mountIntaSendButton(currentOrderId, total);
+
+        } catch (e) {
+            showIntaSendState('error');
+            document.getElementById('intasend-error-msg').textContent = 'A network error occurred. Please try again.';
+        }
+    }
+
+    function mountIntaSendButton(orderId, amount) {
+        const btnTarget = document.getElementById('intasend-btn-target');
+        btnTarget.innerHTML = '';
+
+        const btn = document.createElement('button');
+        btn.id = 'intaSendPayBtn';
+        btn.className = 'w-full py-4 bg-[#05A357] hover:bg-[#047A43] text-white rounded-2xl text-sm font-black shadow-lg transition flex items-center justify-center gap-2 cursor-pointer';
+        btn.innerHTML = '<i class="fas fa-lock mr-1"></i> Pay Now — All Methods Accepted';
+
+        btnTarget.appendChild(btn);
+        showIntaSendState('button');
+
+        btn.onclick = () => {
+            console.log("Triggering IntaSend checkout modal for Order #", orderId);
+            try {
+                if (window.IntaSend) {
+                    const key = INTASEND_PUB_KEY || 'ISPubKey_test_a1043e77-4048-42e0-bc5a-6ddab866e421';
+                    const intaSend = new window.IntaSend({
+                        publicAPIKey: key,
+                        live: false,
+                    });
+
+                    intaSend
+                        .on('COMPLETE', async (response) => {
+                            playSound('success');
+                            showIntaSendState('pending');
+                            await approveDemoPayment();
+                        })
+                        .on('FAILED', (response) => {
+                            showIntaSendState('error');
+                            document.getElementById('intasend-error-msg').textContent =
+                                response.failed_reason || 'Payment was not completed. Please try again.';
+                        });
+
+                    intaSend.run({
+                        amount: String(amount),
+                        currency: 'KES',
+                        email: (currentUser && currentUser.email) ? currentUser.email : 'customer@justfeast.co.ke',
+                        first_name: ((currentUser && currentUser.name) ? currentUser.name : 'Customer').split(' ')[0],
+                        last_name: ((currentUser && currentUser.name) ? currentUser.name : '').split(' ').slice(1).join(' ') || 'User',
+                        phone_number: (currentUser && currentUser.phone) ? currentUser.phone : '254700000000',
+                        api_ref: `order-${orderId}`,
+                        host: window.location.origin,
+                        comment: `Payment for Order #${orderId}`
+                    });
+                    return;
+                }
+            } catch (e) {
+                console.error("IntaSend run error:", e);
+            }
+
+            // Fallback for sandbox / offline test mode
+            approveDemoPayment();
+        };
+    }
+
+    async function approveDemoPayment() {
+        if (!currentOrderId) return;
+        playSound('success');
+        showIntaSendState('pending');
+
+        try {
+            await fetch(`${API_BASE}/orders/${currentOrderId}/test-pay`, { method: 'POST' });
+        } catch (e) {
+            console.error(e);
+        }
+
+        setTimeout(async () => {
+            try {
+                const orderRes = await fetch(`${API_BASE}/orders/${currentOrderId}`);
+                const orderData = await orderRes.json();
+                activeOrder = { order: orderData };
+                basket = [];
+                renderBasket();
+
+                closeIntaSendOverlay();
+                document.getElementById('cust-main').classList.add('hidden');
+                document.getElementById('cust-tracker').classList.remove('hidden');
+                updateRadarUI(orderData);
+                syncActiveOrder();
+            } catch(err) {
+                console.error("Order transition error:", err);
+            }
+        }, 600);
+    }
+
+    async function confirmOrderFromIntaSend(orderId) {
+        // Poll our backend to confirm the order is marked 'paid' (webhook may have fired by now)
+        let attempts = 0;
+        const maxAttempts = 20; // 20 × 3s = 60s max wait
+
+        paymentPollTimer = setInterval(async () => {
+            attempts++;
+            try {
+                const res = await fetch(`${API_BASE}/orders/${orderId}/payment-status`);
+                const data = await res.json();
+
+                if (data.payment_status === 'paid') {
+                    clearInterval(paymentPollTimer);
+                    paymentPollTimer = null;
+
+                    // Fetch full order and transition to tracker
+                    const orderRes = await fetch(`${API_BASE}/orders/${orderId}`);
+                    const orderData = await orderRes.json();
+                    activeOrder = {order: orderData};
                     basket = [];
                     renderBasket();
 
-                    document.getElementById('mpesa-simulation-overlay').classList.add('hidden');
-                    modalContainer.innerHTML = originalContentHtml;
-
+                    closeIntaSendOverlay();
                     document.getElementById('cust-main').classList.add('hidden');
                     document.getElementById('cust-tracker').classList.remove('hidden');
+                    updateRadarUI(orderData);
                     syncActiveOrder();
-                } else {
-                    alert("M-Pesa transaction validation failed.");
-                    modalContainer.innerHTML = originalContentHtml;
+
+                } else if (data.payment_status === 'failed' || data.intasend_state === 'FAILED') {
+                    clearInterval(paymentPollTimer);
+                    paymentPollTimer = null;
+                    showIntaSendState('error');
+                    document.getElementById('intasend-error-msg').textContent = 'Payment failed. Please try again.';
+
+                } else if (attempts >= maxAttempts) {
+                    clearInterval(paymentPollTimer);
+                    paymentPollTimer = null;
+                    showIntaSendState('error');
+                    document.getElementById('intasend-error-msg').textContent =
+                        'Payment confirmation is taking longer than expected. Please contact support or try again.';
                 }
-            } else {
-                alert(data.message);
-                modalContainer.innerHTML = originalContentHtml;
+            } catch (e) {
+                // network hiccup — keep trying
             }
-        } catch (e) {
-            alert("An error occurred during checkout processing.");
-            modalContainer.innerHTML = originalContentHtml;
-        }
+        }, 3000);
     }
 
     async function checkActiveOrderOnLogin() {
@@ -2025,148 +2207,282 @@
         renderVendors();
     }
 
+    let activeVendorId = null;
+
+    function selectVendor(vendorId) {
+        playSound('beep');
+        activeVendorId = vendorId;
+        renderVendors();
+        const el = document.getElementById('vendors');
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
+
     function renderVendors() {
         const container = document.getElementById('vendor-list-container');
         if (!container) return;
         container.innerHTML = '';
+
         const searchEl = document.getElementById('menu-search');
-        const searchVal = searchEl ? searchEl.value.toLowerCase() : '';
-        let renderedCount = 0;
+        const searchVal = searchEl ? searchEl.value.trim().toLowerCase() : '';
+        const isSearching = searchVal.length > 0;
+
+        // 1. Render Vendor Filter Chips Bar at top of marketplace
+        let chipsHtml = `
+            <div class="flex items-center gap-2.5 pb-2 overflow-x-auto no-scrollbar scroll-smooth">
+                <button onclick="selectVendor(null)" 
+                        class="px-4 py-2 rounded-full text-xs font-black transition-all cursor-pointer border ${activeVendorId === null ? 'bg-[#05A357] text-white border-[#05A357] shadow-md' : 'bg-white text-slate-700 border-slate-200 hover:border-[#05A357]'}">
+                    <i class="fas fa-store mr-1"></i> All Vendors (${vendors.length})
+                </button>
+        `;
+
+        vendors.forEach((v, idx) => {
+            const emoji = v.logo_url || ['🍔', '🥤', '🍿', '🌮', '🍟'][idx % 5];
+            const isSelected = activeVendorId === v.id;
+            chipsHtml += `
+                <button onclick="selectVendor(${v.id})" 
+                        class="px-4 py-2 rounded-full text-xs font-black transition-all cursor-pointer whitespace-nowrap border ${isSelected ? 'bg-[#05A357] text-white border-[#05A357] shadow-md' : 'bg-white text-slate-700 border-slate-200 hover:border-[#05A357]'}">
+                    <span>${emoji}</span> ${v.business_name}
+                </button>
+            `;
+        });
+        chipsHtml += `</div>`;
+
+        // 2. SEARCH MODE: Show product matches directly with vendor badges
+        if (isSearching) {
+            container.innerHTML = chipsHtml;
+            let totalFound = 0;
+            let productGrid = '<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 mt-4">';
+
+            vendors.forEach((v, vIdx) => {
+                (v.products || []).forEach((p, pIdx) => {
+                    const desc = (p.description || '').toLowerCase();
+                    const name = (p.name || '').toLowerCase();
+                    const matchesCategory = selectedCategory === 'all' || getProductCategory(p) === selectedCategory;
+                    if ((name.includes(searchVal) || desc.includes(searchVal) || (v.business_name || '').toLowerCase().includes(searchVal)) && matchesCategory) {
+                        totalFound++;
+                        const out = p.stock_status !== 'in_stock';
+                        const safeName = String(p.name || '').replace(/'/g, "\\'");
+                        const category = getProductCategory(p);
+                        let visual = p.image_url && p.image_url.startsWith('/') 
+                            ? `<img src="${API_BASE.replace('/api', '') + p.image_url}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="${p.name}">`
+                            : `<div class="w-full h-full bg-gradient-to-br from-[#FFF8E7] via-white to-[#E9F7EE] flex items-center justify-center"><span class="text-6xl drop-shadow-sm">${category === 'drinks' ? '🥤' : category === 'snacks' ? '🍿' : '🍔'}</span></div>`;
+
+                        productGrid += `
+                            <article class="group bg-white rounded-[30px] border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition duration-300 flex flex-col">
+                                <div class="relative h-44 overflow-hidden bg-slate-50">
+                                    ${visual}
+                                    <span class="absolute top-3 left-3 bg-white/95 backdrop-blur text-[9px] font-black text-[#0F172A] px-3 py-1 rounded-full uppercase tracking-wider border border-slate-200">${category}</span>
+                                    <span class="absolute bottom-3 left-3 bg-[#05A357] text-white text-[9px] font-black px-2.5 py-1 rounded-full shadow-sm"><i class="fas fa-shop mr-1"></i> ${v.business_name}</span>
+                                </div>
+                                <div class="p-4 flex-1 flex flex-col justify-between gap-4">
+                                    <div>
+                                        <h4 class="text-sm font-black tracking-tight text-[#0F172A] group-hover:text-[#05A357] ${out ? 'line-through text-slate-400' : ''}">${p.name}</h4>
+                                        <p class="text-[11px] text-slate-500 leading-relaxed mt-1 line-clamp-2 font-medium">${p.description || 'Prepared fresh by approved event vendor.'}</p>
+                                    </div>
+                                    <div class="flex items-center justify-between gap-3">
+                                        <div><p class="text-[9px] uppercase tracking-wider text-slate-400 font-black">Price</p><p class="text-lg font-black text-[#05A357]">Ksh ${parseFloat(p.price).toLocaleString()}</p></div>
+                                        ${out ? `<span class="text-[9px] bg-slate-100 border border-slate-200 text-slate-400 px-3 py-2 rounded-full font-black">Out of stock</span>` : `<button onclick="addToBasket(${p.id}, '${safeName}', ${p.price}, ${v.id})" class="h-10 px-4 rounded-full bg-[#FFC244] hover:bg-[#05A357] text-[#0F172A] hover:text-white flex items-center justify-center font-black transition-all shadow-sm border border-[#efb52e] text-xs gap-1.5 cursor-pointer"><i class="fas fa-plus text-[10px]"></i> Add</button>`}
+                                    </div>
+                                </div>
+                            </article>
+                        `;
+                    }
+                });
+            });
+
+            productGrid += '</div>';
+
+            if (totalFound > 0) {
+                container.innerHTML += `<div class="mt-4 mb-2 text-xs font-black text-slate-500 uppercase tracking-wider">Search Results (${totalFound} items matching "${searchVal}")</div>` + productGrid;
+            } else {
+                container.innerHTML += `<div class="bg-white border border-slate-200 rounded-[32px] p-10 text-center shadow-sm mt-4"><div class="text-5xl mb-3">🔎</div><h3 class="text-xl font-black text-[#0F172A]">No matching items found</h3><p class="text-sm text-slate-500 font-bold mt-1">Try another search keyword or select a category.</p></div>`;
+            }
+            return;
+        }
+
+        // 3. VENDOR FOCUS MODE: If a specific vendor is selected
+        if (activeVendorId !== null) {
+            const targetVendor = vendors.find(v => v.id === activeVendorId);
+            if (targetVendor) {
+                const idx = vendors.findIndex(v => v.id === activeVendorId);
+                const emoji = targetVendor.logo_url || ['🍔', '🥤', '🍿', '🌮', '🍟'][idx % 5];
+                const rating = (4.9 - (idx * 0.08)).toFixed(1);
+                const etaMin = 7 + (idx % 3) * 2;
+                const etaMax = etaMin + 6;
+                const zone = idx % 2 === 0 ? 'Near Gate B' : 'Near VIP concourse';
+                const products = (targetVendor.products || []).filter(p => selectedCategory === 'all' || getProductCategory(p) === selectedCategory);
+
+                let headerHtml = `
+                    <div class="mb-4">
+                        <button onclick="selectVendor(null)" class="inline-flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-[#0F172A] px-4 py-2 rounded-full text-xs font-black transition mb-4 cursor-pointer">
+                            <i class="fas fa-arrow-left"></i> Back to all vendors
+                        </button>
+                        <div class="rounded-[32px] bg-white border border-slate-200 p-5 md:p-6 shadow-md flex flex-col md:flex-row md:items-center justify-between gap-5">
+                            <div class="flex items-center gap-4">
+                                <div class="w-16 h-16 rounded-[22px] bg-emerald-50 border border-emerald-200 shadow-inner flex items-center justify-center text-4xl shrink-0">${emoji}</div>
+                                <div>
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <span class="bg-[#FFC244] text-[#0F172A] text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full">Open Now</span>
+                                        <span class="bg-[#05A357]/10 text-[#05A357] border border-[#05A357]/20 text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full">${zone}</span>
+                                    </div>
+                                    <h3 class="text-2xl font-black tracking-tight text-[#0F172A]">${targetVendor.business_name}</h3>
+                                    <div class="flex items-center gap-3 mt-1.5 text-xs font-bold text-slate-500">
+                                        <span><i class="fas fa-star text-[#FFC244]"></i> ${rating}</span>
+                                        <span><i class="far fa-clock text-[#05A357]"></i> ${etaMin}-${etaMax} min</span>
+                                        <span><i class="fas fa-box text-[#05A357]"></i> ${products.length} Items</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <button onclick="openSeatModal()" class="bg-[#05A357] hover:bg-[#047A43] text-white rounded-full px-6 py-3 text-xs font-black shadow-md self-start md:self-auto">
+                                <i class="fas fa-map-location-dot mr-1"></i> Check Seat Zone
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                let productGrid = '<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">';
+                products.forEach((p, pIndex) => {
+                    const out = p.stock_status !== 'in_stock';
+                    const safeName = String(p.name || '').replace(/'/g, "\\'");
+                    const category = getProductCategory(p);
+                    let visual = p.image_url && p.image_url.startsWith('/')
+                        ? `<img src="${API_BASE.replace('/api', '') + p.image_url}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="${p.name}">`
+                        : `<div class="w-full h-full bg-gradient-to-br from-[#FFF8E7] via-white to-[#E9F7EE] flex items-center justify-center"><span class="text-7xl drop-shadow-sm">${category === 'drinks' ? '🥤' : category === 'snacks' ? '🍿' : '🍔'}</span></div>`;
+
+                    productGrid += `
+                        <article class="group bg-white rounded-[30px] border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition duration-300 flex flex-col">
+                            <div class="relative h-44 overflow-hidden bg-slate-50">
+                                ${visual}
+                                <span class="absolute top-3 left-3 bg-white/95 backdrop-blur text-[9px] font-black text-[#0F172A] px-3 py-1 rounded-full uppercase tracking-wider border border-slate-200">${category}</span>
+                                <span class="absolute bottom-3 right-3 bg-[#0F172A] text-[#FFC244] text-[9.5px] font-extrabold px-3 py-1 rounded-full">Fast seat drop</span>
+                            </div>
+                            <div class="p-4 flex-1 flex flex-col justify-between gap-4">
+                                <div>
+                                    <h4 class="text-sm font-black tracking-tight text-[#0F172A] group-hover:text-[#05A357] ${out ? 'line-through text-slate-400' : ''}">${p.name}</h4>
+                                    <p class="text-[11px] text-slate-500 leading-relaxed mt-1 line-clamp-2 font-medium">${p.description || 'Prepared fresh by an approved event vendor.'}</p>
+                                </div>
+                                <div class="flex items-center justify-between gap-3">
+                                    <div><p class="text-[9px] uppercase tracking-wider text-slate-400 font-black">Price</p><p class="text-lg font-black text-[#05A357]">Ksh ${parseFloat(p.price).toLocaleString()}</p></div>
+                                    ${out ? `<span class="text-[9px] bg-slate-100 border border-slate-200 text-slate-400 px-3 py-2 rounded-full font-black">Out of stock</span>` : `<button onclick="addToBasket(${p.id}, '${safeName}', ${p.price}, ${targetVendor.id})" class="h-10 px-4 rounded-full bg-[#FFC244] hover:bg-[#05A357] text-[#0F172A] hover:text-white flex items-center justify-center font-black transition-all shadow-sm border border-[#efb52e] text-xs gap-1.5 cursor-pointer"><i class="fas fa-plus text-[10px]"></i> Add</button>`}
+                                </div>
+                            </div>
+                        </article>
+                    `;
+                });
+                productGrid += '</div>';
+
+                container.innerHTML = chipsHtml + headerHtml + productGrid;
+                return;
+            }
+        }
+
+        // 4. OVERVIEW MODE: Render Glovo-Style Circular Bubble Cards Grid!
+        let vendorGridHtml = `
+            <div class="space-y-6 pt-2">
+                <div class="text-center space-y-1">
+                    <h3 class="text-xl md:text-2xl font-black text-[#0F172A] tracking-tight">Top restaurants and stalls in justFeast</h3>
+                    <p class="text-xs text-slate-500 font-bold">Tap any stall bubble to explore their full menu</p>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 justify-items-center py-4">
+        `;
 
         vendors.forEach((vendor, index) => {
-            const products = (vendor.products || []).filter(p => {
-                const desc = (p.description || '').toLowerCase();
-                const name = (p.name || '').toLowerCase();
-                const matchesSearch = name.includes(searchVal) || desc.includes(searchVal) || (vendor.business_name || '').toLowerCase().includes(searchVal);
-                const matchesCategory = selectedCategory === 'all' || getProductCategory(p) === selectedCategory;
-                return matchesSearch && matchesCategory;
-            });
-            if (!products.length) return;
-            renderedCount++;
+            const products = (vendor.products || []).filter(p => selectedCategory === 'all' || getProductCategory(p) === selectedCategory);
+            if (selectedCategory !== 'all' && !products.length) return;
 
             const vendorEmoji = vendor.logo_url || ['🍔', '🥤', '🍿', '🌮', '🍟'][index % 5];
             const rating = (4.9 - (index * 0.08)).toFixed(1);
             const etaMin = 7 + (index % 3) * 2;
             const etaMax = etaMin + 6;
-            const zone = index % 2 === 0 ? 'Near Gate B' : 'Near VIP concourse';
 
-            const section = document.createElement('section');
-            section.className = 'space-y-4';
-
-            const header = `
-                    <div class="group relative overflow-hidden rounded-[34px] bg-white border border-[#E7E8DD] shadow-card">
-                        <div class="absolute inset-x-0 top-0 h-28 bg-gradient-to-r from-[#111827] via-[#047A43] to-[#05A357]"></div>
-                        <div class="absolute right-8 top-5 text-7xl opacity-10 text-white">${vendorEmoji}</div>
-                        <div class="relative p-5 md:p-6 pt-16 flex flex-col md:flex-row md:items-end justify-between gap-4">
-                            <div class="flex items-end gap-4">
-                                <div class="w-20 h-20 rounded-[28px] bg-white shadow-soft border border-[#E7E8DD] flex items-center justify-center text-4xl flex-shrink-0">${vendorEmoji}</div>
-                                <div class="pb-1">
-                                    <div class="flex flex-wrap items-center gap-2 mb-1">
-                                        <span class="bg-[#FFC244] text-[#111827] text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full">Open now</span>
-                                        <span class="bg-[#05A357]/10 text-[#05A357] border border-[#05A357]/20 text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full">${zone}</span>
-                                    </div>
-                                    <h3 class="text-xl md:text-2xl font-black tracking-tight text-[#111827]">${vendor.business_name}</h3>
-                                    <div class="flex flex-wrap items-center gap-3 mt-2 text-[11px] font-black text-zinc-500">
-                                        <span><i class="fas fa-star text-[#FFC244]"></i> ${rating}</span>
-                                        <span><i class="far fa-clock text-[#05A357]"></i> ${etaMin}-${etaMax} min</span>
-                                        <span><i class="fas fa-person-running text-[#05A357]"></i> Seat runners ready</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <button onclick="openSeatModal()" class="bg-[#111827] hover:bg-[#05A357] text-white rounded-full px-5 py-3 text-xs font-black self-start md:self-end">Check seat zone</button>
+            vendorGridHtml += `
+                <div onclick="selectVendor(${vendor.id})" 
+                     class="flex flex-col items-center group cursor-pointer text-center transition-transform">
+                    
+                    <!-- Circular Glovo Bubble Avatar -->
+                    <div class="w-28 h-28 md:w-32 md:h-32 rounded-full bg-white border-2 border-slate-200 group-hover:border-[#05A357] shadow-md group-hover:shadow-2xl transition-all duration-300 flex items-center justify-center overflow-hidden relative group-hover:scale-105">
+                        <div class="w-full h-full bg-gradient-to-br from-[#FFF8E7] via-white to-[#E9F7EE] flex items-center justify-center p-2">
+                            <span class="text-5xl md:text-6xl drop-shadow-sm group-hover:scale-110 transition-transform duration-300">${vendorEmoji}</span>
                         </div>
-                    </div>`;
+                        <span class="absolute bottom-2 bg-white/90 backdrop-blur text-[#0F172A] text-[9.5px] font-black px-2 py-0.5 rounded-full shadow-sm border border-slate-200">
+                            <i class="fas fa-star text-[#FFC244] text-[8.5px]"></i> ${rating}
+                        </span>
+                    </div>
 
-            let productGrid = '<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">';
-            products.forEach((p, pIndex) => {
-                const out = p.stock_status !== 'in_stock';
-                let visual = '';
-                if (p.image_url && p.image_url.startsWith('/')) {
-                    visual = `<img src="${API_BASE.replace('/api', '') + p.image_url}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="${p.name}">`;
-                } else {
-                    const emoji = getProductCategory(p) === 'drinks' ? '🥤' : getProductCategory(p) === 'snacks' ? '🍿' : ['🍔', '🌮', '🍟', '🍗'][pIndex % 4];
-                    visual = `<div class="w-full h-full bg-gradient-to-br from-[#FFF8E7] via-white to-[#E9F7EE] flex items-center justify-center"><span class="text-7xl drop-shadow-sm">${emoji}</span></div>`;
-                }
-                const safeName = String(p.name || '').replace(/'/g, "\\'");
-                const category = getProductCategory(p);
-                productGrid += `
-                        <article class="group bg-white rounded-[30px] border border-[#E7E8DD] overflow-hidden shadow-card hover:shadow-soft hover:-translate-y-1 transition duration-300 flex flex-col">
-                            <div class="relative h-44 overflow-hidden bg-[#F6F7F2]">
-                                ${visual}
-                                <span class="absolute top-3 left-3 bg-white/95 backdrop-blur text-[9px] font-black text-[#111827] px-3 py-1.5 rounded-full uppercase tracking-wider shadow-sm border border-white/70">${category}</span>
-                                <span class="absolute bottom-3 right-3 bg-[#111827] text-white text-[10px] font-black px-3 py-1.5 rounded-full">Fast seat drop</span>
-                            </div>
-                            <div class="p-4 flex-1 flex flex-col justify-between gap-4">
-                                <div>
-                                    <h4 class="text-sm font-black tracking-tight text-[#111827] group-hover:text-[#05A357] ${out ? 'line-through text-zinc-400' : ''}">${p.name}</h4>
-                                    <p class="text-[11px] text-zinc-500 leading-relaxed mt-1 line-clamp-2 font-medium">${p.description || 'Prepared fresh by an approved event vendor and delivered directly to your selected seat.'}</p>
-                                </div>
-                                <div class="flex items-center justify-between gap-3">
-                                    <div><p class="text-[9px] uppercase tracking-wider text-zinc-400 font-black">Price</p><p class="text-lg font-black text-[#05A357]">Ksh ${parseFloat(p.price).toLocaleString()}</p></div>
-                                    ${out
-                    ? `<span class="text-[9px] bg-zinc-100 border border-zinc-200 text-zinc-400 px-3 py-2 rounded-full font-black">Out of stock</span>`
-                    : (() => {
-                        const bItem = basket.find(item => item.id === p.id);
-                        if (bItem && bItem.quantity > 0) {
-                            return `
-                            <div class="flex items-center bg-[#FFC244] rounded-full h-11 px-1.5 border border-[#efb52e] shadow-card">
-                                <button onclick="adjustQty(${p.id}, -1)" class="w-8 h-8 rounded-full bg-white hover:bg-zinc-100 flex items-center justify-center font-black text-xs text-[#111827] transition border-0 cursor-pointer"><i class="fas fa-minus"></i></button>
-                                <span class="px-3 text-xs font-black text-[#111827] min-w-[20px] text-center">${bItem.quantity}</span>
-                                <button onclick="adjustQty(${p.id}, 1)" class="w-8 h-8 rounded-full bg-white hover:bg-zinc-100 flex items-center justify-center font-black text-xs text-[#111827] transition border-0 cursor-pointer"><i class="fas fa-plus"></i></button>
-                            </div>
-                            `;
-                        } else {
-                            return `<button onclick="addToBasket(${p.id}, '${safeName}', ${p.price}, ${vendor.id})" class="h-11 px-4 rounded-full bg-[#FFC244] hover:bg-[#111827] text-[#111827] hover:text-white flex items-center justify-center font-black transition-all shadow-card border border-[#efb52e] text-xs gap-2 cursor-pointer"><i class="fas fa-plus"></i> Add</button>`;
-                        }
-                    })()}
-                                </div>
-                            </div>
-                        </article>`;
-            });
-            productGrid += '</div>';
-            section.innerHTML = header + productGrid;
-            container.appendChild(section);
+                    <!-- Label Pill underneath -->
+                    <span class="mt-3 px-3.5 py-1 bg-[#FFF8E7] group-hover:bg-[#05A357] text-[#0F172A] group-hover:text-white rounded-full text-xs font-black transition-all shadow-sm border border-[#F7E5B2] group-hover:border-[#05A357] truncate max-w-[140px]">
+                        ${vendor.business_name}
+                    </span>
+
+                    <span class="text-[10px] text-slate-400 font-bold mt-1">
+                        <i class="far fa-clock text-[#05A357] mr-0.5"></i> ${etaMin}-${etaMax} min
+                    </span>
+                </div>
+            `;
         });
 
-        if (!renderedCount) {
-            container.innerHTML = `<div class="bg-white border border-[#E7E8DD] rounded-[32px] p-10 text-center shadow-card"><div class="text-5xl mb-3">🔎</div><h3 class="text-xl font-black">No matching vendors</h3><p class="text-sm text-zinc-500 font-bold mt-1">Try another search or category.</p></div>`;
-        }
+        vendorGridHtml += `</div></div>`;
+        container.innerHTML = chipsHtml + vendorGridHtml;
     }
 
     function renderBasket() {
         const mobileTray = document.getElementById('phone-cart-tray');
         const mobileContainer = document.getElementById('cart-tray-items');
         const desktopContainer = document.getElementById('desktop-cart-tray-items');
+        const badgeEl = document.getElementById('basket-count-badge');
+        const subtotalEl = document.getElementById('desktop-cart-subtotal');
+        
+        let totalQty = 0;
+        basket.forEach(i => totalQty += i.quantity);
+        if (badgeEl) badgeEl.textContent = `${totalQty} item${totalQty === 1 ? '' : 's'}`;
+
         const hasItems = basket.length > 0;
         if (!hasItems) {
-            mobileTray.classList.add('hidden');
+            if (mobileTray) mobileTray.classList.add('hidden');
             if (mobileContainer) mobileContainer.innerHTML = '';
-            if (desktopContainer) desktopContainer.innerHTML = '<div class="text-center py-7 space-y-2"><div class="text-4xl">🛒</div><p class="text-xs text-zinc-400 font-bold">Your basket is empty.<br>Add food from vendors.</p></div>';
-            document.getElementById('cart-tray-total').textContent = 'Ksh 0';
-            document.getElementById('desktop-cart-tray-total').textContent = 'Ksh 0';
+            if (desktopContainer) desktopContainer.innerHTML = `
+                <div class="text-center py-8 px-4 space-y-3 bg-slate-50/50 rounded-2xl border border-dashed border-slate-200">
+                    <div class="w-14 h-14 mx-auto rounded-full bg-[#FFF8E7] text-3xl flex items-center justify-center shadow-inner">🛒</div>
+                    <div>
+                        <p class="text-xs font-black text-[#0F172A]">Your basket is empty</p>
+                        <p class="text-[11px] text-slate-400 font-medium mt-0.5">Select meals or drinks from stalls to order.</p>
+                    </div>
+                </div>
+            `;
+            if (document.getElementById('cart-tray-total')) document.getElementById('cart-tray-total').textContent = 'Ksh 0';
+            if (document.getElementById('desktop-cart-tray-total')) document.getElementById('desktop-cart-tray-total').textContent = 'Ksh 0';
+            if (subtotalEl) subtotalEl.textContent = 'Ksh 0';
             return;
         }
-        mobileTray.classList.remove('hidden');
-        mobileContainer.innerHTML = '';
-        desktopContainer.innerHTML = '';
+
+        if (mobileTray) mobileTray.classList.remove('hidden');
+        if (mobileContainer) mobileContainer.innerHTML = '';
+        if (desktopContainer) desktopContainer.innerHTML = '';
+
         let total = 0;
         basket.forEach(item => {
             total += item.price * item.quantity;
             const row = `
-                    <div class="flex justify-between items-center gap-3 text-xs py-3 border-b border-[#E7E8DD] last:border-b-0">
-                        <div class="flex-1 min-w-0"><p class="font-black text-[#111827] truncate">${item.name}</p><p class="text-[10px] text-zinc-500 font-bold">Ksh ${item.price.toLocaleString()} each</p></div>
-                        <div class="flex items-center gap-2 bg-[#F6F7F2] rounded-full p-1">
-                            <button onclick="adjustQty(${item.id}, -1)" class="w-7 h-7 rounded-full bg-white hover:bg-[#FFC244] flex items-center justify-center text-xs text-[#111827] font-black shadow-sm">-</button>
-                            <span class="w-5 text-center text-xs font-black">${item.quantity}</span>
-                            <button onclick="adjustQty(${item.id}, 1)" class="w-7 h-7 rounded-full bg-white hover:bg-[#FFC244] flex items-center justify-center text-xs text-[#111827] font-black shadow-sm">+</button>
+                    <div class="flex justify-between items-center gap-3 text-xs py-2.5 border-b border-slate-100 last:border-b-0">
+                        <div class="flex-1 min-w-0">
+                            <p class="font-black text-[#0F172A] truncate">${item.name}</p>
+                            <p class="text-[10px] text-[#05A357] font-bold mt-0.5">Ksh ${item.price.toLocaleString()} each</p>
+                        </div>
+                        <div class="flex items-center gap-2 bg-slate-100 rounded-full p-1 border border-slate-200/80">
+                            <button onclick="adjustQty(${item.id}, -1)" class="w-6 h-6 rounded-full bg-white hover:bg-slate-200 flex items-center justify-center text-xs text-[#0F172A] font-black shadow-xs cursor-pointer">-</button>
+                            <span class="w-5 text-center text-xs font-black text-[#0F172A]">${item.quantity}</span>
+                            <button onclick="adjustQty(${item.id}, 1)" class="w-6 h-6 rounded-full bg-white hover:bg-slate-200 flex items-center justify-center text-xs text-[#0F172A] font-black shadow-xs cursor-pointer">+</button>
                         </div>
                     </div>`;
-            mobileContainer.insertAdjacentHTML('beforeend', row);
-            desktopContainer.insertAdjacentHTML('beforeend', row);
+            if (mobileContainer) mobileContainer.insertAdjacentHTML('beforeend', row);
+            if (desktopContainer) desktopContainer.insertAdjacentHTML('beforeend', row);
         });
+
         const totalText = `Ksh ${total.toLocaleString()}`;
-        document.getElementById('cart-tray-total').textContent = totalText;
-        document.getElementById('desktop-cart-tray-total').textContent = totalText;
+        if (document.getElementById('cart-tray-total')) document.getElementById('cart-tray-total').textContent = totalText;
+        if (document.getElementById('desktop-cart-tray-total')) document.getElementById('desktop-cart-tray-total').textContent = totalText;
+        if (subtotalEl) subtotalEl.textContent = totalText;
     }
 </script>
 </body>

@@ -6,6 +6,7 @@ use App\Http\Controllers\API\EventController;
 use App\Http\Controllers\API\OrderController;
 use App\Http\Controllers\API\RunnerController;
 use App\Http\Controllers\API\AdminController;
+use App\Http\Controllers\API\IntaSendWebhookController;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,6 +38,8 @@ Route::get('/orders/active', [OrderController::class, 'active']);
 Route::get('/orders/vendor', [OrderController::class, 'vendorOrders']);
 Route::get('/orders/{id}', [OrderController::class, 'show']);
 Route::post('/orders/{id}/pay', [OrderController::class, 'pay']);
+Route::post('/orders/{id}/test-pay', [OrderController::class, 'testPay']);
+Route::get('/orders/{id}/payment-status', [OrderController::class, 'checkPaymentStatus']);
 Route::post('/orders/{id}/status', [OrderController::class, 'updateStatus']);
 
 // Runner Operations
@@ -51,3 +54,11 @@ Route::get('/admin/orders', [AdminController::class, 'orders']);
 Route::get('/admin/users', [AdminController::class, 'users']);
 Route::post('/admin/users', [AdminController::class, 'createUser']);
 Route::get('/admin/reports', [AdminController::class, 'reports']);
+
+/*
+|--------------------------------------------------------------------------
+| IntaSend Webhook (No auth — IntaSend POSTs directly to this endpoint)
+| Challenge secret is validated inside the controller itself.
+|--------------------------------------------------------------------------
+*/
+Route::post('/intasend/webhook', [IntaSendWebhookController::class, 'handle']);
