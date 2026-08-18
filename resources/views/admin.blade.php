@@ -612,7 +612,7 @@ tbody td{padding:1.1rem 1.5rem;vertical-align:middle}
     <div id="section-heatmap" class="section-content">
       <div class="heatmap-container">
         <div class="stadium-wrap">
-          <h3 style="font-size:.9rem;font-weight:700;align-self:flex-start">Uhuru Gardens Layout Monitor</h3>
+          <h3 style="font-size:.9rem;font-weight:700;align-self:flex-start">Uhuru Park Layout Monitor</h3>
           <div class="stadium-svg-container">
             <svg viewBox="0 0 100 100">
               <rect x="36" y="42" width="28" height="16" rx="4" fill="#1c2331" stroke="#ff6b00" stroke-width="1.2" />
@@ -653,7 +653,7 @@ tbody td{padding:1.1rem 1.5rem;vertical-align:middle}
           
           <div style="background:rgba(0,0,0,0.15);padding:1rem;border-radius:12px;border:1px solid var(--border)">
             <h4 style="font-size:.9rem;font-weight:700;margin-bottom:.2rem" id="h-sec-name">Select a Section</h4>
-            <p style="font-size:.72rem;color:var(--muted)">Click a sector on Uhuru Gardens map to inspect stats</p>
+            <p style="font-size:.72rem;color:var(--muted)">Click a sector on Uhuru Park map to inspect stats</p>
           </div>
 
           <div style="display:flex;flex-direction:column;gap:.8rem">
@@ -784,7 +784,7 @@ function showSection(sec) {
     loadVendorsTab();
   } else if (sec === 'heatmap') {
     topTitle.textContent = "Interactive Seating Heatmap";
-    topMeta.textContent = "Visualize hot zones in Uhuru Gardens";
+    topMeta.textContent = "Visualize hot zones in Uhuru Park";
     loadHeatmapTab();
   }
 }

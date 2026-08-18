@@ -428,7 +428,7 @@
                                         <i class="fas fa-music text-xl"></i>
                                     </div>
                                     <p class="text-xs font-black uppercase tracking-widest text-[#0F172A]">Main Stage</p>
-                                    <p class="text-[10px] font-extrabold text-[#0F172A]/70">Uhuru Gardens Arena</p>
+                                    <p class="text-[10px] font-extrabold text-[#0F172A]/70">Uhuru Park Arena</p>
                                 </div>
                             </div>
 
@@ -753,7 +753,7 @@
                 <div>
                     <p class="text-[10px] uppercase tracking-[0.2em] text-[#05A357] font-black">Live Runner Radar</p>
                     <h3 class="text-2xl font-black tracking-tight text-[#0F172A]">Location Active</h3>
-                    <p class="text-xs text-slate-500 font-bold">Uhuru Gardens Event Arena</p>
+                    <p class="text-xs text-slate-500 font-bold">Uhuru Park Event Arena</p>
                 </div>
                 
                 <div class="relative w-52 h-52 mx-auto flex items-center justify-center bg-slate-100 rounded-full border border-slate-200 overflow-hidden shadow-inner">

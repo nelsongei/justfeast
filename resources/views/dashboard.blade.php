@@ -322,7 +322,7 @@
                         <div id="cust-tracker" class="hidden flex flex-col h-full justify-between py-2">
                             <div class="text-center">
                                 <h3 class="text-base font-black text-[#2D3748] mb-0.5">Live Delivery Radar</h3>
-                                <p class="text-[10px] text-zinc-500">Fast Location Delivery — Uhuru Gardens Event Park</p>
+                                <p class="text-[10px] text-zinc-500">Fast Location Delivery — Uhuru Park</p>
                             </div>
  
                             <!-- Simulated radar animation -->
@@ -583,7 +583,7 @@
 
                                     <div class="h-28 bg-zinc-950 rounded-lg border border-zinc-800 flex items-center justify-center relative overflow-hidden">
                                         <!-- Mini stage mapping visual representation -->
-                                        <div class="absolute top-1 bg-zinc-900 border border-zinc-800 px-2 py-0.5 rounded text-[8px] text-zinc-400 font-bold">UHURU GARDENS KITCHEN STALLS</div>
+                                        <div class="absolute top-1 bg-zinc-900 border border-zinc-800 px-2 py-0.5 rounded text-[8px] text-zinc-400 font-bold">UHURU PARK KITCHEN STALLS</div>
                                         <div class="absolute bottom-2 bg-brand-rose px-2 py-1 rounded text-[8px] text-white font-bold" id="runner-target-section-tag">GPS TARGET LOCATION</div>
 
                                         <!-- Dashboard dashed navigation routing path -->
@@ -663,7 +663,7 @@
                     </div>
                 </div>
 
-                <!-- Interactive heatmaps mapping seating quadrants (Uhuru Gardens Arena) -->
+                <!-- Interactive heatmaps mapping seating quadrants (Uhuru Park Arena) -->
                 <div class="bg-zinc-900/30 border border-zinc-900 p-4 rounded-2xl space-y-3 mb-5">
                     <h3 class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider"><i class="fas fa-fire text-brand-orange mr-1.5"></i> Stadium Order Heatmap</h3>
 
