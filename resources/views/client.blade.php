@@ -128,7 +128,7 @@
             content: '';
             position: absolute;
             inset: -20%;
-            background: 
+            background:
                 radial-gradient(circle at 75% 30%, rgba(255, 194, 68, 0.25), transparent 18rem),
                 linear-gradient(120deg, transparent 0% 46%, rgba(255, 255, 255, 0.07) 47% 49%, transparent 50% 100%);
             pointer-events: none;
@@ -157,7 +157,7 @@
         }
 
         .stadium-bowl {
-            background: 
+            background:
                 radial-gradient(ellipse at center, rgba(255, 194, 68, 0.95) 0 20%, transparent 21%),
                 repeating-radial-gradient(ellipse at center, rgba(255, 255, 255, 0.22) 0 10px, rgba(255, 255, 255, 0.06) 11px 20px, transparent 21px 30px);
         }
@@ -198,7 +198,7 @@
         }
 
         .seat-map-mini {
-            background-image: 
+            background-image:
                 linear-gradient(rgba(15, 23, 42, 0.05) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(15, 23, 42, 0.05) 1px, transparent 1px);
             background-size: 20px 20px;
@@ -372,7 +372,7 @@
                             </span>
                             Live Event Food Delivery — Delivered to your spot
                         </div>
-                        
+
                         <div class="space-y-4">
                             <h2 class="text-4xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[0.95] text-white">
                                 Never miss a beat.<br class="hidden md:block">
@@ -420,7 +420,7 @@
                         <div class="relative min-h-[440px] flex items-center justify-center">
                             <!-- Stadium concentric visual radar -->
                             <div class="absolute inset-0 stadium-bowl rounded-full border border-white/20 opacity-80 shadow-2xl"></div>
-                            
+
                             <!-- Center stage node -->
                             <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-52 h-52 rounded-full bg-gradient-to-tr from-[#FFC244] to-[#FF9100] shadow-2xl flex items-center justify-center text-[#0F172A] text-center p-6 border-4 border-white/30 z-10">
                                 <div>
@@ -711,7 +711,7 @@
                     <h3 class="text-2xl font-black tracking-tight text-[#0F172A]">Delivery Timeline</h3>
                     <p class="text-xs text-slate-500 font-extrabold mt-1">Real-time status updates from vendor to your seat.</p>
                 </div>
-                
+
                 <div class="space-y-4 bg-slate-50 p-6 rounded-[30px] border border-slate-200/90 text-left shadow-inner">
                     <div class="flex items-center gap-3.5" id="step-created">
                         <div class="w-7 h-7 rounded-full bg-[#05A357] text-white flex items-center justify-center text-xs font-bold shadow-md shadow-[#05A357]/30">
@@ -755,7 +755,7 @@
                     <h3 class="text-2xl font-black tracking-tight text-[#0F172A]">Location Active</h3>
                     <p class="text-xs text-slate-500 font-bold">Uhuru Park Event Arena</p>
                 </div>
-                
+
                 <div class="relative w-52 h-52 mx-auto flex items-center justify-center bg-slate-100 rounded-full border border-slate-200 overflow-hidden shadow-inner">
                     <div class="radar-sweep"></div>
                     <div class="absolute w-52 h-52 rounded-full border border-[#05A357]/20 pulse-ring"></div>
@@ -2229,7 +2229,7 @@
         // 1. Render Vendor Filter Chips Bar at top of marketplace
         let chipsHtml = `
             <div class="flex items-center gap-2.5 pb-2 overflow-x-auto no-scrollbar scroll-smooth">
-                <button onclick="selectVendor(null)" 
+                <button onclick="selectVendor(null)"
                         class="px-4 py-2 rounded-full text-xs font-black transition-all cursor-pointer border ${activeVendorId === null ? 'bg-[#05A357] text-white border-[#05A357] shadow-md' : 'bg-white text-slate-700 border-slate-200 hover:border-[#05A357]'}">
                     <i class="fas fa-store mr-1"></i> All Vendors (${vendors.length})
                 </button>
@@ -2239,7 +2239,7 @@
             const emoji = v.logo_url || ['🍔', '🥤', '🍿', '🌮', '🍟'][idx % 5];
             const isSelected = activeVendorId === v.id;
             chipsHtml += `
-                <button onclick="selectVendor(${v.id})" 
+                <button onclick="selectVendor(${v.id})"
                         class="px-4 py-2 rounded-full text-xs font-black transition-all cursor-pointer whitespace-nowrap border ${isSelected ? 'bg-[#05A357] text-white border-[#05A357] shadow-md' : 'bg-white text-slate-700 border-slate-200 hover:border-[#05A357]'}">
                     <span>${emoji}</span> ${v.business_name}
                 </button>
@@ -2263,7 +2263,7 @@
                         const out = p.stock_status !== 'in_stock';
                         const safeName = String(p.name || '').replace(/'/g, "\\'");
                         const category = getProductCategory(p);
-                        let visual = p.image_url && p.image_url.startsWith('/') 
+                        let visual = p.image_url && p.image_url.startsWith('/')
                             ? `<img src="${API_BASE.replace('/api', '') + p.image_url}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="${p.name}">`
                             : `<div class="w-full h-full bg-gradient-to-br from-[#FFF8E7] via-white to-[#E9F7EE] flex items-center justify-center"><span class="text-6xl drop-shadow-sm">${category === 'drinks' ? '🥤' : category === 'snacks' ? '🍿' : '🍔'}</span></div>`;
 
@@ -2397,9 +2397,9 @@
             const etaMax = etaMin + 6;
 
             vendorGridHtml += `
-                <div onclick="selectVendor(${vendor.id})" 
+                <div onclick="selectVendor(${vendor.id})"
                      class="flex flex-col items-center group cursor-pointer text-center transition-transform">
-                    
+
                     <!-- Circular Glovo Bubble Avatar -->
                     <div class="w-28 h-28 md:w-32 md:h-32 rounded-full bg-white border-2 border-slate-200 group-hover:border-[#05A357] shadow-md group-hover:shadow-2xl transition-all duration-300 flex items-center justify-center overflow-hidden relative group-hover:scale-105">
                         <div class="w-full h-full bg-gradient-to-br from-[#FFF8E7] via-white to-[#E9F7EE] flex items-center justify-center p-2">
@@ -2432,7 +2432,7 @@
         const desktopContainer = document.getElementById('desktop-cart-tray-items');
         const badgeEl = document.getElementById('basket-count-badge');
         const subtotalEl = document.getElementById('desktop-cart-subtotal');
-        
+
         let totalQty = 0;
         basket.forEach(i => totalQty += i.quantity);
         if (badgeEl) badgeEl.textContent = `${totalQty} item${totalQty === 1 ? '' : 's'}`;
