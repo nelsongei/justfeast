@@ -123,34 +123,34 @@
     </div>
 
     <!-- Header Navigation -->
-    <header class="border-b border-zinc-900 bg-zinc-950/80 backdrop-blur-md sticky top-0 z-40 px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
+    <header class="border-b border-zinc-900 bg-zinc-950/80 backdrop-blur-md sticky top-0 z-40 px-4 md:px-6 py-3 md:py-4 flex flex-col md:flex-row items-center justify-between gap-3 md:gap-4">
         <div class="flex items-center gap-3">
-            <div class="bg-white w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-brand-rose/20 overflow-hidden">
-                <img src="{{ asset('images/logo/jm.png') }}" alt="justFeast Logo" class="h-8 w-auto object-contain">
+            <div class="bg-white w-9 h-9 md:w-10 md:h-10 rounded-xl flex items-center justify-center shadow-lg shadow-brand-rose/20 overflow-hidden shrink-0">
+                <img src="{{ asset('images/logo/jm.png') }}" alt="justFeast Logo" class="h-7 md:h-8 w-auto object-contain">
             </div>
-            <div>
-                <h1 class="text-xl font-bold tracking-tight bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent flex items-center gap-2">
-                    JUSTFEAST <span class="text-xs bg-brand-rose/20 text-brand-rose px-2 py-0.5 rounded-full font-semibold border border-brand-rose/30">Concert Delivery PWA</span>
+            <div class="min-w-0">
+                <h1 class="text-base md:text-xl font-bold tracking-tight bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent flex items-center gap-2">
+                    JUSTFEAST <span class="text-[9px] md:text-xs bg-brand-rose/20 text-brand-rose px-2 py-0.5 rounded-full font-semibold border border-brand-rose/30 whitespace-nowrap">Concert Delivery PWA</span>
                 </h1>
-                <p class="text-xs text-zinc-500" id="live-event-banner">Loading active event...</p>
+                <p class="text-[10px] md:text-xs text-zinc-500 truncate max-w-[200px] md:max-w-none" id="live-event-banner">Loading active event...</p>
             </div>
         </div>
 
         <!-- Global Multi-Role Portal Switcher -->
-        <div class="flex items-center gap-1 bg-zinc-900 p-1.5 rounded-xl border border-zinc-800 text-sm font-medium">
-            <button onclick="switchPortal('all')" id="tab-all" class="px-3.5 py-1.5 rounded-lg transition-all duration-300 bg-brand-rose text-white shadow shadow-brand-rose/30">
+        <div class="flex items-center gap-1 bg-zinc-900 p-1.5 rounded-xl border border-zinc-800 text-xs md:text-sm font-medium overflow-x-auto no-scrollbar max-w-full">
+            <button onclick="switchPortal('all')" id="tab-all" class="px-3 md:px-3.5 py-1.5 rounded-lg transition-all duration-300 bg-brand-rose text-white shadow shadow-brand-rose/30 whitespace-nowrap">
                 <i class="fas fa-cubes mr-1.5"></i>All-in-One
             </button>
-            <button onclick="switchPortal('customer')" id="tab-customer" class="px-3.5 py-1.5 rounded-lg text-zinc-400 hover:text-white transition-all duration-300">
+            <button onclick="switchPortal('customer')" id="tab-customer" class="px-3 md:px-3.5 py-1.5 rounded-lg text-zinc-400 hover:text-white transition-all duration-300 whitespace-nowrap">
                 <i class="fas fa-mobile-screen mr-1.5"></i>Attendee
             </button>
-            <button onclick="switchPortal('vendor')" id="tab-vendor" class="px-3.5 py-1.5 rounded-lg text-zinc-400 hover:text-white transition-all duration-300">
+            <button onclick="switchPortal('vendor')" id="tab-vendor" class="px-3 md:px-3.5 py-1.5 rounded-lg text-zinc-400 hover:text-white transition-all duration-300 whitespace-nowrap">
                 <i class="fas fa-store mr-1.5"></i>Vendor
             </button>
-            <button onclick="switchPortal('runner')" id="tab-runner" class="px-3.5 py-1.5 rounded-lg text-zinc-400 hover:text-white transition-all duration-300">
+            <button onclick="switchPortal('runner')" id="tab-runner" class="px-3 md:px-3.5 py-1.5 rounded-lg text-zinc-400 hover:text-white transition-all duration-300 whitespace-nowrap">
                 <i class="fas fa-person-running mr-1.5"></i>Runner
             </button>
-            <button onclick="switchPortal('admin')" id="tab-admin" class="px-3.5 py-1.5 rounded-lg text-zinc-400 hover:text-white transition-all duration-300">
+            <button onclick="switchPortal('admin')" id="tab-admin" class="px-3 md:px-3.5 py-1.5 rounded-lg text-zinc-400 hover:text-white transition-all duration-300 whitespace-nowrap">
                 <i class="fas fa-sliders mr-1.5"></i>Admin
             </button>
         </div>
@@ -176,13 +176,13 @@
                     </div>
                     <div class="flex items-center gap-2">
                         <div id="header-user-badge" class="hidden flex items-center gap-1 bg-zinc-950 px-2 py-0.5 rounded-full border border-zinc-800">
-                            <span class="w-1 h-1 rounded-full bg-[#00A082] animate-pulse"></span>
+                            <span class="w-1 h-1 rounded-full bg-[#A31D1D] animate-pulse"></span>
                             <span class="text-[8px] font-bold text-zinc-300" id="header-user-name">Guest</span>
                         </div>
                         <div id="header-auth-buttons">
                             <!-- Toggle Login/Logout -->
                         </div>
-                        <span class="text-[9px] text-zinc-500 font-semibold"><i class="fas fa-signal text-[#00A082]"></i> 5G</span>
+                        <span class="text-[9px] text-zinc-500 font-semibold"><i class="fas fa-signal text-[#A31D1D]"></i> 5G</span>
                     </div>
                 </div>
  
@@ -199,20 +199,13 @@
                                 <div class="space-y-1">
                                     <h3 class="text-sm font-black text-white">Concert Location Delivery</h3>
                                     <p class="text-[10px] text-zinc-400 leading-relaxed font-medium">Get food, drinks, and snacks delivered directly to your location during the concert!</p>
-                                </div>
-                                <div class="space-y-3 text-left">
+                                </d                                <div class="space-y-3 text-left">
                                     <div>
                                         <label class="block text-[8px] font-black text-zinc-400 mb-1 uppercase tracking-wider">Enter Phone Number</label>
-                                        <input type="text" id="cust-phone-input" placeholder="e.g. 0712345678" class="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-white text-xs focus:outline-none focus:border-[#00A082]" value="0712345678">
+                                        <input type="text" id="cust-phone-input" placeholder="e.g. 0712345678" class="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-white text-xs focus:outline-none focus:border-[#A31D1D]" value="">
                                     </div>
-                                    <button onclick="sendOTP()" class="w-full py-2.5 rounded-full bg-[#00A082] text-white font-bold text-xs hover:bg-[#008A70] transition shadow-md shadow-[#00A082]/10 border-0 cursor-pointer">
+                                    <button onclick="sendOTP()" class="w-full py-2.5 rounded-full bg-[#A31D1D] text-white font-bold text-xs hover:bg-[#008A70] transition shadow-md shadow-[#A31D1D]/10 border-0 cursor-pointer">
                                         Send Verification OTP
-                                    </button>
-                                </div>
-                                <div class="border-t border-zinc-800 pt-4">
-                                    <span class="text-[8px] text-zinc-500 block mb-2 font-semibold uppercase tracking-wider">Or instantly access:</span>
-                                    <button onclick="quickLogin('customer@justfeast.com')" class="w-full py-2 rounded-full bg-[#FFC244] hover:bg-[#E0A325] text-[#2D3748] text-xs font-bold transition shadow-sm border border-[#E0A325] cursor-pointer">
-                                        🚀 Access as John Customer
                                     </button>
                                 </div>
                             </div>
@@ -225,9 +218,9 @@
                                 <div class="space-y-3 text-left">
                                     <div>
                                         <label class="block text-[8px] font-black text-zinc-400 mb-1 uppercase tracking-wider">Enter 4-Digit Code</label>
-                                        <input type="text" id="cust-otp-input" placeholder="Enter 1234" class="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-white text-center text-base tracking-widest font-bold focus:outline-none focus:border-[#00A082]" value="1234">
+                                        <input type="text" id="cust-otp-input" placeholder="Enter 1234" class="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-white text-center text-base tracking-widest font-bold focus:outline-none focus:border-[#A31D1D]" value="">
                                     </div>
-                                    <button onclick="verifyOTP()" class="w-full py-2.5 rounded-full bg-[#00A082] text-white font-bold text-xs hover:bg-[#008A70] transition shadow-md shadow-[#00A082]/10 border-0 cursor-pointer">
+                                    <button onclick="verifyOTP()" class="w-full py-2.5 rounded-full bg-[#A31D1D] text-white font-bold text-xs hover:bg-[#008A70] transition shadow-md shadow-[#A31D1D]/10 border-0 cursor-pointer">
                                         Verify Code
                                     </button>
                                     <button onclick="showAuthScreen()" class="w-full py-1.5 rounded-full text-zinc-500 hover:text-zinc-300 text-[10px] font-bold text-center transition">
@@ -245,24 +238,24 @@
                                 <p class="text-[8px] text-zinc-400 mt-1 max-w-[200px] mx-auto leading-relaxed">Skip the stadium queues. Order snacks delivered directly to your location!</p>
                                 
                                 <!-- Address search capsule -->
-                                <div onclick="openSeatModal()" class="mt-3 flex items-center bg-white rounded-full border border-[#E2E8F0] shadow-md p-1 hover:border-[#00A082] transition duration-200 cursor-pointer group">
-                                    <span class="pl-2 pr-1 text-[#00A082] text-xs"><i class="fas fa-location-dot"></i></span>
+                                <div onclick="openSeatModal()" class="mt-3 flex items-center bg-white rounded-full border border-[#E2E8F0] shadow-md p-1 hover:border-[#A31D1D] transition duration-200 cursor-pointer group">
+                                    <span class="pl-2 pr-1 text-[#A31D1D] text-xs"><i class="fas fa-location-dot"></i></span>
                                     <div class="flex-1 text-left min-w-0">
                                         <p class="text-[7px] uppercase tracking-wider text-zinc-400 font-bold">Delivery Location</p>
                                         <p class="text-[9px] font-black text-[#2D3748] truncate" id="selected-seat-hero">Select Delivery Location...</p>
                                     </div>
-                                    <span class="bg-[#00A082] text-white px-3 py-1 rounded-full text-[8px] font-black">Select</span>
+                                    <span class="bg-[#A31D1D] text-white px-3 py-1 rounded-full text-[8px] font-black">Select</span>
                                 </div>
                             </div>
-
+ 
                             <!-- User Welcome Segment -->
                             <div class="flex justify-between items-center bg-zinc-900/40 p-3 rounded-xl border border-zinc-900">
                                 <div>
                                     <p class="text-[10px] text-zinc-500 font-semibold uppercase">Attendee</p>
-                                    <h4 class="text-xs font-bold text-white" id="cust-user-name">John Customer</h4>
+                                    <h4 class="text-xs font-bold text-white" id="cust-user-name">Guest</h4>
                                 </div>
                                 <button onclick="logoutCustomer()" class="text-zinc-500 hover:text-zinc-400 text-xs"><i class="fas fa-sign-out-alt"></i> Logout</button>
-                            </div>
+                            </div> </div>
 
                             <!-- STEP A: LOCATION CONFIGURATION -->
                             <div class="space-y-2">
@@ -285,12 +278,12 @@
 
                             <!-- STEP B: VENDORS MARKETPLACE -->
                             <div class="space-y-3">
-                                <h3 class="text-[10px] font-black text-[#00A082] uppercase tracking-wider">Browse Stalls</h3>
+                                <h3 class="text-[10px] font-black text-[#A31D1D] uppercase tracking-wider">Browse Stalls</h3>
  
                                 <!-- Search bar -->
                                 <div class="relative">
                                     <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-500"><i class="fas fa-search text-xs"></i></span>
-                                    <input type="text" id="cust-menu-search" oninput="searchCustomerMenu()" placeholder="Search food, drinks..." class="w-full pl-9 pr-4 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs text-white focus:outline-none focus:border-[#00A082]">
+                                    <input type="text" id="cust-menu-search" oninput="searchCustomerMenu()" placeholder="Search food, drinks..." class="w-full pl-9 pr-4 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs text-white focus:outline-none focus:border-[#A31D1D]">
                                 </div>
  
                                 <!-- Glovo-style Category Pills (Mini) -->
@@ -328,9 +321,9 @@
                             <!-- Simulated radar animation -->
                             <div class="relative w-44 h-44 mx-auto my-6 flex items-center justify-center bg-[#F7F9FA] rounded-full border border-[#E2E8F0]">
                                 <!-- Pulsing concentric circles -->
-                                <div class="absolute w-44 h-44 rounded-full border border-[#00A082]/10 pulse-ring"></div>
+                                <div class="absolute w-44 h-44 rounded-full border border-[#A31D1D]/10 pulse-ring"></div>
                                 <div class="absolute w-32 h-32 rounded-full border border-[#FFC244]/20 pulse-ring" style="animation-delay: 0.5s"></div>
-                                <div class="absolute w-20 h-20 rounded-full border border-[#00A082]/20 pulse-ring" style="animation-delay: 1s"></div>
+                                <div class="absolute w-20 h-20 rounded-full border border-[#A31D1D]/20 pulse-ring" style="animation-delay: 1s"></div>
  
                                 <div class="w-14 h-14 bg-[#FFC244] border border-[#E0A325] rounded-full flex items-center justify-center shadow-lg relative z-10 animate-bounce">
                                     <i class="fas fa-person-running text-[#2D3748] text-xl"></i>
@@ -340,13 +333,13 @@
                             <!-- Secret Verification PIN Block -->
                             <div class="bg-[#F7F9FA] border border-[#E2E8F0] p-4 rounded-xl text-center space-y-1.5 relative overflow-hidden">
                                 <span class="text-[9px] uppercase tracking-widest text-zinc-500 font-bold">Secure Delivery PIN</span>
-                                <h4 class="text-3xl font-black text-[#00A082] tracking-widest" id="tracker-pin">----</h4>
+                                <h4 class="text-3xl font-black text-[#A31D1D] tracking-widest" id="tracker-pin">----</h4>
                                 <p class="text-[10px] text-zinc-500">Share this secret PIN with the runner when they arrive at your location to confirm delivery.</p>
                             </div>
 
                             <!-- QR Verification Code Block (Generates dynamically on arrival) -->
                             <div id="tracker-qr-container" class="hidden bg-white border border-[#E2E8F0] p-4 rounded-xl text-center space-y-2 flex flex-col items-center justify-center">
-                                <span class="text-[9px] uppercase tracking-widest text-[#00A082] font-black"><i class="fas fa-qrcode mr-1"></i> Scan to Verify Delivery</span>
+                                <span class="text-[9px] uppercase tracking-widest text-[#A31D1D] font-black"><i class="fas fa-qrcode mr-1"></i> Scan to Verify Delivery</span>
                                 <canvas id="tracker-qr-canvas" class="w-32 h-32 border border-zinc-100 p-1 bg-white"></canvas>
                                 <p class="text-[9px] text-zinc-500 font-medium leading-relaxed">Let the runner scan this QR code or type your PIN to complete the delivery.</p>
                             </div>
@@ -354,7 +347,7 @@
                             <!-- Live timeline tracker checklist -->
                             <div class="space-y-3 bg-[#F7F9FA] p-4 rounded-xl border border-[#E2E8F0]">
                                 <div class="flex items-center gap-3" id="step-created">
-                                    <div class="w-5 h-5 rounded-full bg-[#00A082]/15 text-[#00A082] flex items-center justify-center text-[10px] font-bold"><i class="fas fa-check"></i></div>
+                                    <div class="w-5 h-5 rounded-full bg-[#A31D1D]/15 text-[#A31D1D] flex items-center justify-center text-[10px] font-bold"><i class="fas fa-check"></i></div>
                                     <span class="text-xs font-bold text-[#2D3748]">Order Placed & Paid</span>
                                 </div>
                                 <div class="flex items-center gap-3" id="step-preparing">
@@ -408,22 +401,22 @@
                     <div id="mpesa-simulation-overlay" class="hidden absolute inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
                         <div class="w-full max-w-[280px] bg-white rounded-[32px] p-6 shadow-2xl border border-[#E2E8F0] phone-buzz">
                             <div class="text-center space-y-4">
-                                <div class="w-12 h-12 bg-[#00A082]/10 text-[#00A082] rounded-full flex items-center justify-center mx-auto shadow-sm">
+                                <div class="w-12 h-12 bg-[#A31D1D]/10 text-[#A31D1D] rounded-full flex items-center justify-center mx-auto shadow-sm">
                                     <i class="fas fa-mobile-screen text-xl"></i>
                                 </div>
                                 <div class="space-y-1">
                                     <h4 class="text-[9px] uppercase tracking-widest text-zinc-500 font-black">M-Pesa STK Push</h4>
                                     <p class="text-[11px] text-zinc-600 px-1 leading-relaxed font-medium">
                                         Enter M-Pesa PIN to authorize payment of <br>
-                                        <strong class="text-[#00A082] text-xs font-black" id="mpesa-amount">Ksh 0</strong> to <strong class="text-[#2D3748] font-bold">JUSTFEAST LTD</strong>.
+                                        <strong class="text-[#A31D1D] text-xs font-black" id="mpesa-amount">Ksh 0</strong> to <strong class="text-[#2D3748] font-bold">JUSTFEAST LTD</strong>.
                                     </p>
                                 </div>
                                 <div class="py-0.5">
-                                    <input type="password" id="mpesa-pin-input" placeholder="••••" class="w-36 mx-auto text-center font-black tracking-widest text-xl py-2.5 rounded-xl bg-[#F7F9FA] border border-[#E2E8F0] text-[#2D3748] focus:outline-none focus:border-[#00A082] focus:ring-1 focus:ring-[#00A082] transition shadow-inner" maxlength="4" value="1234">
+                                    <input type="password" id="mpesa-pin-input" placeholder="••••" class="w-36 mx-auto text-center font-black tracking-widest text-xl py-2.5 rounded-xl bg-[#F7F9FA] border border-[#E2E8F0] text-[#2D3748] focus:outline-none focus:border-[#A31D1D] focus:ring-1 focus:ring-[#A31D1D] transition shadow-inner" maxlength="4" value="1234">
                                 </div>
                                 <div class="grid grid-cols-2 gap-3 pt-1">
                                     <button onclick="cancelMpesaSimulation()" class="py-2.5 bg-[#F7F9FA] hover:bg-[#E2E8F0] text-zinc-600 rounded-full text-[10px] font-bold transition duration-200 border border-[#E2E8F0] cursor-pointer">Cancel</button>
-                                    <button onclick="confirmMpesaSimulation()" class="py-2.5 bg-[#00A082] hover:bg-[#008A70] text-white rounded-full text-[10px] font-bold transition duration-200 shadow-md shadow-[#00A082]/10 cursor-pointer">Pay Now</button>
+                                    <button onclick="confirmMpesaSimulation()" class="py-2.5 bg-[#A31D1D] hover:bg-[#008A70] text-white rounded-full text-[10px] font-bold transition duration-200 shadow-md shadow-[#A31D1D]/10 cursor-pointer">Pay Now</button>
                                 </div>
                             </div>
                         </div>                    <!-- Stadium Interactive SVG Map Modal Overlay -->
@@ -450,11 +443,11 @@
                                 <div class="grid grid-cols-2 gap-2">
                                     <div>
                                         <label class="block text-[8px] font-bold text-zinc-500 uppercase">Latitude</label>
-                                        <input type="text" id="gps-lat-input" class="w-full px-2.5 py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-bold text-white" value="-1.32588000" readonly>
+                                        <input type="text" id="gps-lat-input" class="w-full px-2.5 py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-bold text-white" value="-1.28817042" readonly>
                                     </div>
                                     <div>
                                         <label class="block text-[8px] font-bold text-zinc-500 uppercase">Longitude</label>
-                                        <input type="text" id="gps-lng-input" class="w-full px-2.5 py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-bold text-white" value="36.79941000" readonly>
+                                        <input type="text" id="gps-lng-input" class="w-full px-2.5 py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-bold text-white" value="36.81647301" readonly>
                                     </div>
                                 </div>
 
@@ -800,7 +793,17 @@
             // Load saved user session
             const saved = localStorage.getItem('justfeast_client_user');
             if (saved) {
-                currentUser = JSON.parse(saved);
+                try {
+                    const parsed = JSON.parse(saved);
+                    if (parsed && (parsed.name === 'John Customer' || parsed.email === 'customer@justfeast.com')) {
+                        localStorage.removeItem('justfeast_client_user');
+                        currentUser = null;
+                    } else {
+                        currentUser = parsed;
+                    }
+                } catch (e) {
+                    localStorage.removeItem('justfeast_client_user');
+                }
             }
             updateAuthHeader();
  
@@ -980,7 +983,7 @@
                 } else if (vendor.id === 2) { 
                     rating = "4.7"; 
                     deliveryTime = "12-18 min"; 
-                    coverImg = 'bg-gradient-to-r from-[#00A082]/10 to-[#008A70]/20';
+                    coverImg = 'bg-gradient-to-r from-[#A31D1D]/10 to-[#008A70]/20';
                 }
  
                 const headerCard = `
@@ -1030,7 +1033,7 @@
                             <div class="flex-1 min-w-0">
                                 <h5 class="text-[10px] font-black text-white truncate ${out ? 'text-zinc-600 line-through' : ''}">${p.name}</h5>
                                 <p class="text-[8px] text-zinc-500 line-clamp-1 leading-none mt-0.5">${p.description || 'Stadium seat delivery'}</p>
-                                <p class="text-[10px] font-black text-[#00A082] mt-1">Ksh ${parseFloat(p.price).toLocaleString()}</p>
+                                <p class="text-[10px] font-black text-[#A31D1D] mt-1">Ksh ${parseFloat(p.price).toLocaleString()}</p>
                             </div>
                             <div class="flex-shrink-0">
                                 ${out 
@@ -1349,7 +1352,7 @@
 
         function initLeafletMap() {
             setTimeout(() => {
-                const center = [-1.32588, 36.79941];
+                const center = [-1.28817042, 36.81647301];
                 if (!leafletMap) {
                     leafletMap = L.map('modal-leaflet-map').setView(center, 16);
                     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -1533,9 +1536,9 @@
             modalContainer.innerHTML = `
                 <div class="text-center space-y-4 py-2">
                     <div class="relative w-12 h-12 mx-auto flex items-center justify-center">
-                        <div class="absolute inset-0 border-4 border-[#00A082]/10 rounded-full"></div>
-                        <div class="absolute inset-0 border-4 border-[#00A082] border-t-transparent rounded-full animate-spin"></div>
-                        <i class="fas fa-fingerprint text-xl text-[#00A082]"></i>
+                        <div class="absolute inset-0 border-4 border-[#A31D1D]/10 rounded-full"></div>
+                        <div class="absolute inset-0 border-4 border-[#A31D1D] border-t-transparent rounded-full animate-spin"></div>
+                        <i class="fas fa-fingerprint text-xl text-[#A31D1D]"></i>
                     </div>
                     <div class="space-y-1">
                         <h4 class="text-[9px] font-black text-[#2D3748] tracking-wider uppercase">Authenticating...</h4>

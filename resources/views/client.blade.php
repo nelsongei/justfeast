@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>justFeast — Event Seat Delivery</title>
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#05A357">
+    <meta name="theme-color" content="#A31D1D">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -27,10 +27,12 @@
                 extend: {
                     fontFamily: {sans: ['Outfit', 'sans-serif']},
                     colors: {
-                        brand: {rose: '#FFC244', orange: '#FFC244', amber: '#FFC244', emerald: '#05A357'},
+                        brand: {rose: '#FFC244', orange: '#FFC244', amber: '#FFC244', emerald: '#A31D1D', red: '#A31D1D'},
                         jf: {
-                            green: '#05A357',
-                            greenDark: '#047A43',
+                            red: '#A31D1D',
+                            redDark: '#841313',
+                            green: '#A31D1D',
+                            greenDark: '#841313',
                             yellow: '#FFC244',
                             ink: '#111827',
                             cloud: '#F6F7F2',
@@ -41,7 +43,7 @@
                     boxShadow: {
                         soft: '0 18px 50px rgba(17, 24, 39, 0.10)',
                         card: '0 10px 30px rgba(17, 24, 39, 0.08)',
-                        glow: '0 20px 50px rgba(5, 163, 87, 0.22)'
+                        glow: '0 20px 50px rgba(163, 29, 29, 0.22)'
                     }
                 }
             }
@@ -49,8 +51,10 @@
     </script>
     <style>
         :root {
-            --jf-green: #05A357;
-            --jf-green-dark: #047A43;
+            --jf-red: #A31D1D;
+            --jf-red-dark: #841313;
+            --jf-green: #A31D1D;
+            --jf-green-dark: #841313;
             --jf-yellow: #FFC244;
             --jf-ink: #0F172A;
             --jf-muted: #64748B;
@@ -108,7 +112,13 @@
         .app-shell {
             max-width: 1480px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 12px;
+        }
+
+        @media (min-width: 640px) {
+            .app-shell {
+                padding: 20px;
+            }
         }
 
         .jf-card {
@@ -118,10 +128,10 @@
         }
 
         .hero-panel {
-            background: #05A357;
+            background: linear-gradient(135deg, #A31D1D 0%, #841313 50%, #630C0C 100%);
             position: relative;
             overflow: hidden;
-            box-shadow: 0 20px 40px -10px rgba(5, 163, 87, 0.3);
+            box-shadow: 0 20px 40px -10px rgba(163, 29, 29, 0.35);
         }
 
         .hero-panel::before {
@@ -167,10 +177,10 @@
         }
 
         .category-active {
-            background: #05A357 !important;
+            background: #A31D1D !important;
             color: #FFFFFF !important;
-            border-color: #05A357 !important;
-            box-shadow: 0 8px 24px -4px rgba(5, 163, 87, 0.35);
+            border-color: #A31D1D !important;
+            box-shadow: 0 8px 24px -4px rgba(163, 29, 29, 0.35);
             transform: translateY(-2px);
         }
 
@@ -182,10 +192,10 @@
         }
 
         .category-pill:hover {
-            border-color: var(--jf-green);
-            color: var(--jf-green-dark);
+            border-color: #A31D1D;
+            color: #A31D1D;
             transform: translateY(-2px);
-            box-shadow: 0 6px 16px -4px rgba(5, 163, 87, 0.15);
+            box-shadow: 0 6px 16px -4px rgba(163, 29, 29, 0.15);
         }
 
         .product-card-hover {
@@ -317,42 +327,42 @@
 
 <div class="app-shell relative z-10">
     <!-- App Header -->
-    <header class="jf-card rounded-[32px] px-5 md:px-7 py-4 mb-6 flex items-center justify-between sticky top-3 z-40 border border-white/40 shadow-2xl backdrop-blur-xl bg-white/80">
-        <div class="flex items-center gap-3.5">
-            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#05A357] to-[#047A43] p-0.5 shadow-lg shadow-[#05A357]/20 flex items-center justify-center overflow-hidden group hover:scale-105 transition duration-300">
-                <div class="w-full h-full bg-white rounded-[14px] flex items-center justify-center p-1">
-                    <img src="{{ asset('images/logo/jm.png') }}" alt="justFeast Logo" class="h-8 w-auto object-contain">
+    <header class="jf-card rounded-[24px] sm:rounded-[32px] px-3 sm:px-5 md:px-7 py-3 md:py-4 mb-6 flex items-center justify-between sticky top-3 z-40 border border-white/40 shadow-2xl backdrop-blur-xl bg-white/80">
+        <div class="flex items-center gap-2 sm:gap-3.5 min-w-0">
+            <div class="w-9 h-9 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-gradient-to-br from-[#A31D1D] to-[#841313] p-0.5 shadow-lg shadow-[#A31D1D]/20 flex items-center justify-center overflow-hidden shrink-0 group hover:scale-105 transition duration-300">
+                <div class="w-full h-full bg-white rounded-[10px] sm:rounded-[14px] flex items-center justify-center p-1">
+                    <img src="{{ asset('images/logo/jm.png') }}" alt="justFeast Logo" class="h-5 sm:h-8 w-auto object-contain">
                 </div>
             </div>
-            <div>
-                <div class="flex items-center gap-2">
-                    <h1 class="text-2xl font-black tracking-tight leading-none text-[#0F172A]">just<span class="text-[#05A357]">Feast</span></h1>
-                    <span class="bg-[#05A357]/15 text-[#05A357] text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border border-[#05A357]/20">Live Event</span>
+            <div class="min-w-0">
+                <div class="flex items-center gap-1.5 sm:gap-2">
+                    <h1 class="text-base sm:text-2xl font-black tracking-tight leading-none text-[#0F172A] shrink-0">just<span class="text-[#FFC244]">Feast</span></h1>
+                    <span class="hidden sm:inline-flex bg-[#A31D1D]/10 text-[#A31D1D] text-[8px] sm:text-[9px] font-black uppercase tracking-wider px-1.5 sm:px-2 py-0.5 rounded-full border border-[#A31D1D]/20 whitespace-nowrap">Live Event</span>
                 </div>
-                <p class="text-[11px] text-slate-500 font-extrabold mt-1 flex items-center gap-1.5" id="live-event-banner">
-                    <span class="w-2 h-2 rounded-full bg-[#05A357] animate-ping"></span>
-                    Loading active event...
+                <p class="text-[9.5px] sm:text-[11px] text-slate-500 font-extrabold mt-0.5 sm:mt-1 flex items-center gap-1 sm:gap-1.5 truncate max-w-[140px] xs:max-w-[180px] sm:max-w-xs md:max-w-none" id="live-event-banner">
+                    <span class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#A31D1D] animate-ping shrink-0"></span>
+                    <span class="truncate">Loading active event...</span>
                 </p>
             </div>
         </div>
 
         <nav class="hidden lg:flex items-center gap-1 bg-slate-100/80 p-1.5 rounded-full border border-slate-200/80 backdrop-blur">
             <a href="#vendors"
-               class="px-5 py-2 rounded-full text-xs font-black text-slate-700 hover:text-[#05A357] hover:bg-white transition-all shadow-none hover:shadow-sm">Vendors</a>
+               class="px-5 py-2 rounded-full text-xs font-black text-slate-700 hover:text-[#A31D1D] hover:bg-white transition-all shadow-none hover:shadow-sm">Vendors</a>
             <button onclick="openSeatModal()"
-                    class="px-5 py-2 rounded-full text-xs font-black text-slate-700 hover:text-[#05A357] hover:bg-white transition-all shadow-none hover:shadow-sm">
-                <i class="fas fa-map-location-dot mr-1 text-[#05A357]"></i> Delivery map
+                    class="px-5 py-2 rounded-full text-xs font-black text-slate-700 hover:text-[#A31D1D] hover:bg-white transition-all shadow-none hover:shadow-sm">
+                <i class="fas fa-map-location-dot mr-1 text-[#A31D1D]"></i> Delivery map
             </button>
-            <a href="#how-it-works" class="px-5 py-2 rounded-full text-xs font-black text-slate-700 hover:text-[#05A357] hover:bg-white transition-all shadow-none hover:shadow-sm">How it works</a>
+            <a href="#how-it-works" class="px-5 py-2 rounded-full text-xs font-black text-slate-700 hover:text-[#A31D1D] hover:bg-white transition-all shadow-none hover:shadow-sm">How it works</a>
         </nav>
 
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-1.5 sm:gap-3 shrink-0">
             <div id="header-user-badge"
-                 class="hidden md:flex items-center gap-2.5 bg-slate-100 border border-slate-200 px-4 py-2 rounded-full shadow-inner">
-                <span class="w-2.5 h-2.5 rounded-full bg-[#05A357] animate-pulse"></span>
-                <span class="text-xs font-black text-[#0F172A]" id="header-user-name">Guest</span>
+                 class="max-sm:hidden sm:flex items-center gap-1.5 sm:gap-2.5 bg-slate-100 border border-slate-200 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full shadow-inner whitespace-nowrap">
+                <span class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#A31D1D] animate-pulse shrink-0"></span>
+                <span class="text-[11px] sm:text-xs font-black text-[#0F172A] truncate max-w-[80px] xs:max-w-[110px] sm:max-w-[150px]" id="header-user-name">Guest</span>
             </div>
-            <div id="header-auth-buttons"></div>
+            <div id="header-auth-buttons" class="shrink-0"></div>
         </div>
     </header>
 
@@ -361,110 +371,117 @@
         <div id="cust-main" class="hidden space-y-8 pb-12">
             <!-- Hero Fold -->
             <section id="glovo-hero-fold"
-                     class="hero-panel rounded-[40px] md:rounded-[52px] p-6 md:p-10 lg:p-12 text-white border border-white/10 relative">
-                <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-                    <div class="lg:col-span-7 space-y-7">
+                     class="hero-panel rounded-[28px] sm:rounded-[40px] md:rounded-[52px] p-4 sm:p-6 md:p-10 lg:p-12 text-white border border-white/10 relative">
+                <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center">
+                    <div class="lg:col-span-7 space-y-5 sm:space-y-7">
                         <div
-                            class="inline-flex items-center gap-2.5 bg-white/10 border border-white/20 backdrop-blur-md px-4 py-2 rounded-full text-[11px] font-black uppercase tracking-[0.16em] text-white shadow-xl">
-                            <span class="relative flex h-2.5 w-2.5">
+                            class="inline-flex items-center gap-2 sm:gap-2.5 bg-white/10 border border-white/20 backdrop-blur-md px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-[9.5px] sm:text-[11px] font-black uppercase tracking-[0.1em] sm:tracking-[0.16em] text-white shadow-xl max-w-full">
+                            <span class="relative flex h-2 w-2 sm:h-2.5 sm:w-2.5 shrink-0">
                                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FFC244] opacity-75"></span>
-                                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#FFC244]"></span>
+                                <span class="relative inline-flex rounded-full h-2 w-2 sm:h-2.5 sm:w-2.5 bg-[#FFC244]"></span>
                             </span>
-                            Live Event Food Delivery — Delivered to your spot
+                            <span class="sm:hidden truncate">Live Event Seat Delivery</span>
+                            <span class="hidden sm:inline truncate">Live Event Food Delivery — Delivered to your spot</span>
                         </div>
 
-                        <div class="space-y-4">
-                            <h2 class="text-4xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[0.95] text-white">
+                        <div class="space-y-3 sm:space-y-4">
+                            <h2 class="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[0.98] sm:leading-[0.95] text-white">
                                 Never miss a beat.<br class="hidden md:block">
                                 Food <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#FFC244] to-[#FF9100]">finds your seat.</span>
                             </h2>
-                            <p class="text-slate-200/90 text-sm md:text-base leading-relaxed max-w-xl font-medium">
+                            <p class="text-slate-200/90 text-xs sm:text-sm md:text-base leading-relaxed max-w-xl font-medium">
                                 Pin your precise location on the map, choose your favorite concert meals, pay instantly with M-Pesa, and track your runner in real-time.
                             </p>
                         </div>
 
-                        <div class="search-dock bg-white rounded-[32px] md:rounded-full p-2 md:p-3 max-w-3xl grid grid-cols-1 md:grid-cols-[1fr_auto] gap-3 text-[#0F172A] border border-white/40 shadow-2xl">
+                        <div class="search-dock bg-white rounded-[24px] sm:rounded-[32px] md:rounded-full p-2 md:p-3 max-w-3xl grid grid-cols-1 md:grid-cols-[1fr_auto] gap-2.5 sm:gap-3 text-[#0F172A] border border-white/40 shadow-2xl">
                             <button onclick="openSeatModal()"
-                                    class="flex items-center gap-4 px-5 py-3.5 rounded-2xl md:rounded-full hover:bg-slate-50 text-left group transition-all">
-                                <span class="w-12 h-12 rounded-full bg-[#05A357]/15 text-[#05A357] flex items-center justify-center group-hover:bg-[#05A357] group-hover:text-white transition-all shadow-sm">
-                                    <i class="fas fa-location-dot text-lg"></i>
+                                    class="flex items-center gap-3 sm:gap-4 px-3.5 sm:px-5 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl md:rounded-full hover:bg-slate-50 text-left group transition-all min-w-0">
+                                <span class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#A31D1D]/10 text-[#A31D1D] flex items-center justify-center group-hover:bg-[#A31D1D] group-hover:text-white transition-all shadow-sm shrink-0">
+                                    <i class="fas fa-location-dot text-base sm:text-lg"></i>
                                 </span>
-                                <span class="min-w-0">
-                                    <span class="block text-[9.5px] uppercase tracking-wider font-black text-slate-400">Delivery Spot Coordinates</span>
-                                    <span class="block text-sm font-black truncate text-[#0F172A]" id="selected-seat-hero">Set delivery location</span>
+                                <span class="min-w-0 flex-1">
+                                    <span class="block text-[8.5px] sm:text-[9.5px] uppercase tracking-wider font-black text-slate-400 truncate">Delivery Spot Coordinates</span>
+                                    <span class="block text-xs sm:text-sm font-black truncate text-[#0F172A]" id="selected-seat-hero">Set delivery location</span>
                                 </span>
                             </button>
                             <a href="#vendors"
-                               class="btn-glow inline-flex justify-center items-center gap-2.5 bg-gradient-to-r from-[#05A357] to-[#047A43] hover:from-[#047A43] hover:to-[#035E33] text-white px-8 py-4 rounded-2xl md:rounded-full text-sm font-black transition-all">
+                               class="btn-glow inline-flex justify-center items-center gap-2 sm:gap-2.5 bg-gradient-to-r from-[#FFC244] to-[#E0A325] hover:from-[#E0A325] hover:to-[#C28916] text-[#0F172A] px-5 sm:px-8 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl md:rounded-full text-xs sm:text-sm font-black transition-all shadow-lg">
                                 Explore Vendors <i class="fas fa-arrow-right text-xs"></i>
                             </a>
                         </div>
 
-                        <div class="grid grid-cols-3 gap-3.5 max-w-xl">
-                            <div class="bg-white/10 border border-white/15 rounded-3xl p-4 backdrop-blur-md hover:bg-white/15 transition">
-                                <p class="text-2xl font-black text-[#FFC244]">8-15 min</p>
-                                <p class="text-[10px] uppercase tracking-wider text-white/70 font-black mt-0.5">Average Drop</p>
+                        <div class="grid grid-cols-3 gap-2 sm:gap-3.5 max-w-xl">
+                            <div class="bg-white/10 border border-white/15 rounded-2xl sm:rounded-3xl p-2 sm:p-4 backdrop-blur-md hover:bg-white/15 transition min-w-0 text-center sm:text-left">
+                                <p class="text-xs xs:text-sm sm:text-2xl font-black text-[#FFC244] truncate">8-15 min</p>
+                                <p class="text-[8px] xs:text-[9px] sm:text-[10px] uppercase tracking-wider text-white/70 font-black mt-0.5 truncate">Average Drop</p>
                             </div>
-                            <div class="bg-white/10 border border-white/15 rounded-3xl p-4 backdrop-blur-md hover:bg-white/15 transition">
-                                <p class="text-2xl font-black text-[#FFC244]">M-Pesa</p>
-                                <p class="text-[10px] uppercase tracking-wider text-white/70 font-black mt-0.5">Instant Checkout</p>
+                            <div class="bg-white/10 border border-white/15 rounded-2xl sm:rounded-3xl p-2 sm:p-4 backdrop-blur-md hover:bg-white/15 transition min-w-0 text-center sm:text-left">
+                                <p class="text-xs xs:text-sm sm:text-2xl font-black text-[#FFC244] truncate">M-Pesa</p>
+                                <p class="text-[8px] xs:text-[9px] sm:text-[10px] uppercase tracking-wider text-white/70 font-black mt-0.5 truncate">
+                                    <span class="sm:hidden">Instant Pay</span>
+                                    <span class="hidden sm:inline">Instant Checkout</span>
+                                </p>
                             </div>
-                            <div class="bg-white/10 border border-white/15 rounded-3xl p-4 backdrop-blur-md hover:bg-white/15 transition">
-                                <p class="text-2xl font-black text-[#FFC244]">Safe PIN</p>
-                                <p class="text-[10px] uppercase tracking-wider text-white/70 font-black mt-0.5">Secure Handover</p>
+                            <div class="bg-white/10 border border-white/15 rounded-2xl sm:rounded-3xl p-2 sm:p-4 backdrop-blur-md hover:bg-white/15 transition min-w-0 text-center sm:text-left">
+                                <p class="text-xs xs:text-sm sm:text-2xl font-black text-[#FFC244] truncate">Safe PIN</p>
+                                <p class="text-[8px] xs:text-[9px] sm:text-[10px] uppercase tracking-wider text-white/70 font-black mt-0.5 truncate">
+                                    <span class="sm:hidden">Secure Drop</span>
+                                    <span class="hidden sm:inline">Secure Handover</span>
+                                </p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="lg:col-span-5">
-                        <div class="relative min-h-[440px] flex items-center justify-center">
+                    <div class="lg:col-span-5 mt-4 lg:mt-0">
+                        <div class="relative min-h-[300px] sm:min-h-[440px] flex items-center justify-center">
                             <!-- Stadium concentric visual radar -->
                             <div class="absolute inset-0 stadium-bowl rounded-full border border-white/20 opacity-80 shadow-2xl"></div>
 
                             <!-- Center stage node -->
-                            <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-52 h-52 rounded-full bg-gradient-to-tr from-[#FFC244] to-[#FF9100] shadow-2xl flex items-center justify-center text-[#0F172A] text-center p-6 border-4 border-white/30 z-10">
+                            <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 sm:w-52 sm:h-52 rounded-full bg-gradient-to-tr from-[#FFC244] to-[#FF9100] shadow-2xl flex items-center justify-center text-[#0F172A] text-center p-4 sm:p-6 border-4 border-white/30 z-10">
                                 <div>
-                                    <div class="w-12 h-12 mx-auto bg-[#0F172A] text-[#FFC244] rounded-full flex items-center justify-center mb-2 shadow-lg">
-                                        <i class="fas fa-music text-xl"></i>
+                                    <div class="w-9 h-9 sm:w-12 sm:h-12 mx-auto bg-[#0F172A] text-[#FFC244] rounded-full flex items-center justify-center mb-1.5 sm:mb-2 shadow-lg">
+                                        <i class="fas fa-music text-sm sm:text-xl"></i>
                                     </div>
-                                    <p class="text-xs font-black uppercase tracking-widest text-[#0F172A]">Main Stage</p>
-                                    <p class="text-[10px] font-extrabold text-[#0F172A]/70">Uhuru Park Arena</p>
+                                    <p class="text-[10px] sm:text-xs font-black uppercase tracking-widest text-[#0F172A]">Main Stage</p>
+                                    <p class="text-[9px] sm:text-[10px] font-extrabold text-[#0F172A]/70">Uhuru Park Arena</p>
                                 </div>
                             </div>
 
                             <!-- Floating interactive items -->
-                            <div class="floating-food absolute left-2 top-8 bg-white/95 text-[#0F172A] rounded-[26px] p-3.5 shadow-2xl flex items-center gap-3 border border-white/60 z-20">
-                                <span class="text-3xl">🍔</span>
+                            <div class="floating-food absolute left-1 sm:left-2 top-4 sm:top-8 bg-white/95 text-[#0F172A] rounded-2xl sm:rounded-[26px] p-2.5 sm:p-3.5 shadow-2xl flex items-center gap-2 sm:gap-3 border border-white/60 z-20">
+                                <span class="text-xl sm:text-3xl">🍔</span>
                                 <div>
-                                    <p class="text-xs font-black">Smash Burgers</p>
-                                    <p class="text-[10px] text-[#05A357] font-extrabold">from Ksh 450</p>
+                                    <p class="text-[11px] sm:text-xs font-black">Smash Burgers</p>
+                                    <p class="text-[9px] sm:text-[10px] text-[#05A357] font-extrabold">from Ksh 450</p>
                                 </div>
                             </div>
 
-                            <div class="floating-food absolute right-2 top-24 bg-white/95 text-[#0F172A] rounded-[26px] p-3.5 shadow-2xl flex items-center gap-3 border border-white/60 z-20">
-                                <span class="text-3xl">🥤</span>
+                            <div class="floating-food absolute right-1 sm:right-2 top-16 sm:top-24 bg-white/95 text-[#0F172A] rounded-2xl sm:rounded-[26px] p-2.5 sm:p-3.5 shadow-2xl flex items-center gap-2 sm:gap-3 border border-white/60 z-20">
+                                <span class="text-xl sm:text-3xl">🥤</span>
                                 <div>
-                                    <p class="text-xs font-black">Ice Cold Drinks</p>
-                                    <p class="text-[10px] text-[#05A357] font-extrabold">Chilled & Fast</p>
+                                    <p class="text-[11px] sm:text-xs font-black">Ice Cold Drinks</p>
+                                    <p class="text-[9px] sm:text-[10px] text-[#05A357] font-extrabold">Chilled & Fast</p>
                                 </div>
                             </div>
 
-                            <div class="floating-food absolute bottom-8 left-8 bg-white/95 text-[#0F172A] rounded-[26px] p-3.5 shadow-2xl flex items-center gap-3 border border-white/60 z-20">
-                                <span class="text-3xl">🍿</span>
+                            <div class="floating-food absolute bottom-6 sm:bottom-8 left-4 sm:left-8 bg-white/95 text-[#0F172A] rounded-2xl sm:rounded-[26px] p-2.5 sm:p-3.5 shadow-2xl flex items-center gap-2 sm:gap-3 border border-white/60 z-20">
+                                <span class="text-xl sm:text-3xl">🍿</span>
                                 <div>
-                                    <p class="text-xs font-black">Event Snacks</p>
-                                    <p class="text-[10px] text-[#05A357] font-extrabold">Queue-free</p>
+                                    <p class="text-[11px] sm:text-xs font-black">Event Snacks</p>
+                                    <p class="text-[9px] sm:text-[10px] text-[#05A357] font-extrabold">Queue-free</p>
                                 </div>
                             </div>
 
                             <!-- Runner status pill -->
-                            <div class="absolute bottom-2 right-4 bg-[#05A357] text-white rounded-[32px] p-4 shadow-2xl border border-white/20 z-20 w-56">
-                                <p class="text-[9.5px] uppercase tracking-widest font-black text-white/80 flex items-center gap-1.5">
+                            <div class="absolute bottom-1 sm:bottom-2 right-2 sm:right-4 bg-[#05A357] text-white rounded-2xl sm:rounded-[32px] p-3 sm:p-4 shadow-2xl border border-white/20 z-20 w-44 sm:w-56">
+                                <p class="text-[8.5px] sm:text-[9.5px] uppercase tracking-widest font-black text-white/80 flex items-center gap-1 sm:gap-1.5">
                                     <i class="fas fa-bolt text-[#FFC244]"></i> Runner Dispatch
                                 </p>
-                                <div class="flex items-center gap-2 mt-1.5">
-                                    <span class="w-2.5 h-2.5 bg-[#FFC244] rounded-full animate-pulse"></span>
-                                    <p class="text-sm font-black">Active near Gate B</p>
+                                <div class="flex items-center gap-1.5 sm:gap-2 mt-1 sm:mt-1.5">
+                                    <span class="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-[#FFC244] rounded-full animate-pulse"></span>
+                                    <p class="text-xs sm:text-sm font-black">Active near Gate B</p>
                                 </div>
                             </div>
                         </div>
@@ -528,54 +545,54 @@
             <!-- Marketplace Section -->
             <section id="vendors" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                 <div class="lg:col-span-8 xl:col-span-9 space-y-6 min-w-0">
-                    <div class="jf-card rounded-[36px] p-5 md:p-6 space-y-5">
-                        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div class="jf-card rounded-[28px] sm:rounded-[36px] p-4 sm:p-6 space-y-4 sm:space-y-5">
+                        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 sm:gap-4">
                             <div>
-                                <p class="text-[10px] uppercase tracking-[0.2em] text-[#05A357] font-black">Event Marketplace</p>
-                                <h2 class="text-2xl md:text-3xl font-black tracking-tight text-[#0F172A]">Order from stalls serving your zone</h2>
+                                <p class="text-[10px] uppercase tracking-[0.2em] text-[#A31D1D] font-black">Event Marketplace</p>
+                                <h2 class="text-xl sm:text-2xl md:text-3xl font-black tracking-tight text-[#0F172A]">Order from stalls serving your zone</h2>
                             </div>
-                            <div class="flex items-center gap-2 text-[11px] font-black text-slate-600 bg-slate-100/90 border border-slate-200/90 rounded-full px-3.5 py-2 self-start md:self-auto shadow-sm">
-                                <i class="fas fa-shield-halved text-[#05A357]"></i> Verified Festival Vendors
+                            <div class="flex items-center gap-2 text-[10.5px] sm:text-[11px] font-black text-slate-600 bg-slate-100/90 border border-slate-200/90 rounded-full px-3 sm:px-3.5 py-1.5 sm:py-2 self-start md:self-auto shadow-sm whitespace-nowrap">
+                                <i class="fas fa-shield-halved text-[#A31D1D]"></i> Verified Festival Vendors
                             </div>
                         </div>
 
                         <!-- Search dock -->
                         <div class="relative">
-                            <span class="absolute inset-y-0 left-0 pl-4.5 flex items-center pointer-events-none text-[#05A357]">
-                                <i class="fas fa-search text-base"></i>
+                            <span class="absolute inset-y-0 left-0 pl-3.5 sm:pl-4.5 flex items-center pointer-events-none text-[#A31D1D]">
+                                <i class="fas fa-search text-sm sm:text-base"></i>
                             </span>
                             <input type="text" id="menu-search" oninput="searchMenu()"
-                                   placeholder="Search burgers, fries, drinks, water, snacks..."
-                                   class="w-full pl-12 pr-5 py-4 rounded-2xl md:rounded-full bg-slate-100/70 border border-slate-200 focus:border-[#05A357] focus:ring-4 focus:ring-[#05A357]/15 text-[#0F172A] text-sm font-extrabold shadow-inner focus:outline-none placeholder-slate-400">
+                                   placeholder="Search meals, drinks, snacks..."
+                                   class="w-full pl-10 sm:pl-12 pr-4 sm:pr-5 py-3 sm:py-4 rounded-xl sm:rounded-2xl md:rounded-full bg-slate-100/70 border border-slate-200 focus:border-[#A31D1D] focus:ring-4 focus:ring-[#A31D1D]/15 text-[#0F172A] text-xs sm:text-sm font-extrabold shadow-inner focus:outline-none placeholder-slate-400">
                         </div>
 
                         <!-- Category Selector Pills -->
-                        <div class="flex items-center gap-3 py-1 overflow-x-auto no-scrollbar scroll-smooth">
+                        <div class="flex items-center gap-2 sm:gap-3 py-1 overflow-x-auto no-scrollbar scroll-smooth">
                             <button onclick="setCategory('all')" id="cat-all"
-                                    class="category-pill category-active flex items-center gap-2.5 px-5 py-3 rounded-full shadow-sm whitespace-nowrap cursor-pointer focus:outline-none">
-                                <span class="text-base">🏟️</span>
-                                <span class="text-xs font-black uppercase tracking-wide">All Vendors</span>
+                                    class="category-pill category-active flex items-center gap-2 px-3.5 sm:px-5 py-2 sm:py-3 rounded-full shadow-sm whitespace-nowrap cursor-pointer focus:outline-none">
+                                <span class="text-sm sm:text-base">🏟️</span>
+                                <span class="text-[11px] sm:text-xs font-black uppercase tracking-wide">All Vendors</span>
                             </button>
                             <button onclick="setCategory('food')" id="cat-food"
-                                    class="category-pill flex items-center gap-2.5 px-5 py-3 rounded-full shadow-sm whitespace-nowrap cursor-pointer focus:outline-none">
-                                <span class="text-base">🍔</span>
-                                <span class="text-xs font-black uppercase tracking-wide">Meals</span>
+                                    class="category-pill flex items-center gap-2 px-3.5 sm:px-5 py-2 sm:py-3 rounded-full shadow-sm whitespace-nowrap cursor-pointer focus:outline-none">
+                                <span class="text-sm sm:text-base">🍔</span>
+                                <span class="text-[11px] sm:text-xs font-black uppercase tracking-wide">Meals</span>
                             </button>
                             <button onclick="setCategory('drinks')" id="cat-drinks"
-                                    class="category-pill flex items-center gap-2.5 px-5 py-3 rounded-full shadow-sm whitespace-nowrap cursor-pointer focus:outline-none">
-                                <span class="text-base">🥤</span>
-                                <span class="text-xs font-black uppercase tracking-wide">Drinks</span>
+                                    class="category-pill flex items-center gap-2 px-3.5 sm:px-5 py-2 sm:py-3 rounded-full shadow-sm whitespace-nowrap cursor-pointer focus:outline-none">
+                                <span class="text-sm sm:text-base">🥤</span>
+                                <span class="text-[11px] sm:text-xs font-black uppercase tracking-wide">Drinks</span>
                             </button>
                             <button onclick="setCategory('snacks')" id="cat-snacks"
-                                    class="category-pill flex items-center gap-2.5 px-5 py-3 rounded-full shadow-sm whitespace-nowrap cursor-pointer focus:outline-none">
-                                <span class="text-base">🍿</span>
-                                <span class="text-xs font-black uppercase tracking-wide">Snacks</span>
+                                    class="category-pill flex items-center gap-2 px-3.5 sm:px-5 py-2 sm:py-3 rounded-full shadow-sm whitespace-nowrap cursor-pointer focus:outline-none">
+                                <span class="text-sm sm:text-base">🍿</span>
+                                <span class="text-[11px] sm:text-xs font-black uppercase tracking-wide">Snacks</span>
                             </button>
                         </div>
                     </div>
 
                     <!-- Live Event Promo Banner -->
-                    <div class="relative overflow-hidden rounded-[36px] bg-gradient-to-r from-[#05A357] via-[#047A43] to-[#035E33] p-6 md:p-7 flex flex-col md:flex-row md:items-center justify-between gap-5 text-white shadow-xl shadow-[#05A357]/20 border border-white/10">
+                    <div class="relative overflow-hidden rounded-[36px] bg-gradient-to-r from-[#A31D1D] via-[#841313] to-[#630C0C] p-6 md:p-7 flex flex-col md:flex-row md:items-center justify-between gap-5 text-white shadow-xl shadow-[#A31D1D]/20 border border-white/10">
                         <div class="absolute -right-8 -top-10 text-[180px] opacity-10 pointer-events-none">🎤</div>
                         <div class="relative z-10 space-y-2">
                             <span class="inline-flex items-center gap-1.5 bg-[#FFC244] text-[#0F172A] text-[9.5px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-sm">
@@ -599,26 +616,26 @@
                     <!-- User Profile Card -->
                     <div class="jf-card rounded-[32px] p-4 flex items-center justify-between border border-slate-200/90 shadow-sm bg-white hover:shadow-md transition">
                         <div class="flex items-center gap-3.5">
-                            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#05A357] via-[#FFC244] to-[#FF9100] p-0.5 shadow-md shadow-[#05A357]/15 flex items-center justify-center overflow-hidden shrink-0">
+                            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#A31D1D] via-[#FFC244] to-[#FF9100] p-0.5 shadow-md shadow-[#A31D1D]/15 flex items-center justify-center overflow-hidden shrink-0">
                                 <div class="w-full h-full bg-white rounded-[14px] flex items-center justify-center text-[#0F172A] font-black text-sm">
-                                    <i class="fas fa-user-tag text-[#05A357]"></i>
+                                    <i class="fas fa-user-tag text-[#A31D1D]"></i>
                                 </div>
                             </div>
                             <div>
                                 <div class="flex items-center gap-1.5">
-                                    <h4 class="text-sm font-black text-[#0F172A]" id="cust-user-name">Guest</h4>
-                                    <span class="bg-[#FFC244]/25 text-[#0F172A] text-[8.5px] font-black uppercase px-2 py-0.5 rounded-full">Pass</span>
+                                    <h4 class="text-sm font-black text-[#0F172A] truncate max-w-[120px] sm:max-w-[160px]" id="cust-user-name">Guest</h4>
+                                    <span class="bg-slate-100 text-slate-500 text-[8.5px] font-black uppercase px-2 py-0.5 rounded-full border border-slate-200 shrink-0" id="cust-user-pass-badge">Guest</span>
                                 </div>
-                                <p class="text-[10px] text-slate-400 font-extrabold flex items-center gap-1 mt-0.5">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-[#05A357]"></span> Verified Attendee
+                                <p class="text-[10px] text-slate-400 font-extrabold flex items-center gap-1 mt-0.5" id="cust-user-status-text">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-slate-300"></span> Tap Log In to order
                                 </p>
                             </div>
                         </div>
-                        <button onclick="logoutCustomer()"
-                                title="Logout"
-                                class="w-9 h-9 rounded-full bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-500 flex items-center justify-center text-xs transition border border-slate-200">
-                            <i class="fas fa-right-from-bracket"></i>
-                        </button>
+                        <div id="cust-profile-action" class="shrink-0">
+                            <button onclick="openAuthModal()" class="px-3.5 py-1.5 bg-[#FFC244] hover:bg-[#E0A325] text-[#0F172A] rounded-full text-xs font-black transition border border-[#E0A325] shadow-xs cursor-pointer">
+                                Log In
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Desktop Cart Basket Tray -->
@@ -626,7 +643,7 @@
                         <!-- Basket Top Header -->
                         <div class="px-5 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/70">
                             <div class="flex items-center gap-2">
-                                <div class="w-8 h-8 rounded-xl bg-[#05A357]/10 text-[#05A357] flex items-center justify-center text-xs">
+                                <div class="w-8 h-8 rounded-xl bg-[#A31D1D]/10 text-[#A31D1D] flex items-center justify-center text-xs">
                                     <i class="fas fa-basket-shopping"></i>
                                 </div>
                                 <div>
@@ -658,7 +675,7 @@
                             <!-- Delivery Location Box -->
                             <div class="bg-white p-3 rounded-2xl border border-slate-200/80 flex items-center justify-between gap-2 shadow-xs">
                                 <div class="flex items-center gap-2.5 min-w-0">
-                                    <div class="w-8 h-8 rounded-xl bg-[#05A357]/15 text-[#05A357] flex items-center justify-center shrink-0">
+                                    <div class="w-8 h-8 rounded-xl bg-[#A31D1D]/15 text-[#A31D1D] flex items-center justify-center shrink-0">
                                         <i class="fas fa-location-dot text-xs"></i>
                                     </div>
                                     <div class="min-w-0">
@@ -666,7 +683,7 @@
                                         <p class="text-xs font-black text-[#0F172A] truncate" id="desktop-cart-location-text">Not configured</p>
                                     </div>
                                 </div>
-                                <button onclick="openSeatModal()" class="text-[10px] text-[#05A357] hover:underline font-black shrink-0">
+                                <button onclick="openSeatModal()" class="text-[10px] text-[#A31D1D] hover:underline font-black shrink-0">
                                     Pin Map
                                 </button>
                             </div>
@@ -679,17 +696,17 @@
                                 </div>
                                 <div class="flex justify-between text-xs text-slate-500 font-medium">
                                     <span>Seat Delivery Fee</span>
-                                    <span class="font-black text-[#05A357]">FREE</span>
+                                    <span class="font-black text-[#A31D1D]">FREE</span>
                                 </div>
                                 <div class="flex justify-between items-end pt-2 border-t border-slate-200/60">
                                     <span class="text-xs text-slate-500 font-black">Total Payable</span>
-                                    <span class="text-2xl font-black text-[#05A357]" id="desktop-cart-tray-total">Ksh 0</span>
+                                    <span class="text-2xl font-black text-[#A31D1D]" id="desktop-cart-tray-total">Ksh 0</span>
                                 </div>
                             </div>
 
                             <!-- Checkout Action Button -->
                             <button onclick="checkoutOrder()"
-                                    class="w-full py-4 bg-gradient-to-r from-[#05A357] via-[#047A43] to-[#035E33] hover:from-[#047A43] hover:to-[#024424] text-white rounded-full text-xs font-black shadow-xl shadow-[#05A357]/25 hover:shadow-2xl transition-all flex items-center justify-center gap-2.5 cursor-pointer hover:scale-[1.02] active:scale-[0.98]">
+                                    class="w-full py-4 bg-gradient-to-r from-[#A31D1D] via-[#841313] to-[#630C0C] hover:from-[#841313] hover:to-[#4D0707] text-white rounded-full text-xs font-black shadow-xl shadow-[#A31D1D]/25 hover:shadow-2xl transition-all flex items-center justify-center gap-2.5 cursor-pointer hover:scale-[1.02] active:scale-[0.98]">
                                 <span class="inline-flex items-center justify-center bg-white px-2.5 py-0.5 rounded-full h-7 overflow-hidden shadow-xs">
                                     <img src="{{ asset('images/logo/mpesa.png') }}" alt="M-Pesa" class="h-5 w-auto object-contain scale-110">
                                 </span>
@@ -707,14 +724,14 @@
         <div id="cust-tracker" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch pb-12">
             <div class="lg:col-span-7 glass-card rounded-[40px] p-7 flex flex-col justify-between space-y-6">
                 <div>
-                    <p class="text-[10px] uppercase tracking-[0.2em] text-[#05A357] font-black">Live Order Status</p>
+                    <p class="text-[10px] uppercase tracking-[0.2em] text-[#A31D1D] font-black">Live Order Status</p>
                     <h3 class="text-2xl font-black tracking-tight text-[#0F172A]">Delivery Timeline</h3>
                     <p class="text-xs text-slate-500 font-extrabold mt-1">Real-time status updates from vendor to your seat.</p>
                 </div>
 
                 <div class="space-y-4 bg-slate-50 p-6 rounded-[30px] border border-slate-200/90 text-left shadow-inner">
                     <div class="flex items-center gap-3.5" id="step-created">
-                        <div class="w-7 h-7 rounded-full bg-[#05A357] text-white flex items-center justify-center text-xs font-bold shadow-md shadow-[#05A357]/30">
+                        <div class="w-7 h-7 rounded-full bg-[#A31D1D] text-white flex items-center justify-center text-xs font-bold shadow-md shadow-[#A31D1D]/30">
                             <i class="fas fa-check"></i>
                         </div>
                         <span class="text-sm font-black text-[#0F172A]">Order Placed & Paid</span>
@@ -742,8 +759,8 @@
                     </div>
                 </div>
 
-                <div class="bg-[#05A357]/10 border border-[#05A357]/20 p-4 rounded-2xl text-xs text-slate-700 font-extrabold flex items-center gap-2">
-                    <i class="fas fa-circle-info text-base text-[#05A357]"></i>
+                <div class="bg-[#A31D1D]/10 border border-[#A31D1D]/20 p-4 rounded-2xl text-xs text-slate-700 font-extrabold flex items-center gap-2">
+                    <i class="fas fa-circle-info text-base text-[#A31D1D]"></i>
                     <span>Remain near your location pin. The runner will request your delivery PIN upon arrival.</span>
                 </div>
             </div>
@@ -751,14 +768,14 @@
             <!-- Radar display container -->
             <div class="lg:col-span-5 glass-card rounded-[40px] p-7 text-center flex flex-col justify-between space-y-6">
                 <div>
-                    <p class="text-[10px] uppercase tracking-[0.2em] text-[#05A357] font-black">Live Runner Radar</p>
+                    <p class="text-[10px] uppercase tracking-[0.2em] text-[#A31D1D] font-black">Live Runner Radar</p>
                     <h3 class="text-2xl font-black tracking-tight text-[#0F172A]">Location Active</h3>
                     <p class="text-xs text-slate-500 font-bold">Uhuru Park Event Arena</p>
                 </div>
 
                 <div class="relative w-52 h-52 mx-auto flex items-center justify-center bg-slate-100 rounded-full border border-slate-200 overflow-hidden shadow-inner">
                     <div class="radar-sweep"></div>
-                    <div class="absolute w-52 h-52 rounded-full border border-[#05A357]/20 pulse-ring"></div>
+                    <div class="absolute w-52 h-52 rounded-full border border-[#A31D1D]/20 pulse-ring"></div>
                     <div class="absolute w-36 h-36 rounded-full border border-[#FFC244]/30 pulse-ring" style="animation-delay:.55s"></div>
                     <div class="w-16 h-16 bg-[#FFC244] border-2 border-white rounded-full flex items-center justify-center shadow-2xl relative z-10 animate-bounce">
                         <i class="fas fa-person-running text-[#0F172A] text-2xl"></i>
@@ -773,7 +790,7 @@
 
                 <div id="tracker-qr-container"
                      class="hidden bg-white border border-slate-200 p-4 rounded-[28px] text-center space-y-2 flex flex-col items-center justify-center shadow-lg">
-                    <span class="text-[9.5px] uppercase tracking-widest text-[#05A357] font-black flex items-center gap-1">
+                    <span class="text-[9.5px] uppercase tracking-widest text-[#A31D1D] font-black flex items-center gap-1">
                         <i class="fas fa-qrcode"></i> Scan to Verify Handover
                     </span>
                     <canvas id="tracker-qr-canvas" class="w-32 h-32 border border-slate-100 p-1 bg-white"></canvas>
@@ -793,7 +810,7 @@
          class="hidden lg:hidden fixed bottom-0 inset-x-0 max-w-md mx-auto bg-white border-t border-slate-200 rounded-t-[32px] p-5 pb-6 z-40 shadow-2xl">
         <div class="flex justify-between items-center mb-3">
             <span class="text-sm font-black text-[#0F172A] flex items-center gap-2">
-                <i class="fas fa-basket-shopping text-[#05A357]"></i> Basket
+                <i class="fas fa-basket-shopping text-[#A31D1D]"></i> Basket
             </span>
             <button onclick="clearBasket()" class="text-[10px] text-slate-400 hover:text-red-500 font-black">Clear</button>
         </div>
@@ -805,10 +822,10 @@
             </div>
             <div class="flex justify-between items-center">
                 <span class="text-xs text-slate-500 font-black">Total Amount:</span>
-                <span class="text-xl font-black text-[#05A357]" id="cart-tray-total">Ksh 0</span>
+                <span class="text-xl font-black text-[#A31D1D]" id="cart-tray-total">Ksh 0</span>
             </div>
             <button onclick="checkoutOrder()"
-                    class="w-full py-4 bg-[#0F172A] hover:bg-[#05A357] text-white rounded-full text-xs font-black flex items-center justify-center gap-2 shadow-xl">
+                    class="w-full py-4 bg-[#0F172A] hover:bg-[#A31D1D] text-white rounded-full text-xs font-black flex items-center justify-center gap-2 shadow-xl">
                 <span class="inline-flex items-center justify-center bg-white px-2 rounded-full h-8 overflow-hidden">
                     <img src="{{ asset('images/logo/mpesa.png') }}" alt="M-Pesa" class="h-6 w-auto object-contain scale-110">
                 </span>
@@ -821,14 +838,14 @@
 </div>
 
 <footer class="mt-10 bg-[#0B1117] text-white relative overflow-hidden">
-    <div class="h-1 bg-gradient-to-r from-[#FFC244] via-[#05A357] to-[#FFC244]"></div>
+    <div class="h-1 bg-gradient-to-r from-[#FFC244] via-[#A31D1D] to-[#FFC244]"></div>
     <div class="max-w-[1480px] mx-auto px-5 md:px-8 py-12 grid grid-cols-1 md:grid-cols-12 gap-8">
         <div class="md:col-span-5 space-y-4">
             <div class="flex items-center gap-3">
                 <div class="w-11 h-11 rounded-2xl bg-white flex items-center justify-center overflow-hidden">
                     <img src="{{ asset('images/logo/jm.png') }}" alt="justFeast Logo" class="h-9 w-auto object-contain">
                 </div>
-                <h2 class="text-2xl font-black">just<span class="text-[#05A357]">Feast</span></h2></div>
+                <h2 class="text-2xl font-black">just<span class="text-[#FFC244]">Feast</span></h2></div>
             <p class="text-sm text-white/55 leading-relaxed max-w-md">Live event food ordering for concerts, stadiums
                 and festivals. Vendors sell more, attendees miss less, runners deliver to the exact location.</p>
         </div>
@@ -961,22 +978,14 @@
             </div>
             <div class="space-y-4 text-left">
                 <div>
-                    <label class="block text-[9px] font-black text-zinc-500 mb-1.5 uppercase tracking-wider">Enter Phone
-                        Number</label>
+                    <label class="block text-[9px] font-black text-zinc-500 mb-1.5 uppercase tracking-wider">Enter Phone Number</label>
                     <input type="text" id="cust-phone-input" placeholder="e.g. 0712345678"
                            class="w-full px-4 py-3 rounded-xl bg-[#F7F9FA] border border-[#E2E8F0] text-[#2D3748] text-sm focus:outline-none focus:border-[#00A082]"
-                           value="0712345678">
+                           value="">
                 </div>
                 <button onclick="sendOTP()"
                         class="w-full py-3.5 rounded-full bg-[#00A082] text-white font-bold text-xs hover:bg-[#008A70] transition shadow-md shadow-[#00A082]/10 border-0 cursor-pointer">
                     Send Verification OTP
-                </button>
-            </div>
-            <div class="border-t border-[#E2E8F0] pt-5">
-                <span class="text-[10px] text-zinc-400 block mb-3 font-semibold uppercase tracking-wider">Or instantly access:</span>
-                <button onclick="quickLogin('customer@justfeast.com')"
-                        class="w-full py-3 rounded-full bg-[#FFC244] hover:bg-[#E0A325] text-[#2D3748] text-xs font-bold transition shadow-sm border border-[#E0A325] cursor-pointer">
-                    🚀 Access as John Customer
                 </button>
             </div>
         </div>
@@ -996,7 +1005,7 @@
                         4-Digit Code</label>
                     <input type="text" id="cust-otp-input" placeholder="Enter 1234"
                            class="w-full px-4 py-3 rounded-xl bg-[#F7F9FA] border border-[#E2E8F0] text-[#2D3748] text-center text-lg tracking-widest font-bold focus:outline-none focus:border-[#00A082]"
-                           value="1234">
+                           value="">
                 </div>
                 <button onclick="verifyOTP()"
                         class="w-full py-3.5 rounded-full bg-[#00A082] text-white font-bold text-xs hover:bg-[#008A70] transition shadow-md shadow-[#00A082]/10 border-0 cursor-pointer">
@@ -1038,13 +1047,13 @@
                         <label class="block text-[8px] font-bold text-zinc-500 uppercase">Latitude</label>
                         <input type="text" id="gps-lat-input"
                                class="w-full px-2 py-1.5 rounded bg-white border border-[#E2E8F0] text-[10px] font-mono font-bold text-zinc-700"
-                               readonly value="-1.32588000">
+                               readonly value="-1.28817042">
                     </div>
                     <div>
                         <label class="block text-[8px] font-bold text-zinc-500 uppercase">Longitude</label>
                         <input type="text" id="gps-lng-input"
                                class="w-full px-2 py-1.5 rounded bg-white border border-[#E2E8F0] text-[10px] font-mono font-bold text-zinc-700"
-                               readonly value="36.79941000">
+                               readonly value="36.81647301">
                     </div>
                 </div>
                 <div>
@@ -1114,13 +1123,29 @@
         // Always show the marketplace main wrapper
         document.getElementById('cust-main').classList.remove('hidden');
 
-        // Session check
+        // Session check & Purge Stale Default Account
         const saved = localStorage.getItem('justfeast_client_user');
+        if (saved) {
+            try {
+                const parsed = JSON.parse(saved);
+                if (parsed && (parsed.name === 'John Customer' || parsed.email === 'customer@justfeast.com')) {
+                    localStorage.removeItem('justfeast_client_user');
+                    currentUser = null;
+                } else {
+                    currentUser = parsed;
+                }
+            } catch (e) {
+                localStorage.removeItem('justfeast_client_user');
+            }
+        }
         if (laravelUser) {
-            currentUser = laravelUser;
-            localStorage.setItem('justfeast_client_user', JSON.stringify(currentUser));
-        } else if (saved) {
-            currentUser = JSON.parse(saved);
+            if (laravelUser.name === 'John Customer' || laravelUser.email === 'customer@justfeast.com') {
+                localStorage.removeItem('justfeast_client_user');
+                currentUser = null;
+            } else {
+                currentUser = laravelUser;
+                localStorage.setItem('justfeast_client_user', JSON.stringify(currentUser));
+            }
         }
         updateAuthHeader();
 
@@ -1165,6 +1190,9 @@
         const userBadge = document.getElementById('header-user-badge');
         const userNameText = document.getElementById('header-user-name');
         const sidebarWelcome = document.getElementById('cust-user-name');
+        const sidebarPassBadge = document.getElementById('cust-user-pass-badge');
+        const sidebarStatusText = document.getElementById('cust-user-status-text');
+        const sidebarAction = document.getElementById('cust-profile-action');
 
         if (currentUser) {
             if (userBadge) {
@@ -1174,10 +1202,24 @@
             if (sidebarWelcome) {
                 sidebarWelcome.textContent = currentUser.name;
             }
+            if (sidebarPassBadge) {
+                sidebarPassBadge.textContent = 'Pass';
+                sidebarPassBadge.className = 'bg-[#FFC244]/25 text-[#0F172A] text-[8.5px] font-black uppercase px-2 py-0.5 rounded-full shrink-0';
+            }
+            if (sidebarStatusText) {
+                sidebarStatusText.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-[#05A357]"></span> Verified Attendee`;
+            }
+            if (sidebarAction) {
+                sidebarAction.innerHTML = `
+                        <button onclick="logoutCustomer()" title="Logout" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-500 flex items-center justify-center text-xs transition border border-slate-200 cursor-pointer">
+                            <i class="fas fa-right-from-bracket"></i>
+                        </button>
+                    `;
+            }
             if (authButtonsContainer) {
                 authButtonsContainer.innerHTML = `
-                        <button onclick="logoutCustomer()" class="px-4 py-2 text-[10px] font-bold text-zinc-500 hover:text-zinc-700 bg-white border border-[#E2E8F0] rounded-full transition cursor-pointer focus:outline-none">
-                            <i class="fas fa-sign-out-alt mr-1"></i> Logout
+                        <button onclick="logoutCustomer()" class="px-3 sm:px-4 py-1.5 sm:py-2 text-[10px] sm:text-xs font-bold text-slate-600 hover:text-slate-900 bg-white border border-slate-200 rounded-full transition cursor-pointer focus:outline-none flex items-center gap-1 whitespace-nowrap shadow-xs">
+                            <i class="fas fa-sign-out-alt text-slate-400"></i> Logout
                         </button>
                     `;
             }
@@ -1188,9 +1230,23 @@
             if (sidebarWelcome) {
                 sidebarWelcome.textContent = 'Guest';
             }
+            if (sidebarPassBadge) {
+                sidebarPassBadge.textContent = 'Guest';
+                sidebarPassBadge.className = 'bg-slate-100 text-slate-500 text-[8.5px] font-black uppercase px-2 py-0.5 rounded-full shrink-0 border border-slate-200';
+            }
+            if (sidebarStatusText) {
+                sidebarStatusText.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-slate-300"></span> Tap Log In to order`;
+            }
+            if (sidebarAction) {
+                sidebarAction.innerHTML = `
+                        <button onclick="openAuthModal()" class="px-3.5 py-1.5 bg-[#FFC244] hover:bg-[#E0A325] text-[#0F172A] rounded-full text-xs font-black transition border border-[#E0A325] shadow-xs cursor-pointer">
+                            Log In
+                        </button>
+                    `;
+            }
             if (authButtonsContainer) {
                 authButtonsContainer.innerHTML = `
-                        <button onclick="openAuthModal()" class="px-5 py-2.5 text-[10px] font-black text-[#2D3748] bg-[#FFC244] hover:bg-[#E0A325] border border-[#E0A325] rounded-full transition shadow-sm cursor-pointer focus:outline-none">
+                        <button onclick="openAuthModal()" class="px-3.5 sm:px-5 py-1.5 sm:py-2.5 text-[10px] sm:text-xs font-black text-[#2D3748] bg-[#FFC244] hover:bg-[#E0A325] border border-[#E0A325] rounded-full transition shadow-sm cursor-pointer focus:outline-none whitespace-nowrap">
                             Log In
                         </button>
                     `;
@@ -1203,7 +1259,7 @@
             const res = await fetch(`${API_BASE}/events/active`);
             if (res.ok) {
                 activeEvent = await res.json();
-                document.getElementById('live-event-banner').innerHTML = `<i class="fas fa-ticket text-brand-rose mr-1"></i> ${activeEvent.name} — @${activeEvent.venue.name}`;
+                document.getElementById('live-event-banner').innerHTML = `<span class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#05A357] animate-ping shrink-0"></span> <span class="truncate">${activeEvent.name} <span class="hidden sm:inline">— @${activeEvent.venue.name}</span></span>`;
             }
         } catch (e) {
         }
@@ -1704,7 +1760,7 @@
 
     function initLeafletMap() {
         setTimeout(() => {
-            const center = [-1.32588, 36.79941];
+            const center = [-1.28817042, 36.81647301];
             if (!leafletMap) {
                 leafletMap = L.map('modal-leaflet-map').setView(center, 16);
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -2230,7 +2286,7 @@
         let chipsHtml = `
             <div class="flex items-center gap-2.5 pb-2 overflow-x-auto no-scrollbar scroll-smooth">
                 <button onclick="selectVendor(null)"
-                        class="px-4 py-2 rounded-full text-xs font-black transition-all cursor-pointer border ${activeVendorId === null ? 'bg-[#05A357] text-white border-[#05A357] shadow-md' : 'bg-white text-slate-700 border-slate-200 hover:border-[#05A357]'}">
+                        class="px-4 py-2 rounded-full text-xs font-black transition-all cursor-pointer whitespace-nowrap border ${activeVendorId === null ? 'bg-[#05A357] text-white border-[#05A357] shadow-md' : 'bg-white text-slate-700 border-slate-200 hover:border-[#05A357]'}">
                     <i class="fas fa-store mr-1"></i> All Vendors (${vendors.length})
                 </button>
         `;
@@ -2378,13 +2434,13 @@
 
         // 4. OVERVIEW MODE: Render Glovo-Style Circular Bubble Cards Grid!
         let vendorGridHtml = `
-            <div class="space-y-6 pt-2">
+            <div class="space-y-5 pt-2">
                 <div class="text-center space-y-1">
-                    <h3 class="text-xl md:text-2xl font-black text-[#0F172A] tracking-tight">Top restaurants and stalls in justFeast</h3>
-                    <p class="text-xs text-slate-500 font-bold">Tap any stall bubble to explore their full menu</p>
+                    <h3 class="text-lg sm:text-xl md:text-2xl font-black text-[#0F172A] tracking-tight">Top restaurants and stalls in justFeast</h3>
+                    <p class="text-[11px] sm:text-xs text-slate-500 font-bold">Tap any stall bubble to explore their full menu</p>
                 </div>
 
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 justify-items-center py-4">
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6 justify-items-center py-3">
         `;
 
         vendors.forEach((vendor, index) => {
@@ -2401,21 +2457,21 @@
                      class="flex flex-col items-center group cursor-pointer text-center transition-transform">
 
                     <!-- Circular Glovo Bubble Avatar -->
-                    <div class="w-28 h-28 md:w-32 md:h-32 rounded-full bg-white border-2 border-slate-200 group-hover:border-[#05A357] shadow-md group-hover:shadow-2xl transition-all duration-300 flex items-center justify-center overflow-hidden relative group-hover:scale-105">
+                    <div class="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full bg-white border-2 border-slate-200 group-hover:border-[#05A357] shadow-md group-hover:shadow-2xl transition-all duration-300 flex items-center justify-center overflow-hidden relative group-hover:scale-105">
                         <div class="w-full h-full bg-gradient-to-br from-[#FFF8E7] via-white to-[#E9F7EE] flex items-center justify-center p-2">
-                            <span class="text-5xl md:text-6xl drop-shadow-sm group-hover:scale-110 transition-transform duration-300">${vendorEmoji}</span>
+                            <span class="text-4xl sm:text-5xl md:text-6xl drop-shadow-sm group-hover:scale-110 transition-transform duration-300">${vendorEmoji}</span>
                         </div>
-                        <span class="absolute bottom-2 bg-white/90 backdrop-blur text-[#0F172A] text-[9.5px] font-black px-2 py-0.5 rounded-full shadow-sm border border-slate-200">
-                            <i class="fas fa-star text-[#FFC244] text-[8.5px]"></i> ${rating}
+                        <span class="absolute bottom-1.5 sm:bottom-2 bg-white/90 backdrop-blur text-[#0F172A] text-[8.5px] sm:text-[9.5px] font-black px-2 py-0.5 rounded-full shadow-sm border border-slate-200">
+                            <i class="fas fa-star text-[#FFC244] text-[8px] sm:text-[8.5px]"></i> ${rating}
                         </span>
                     </div>
 
                     <!-- Label Pill underneath -->
-                    <span class="mt-3 px-3.5 py-1 bg-[#FFF8E7] group-hover:bg-[#05A357] text-[#0F172A] group-hover:text-white rounded-full text-xs font-black transition-all shadow-sm border border-[#F7E5B2] group-hover:border-[#05A357] truncate max-w-[140px]">
+                    <span class="mt-2.5 sm:mt-3 px-3 sm:px-3.5 py-1 bg-[#FFF8E7] group-hover:bg-[#05A357] text-[#0F172A] group-hover:text-white rounded-full text-[11px] sm:text-xs font-black transition-all shadow-sm border border-[#F7E5B2] group-hover:border-[#05A357] truncate max-w-[120px] sm:max-w-[140px]">
                         ${vendor.business_name}
                     </span>
 
-                    <span class="text-[10px] text-slate-400 font-bold mt-1">
+                    <span class="text-[9.5px] sm:text-[10px] text-slate-400 font-bold mt-1">
                         <i class="far fa-clock text-[#05A357] mr-0.5"></i> ${etaMin}-${etaMax} min
                     </span>
                 </div>

@@ -17,7 +17,7 @@
                             rose: '#FFC244',
                             orange: '#FFC244',
                             amber: '#FFC244',
-                            emerald: '#00A082',
+                            emerald: '#A31D1D',
                         }
                     }
                 }
@@ -117,7 +117,7 @@
         
         /* Glovo Header Brand title - force gradient to Glovo Brand colors */
         h1.tracking-wider.bg-gradient-to-r {
-            background-image: linear-gradient(to right, #FFC244, #00A082) !important;
+            background-image: linear-gradient(to right, #FFC244, #A31D1D) !important;
             -webkit-background-clip: text !important;
             background-clip: text !important;
             color: transparent !important;
@@ -137,10 +137,10 @@
         
         /* Successful state text/badges (Glovo Green) */
         .bg-brand-emerald, .bg-gradient-to-r.from-brand-emerald, .text-brand-emerald, .bg-brand-emerald\/20 {
-            color: #00A082 !important;
+            color: #A31D1D !important;
         }
         .bg-brand-emerald, .bg-gradient-to-r.from-brand-emerald {
-            background-color: #00A082 !important;
+            background-color: #A31D1D !important;
             background-image: none !important;
             color: #FFFFFF !important;
         }
@@ -150,7 +150,7 @@
         
         /* Rose/Orange text elements should be changed to Glovo Green or Charcoal for readability */
         .text-brand-rose, .text-brand-orange {
-            color: #00A082 !important;
+            color: #A31D1D !important;
         }
         
         /* Stadium map overrides */
@@ -185,7 +185,7 @@
         }
         svg path.fill-brand-orange\/20 {
             fill: rgba(0, 160, 130, 0.2) !important;
-            stroke: #00A082 !important;
+            stroke: #A31D1D !important;
         }
         svg rect[stroke="#f43f5e"], svg rect[stroke="#8b5cf6"] {
             fill: #FFFDF9 !important;
@@ -214,7 +214,7 @@
 
     <!-- Glowing Background blobs -->
     <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#FFC244]/10 rounded-full blur-[150px] pointer-events-none"></div>
-    <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-[#00A082]/10 rounded-full blur-[150px] pointer-events-none"></div>
+    <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-[#A31D1D]/10 rounded-full blur-[150px] pointer-events-none"></div>
 
     <!-- App Container -->
     <div class="w-full max-w-[1400px] mx-auto min-h-screen flex flex-col relative z-10 px-4 md:px-6 pt-6">

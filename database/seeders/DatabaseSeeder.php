@@ -14,15 +14,7 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Create Default Users for each role
-        $customer = User::create([
-            'name' => 'John Customer',
-            'email' => 'customer@justfeast.com',
-            'phone' => '0712345678',
-            'role' => 'customer',
-            'password' => Hash::make('password'),
-        ]);
-
+        // 1. Create Default Users for staff roles
         $vendorUser1 = User::create([
             'name' => 'Alex Vendor (Burger World)',
             'email' => 'vendor@justfeast.com',
@@ -76,7 +68,7 @@ class DatabaseSeeder extends Seeder
         $venue = Venue::create([
             'name' => 'Uhuru Park',
             'map_data' => [
-                'coordinates' => '1.3259° S, 36.7994° E',
+                'coordinates' => '1.28817042° S, 36.81647301° E',
                 'sections_count' => 4,
             ],
             'seating_layout' => [

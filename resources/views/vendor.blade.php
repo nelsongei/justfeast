@@ -17,7 +17,7 @@
                             rose: '#FFC244',
                             orange: '#FFC244',
                             amber: '#FFC244',
-                            emerald: '#00A082',
+                            emerald: '#A31D1D',
                         }
                     }
                 }
@@ -117,7 +117,7 @@
         
         /* Glovo Header Brand title - force gradient to Glovo Brand colors */
         h1.tracking-wider.bg-gradient-to-r {
-            background-image: linear-gradient(to right, #FFC244, #00A082) !important;
+            background-image: linear-gradient(to right, #FFC244, #A31D1D) !important;
             -webkit-background-clip: text !important;
             background-clip: text !important;
             color: transparent !important;
@@ -137,10 +137,10 @@
         
         /* Successful state text/badges (Glovo Green) */
         .bg-brand-emerald, .bg-gradient-to-r.from-brand-emerald, .text-brand-emerald, .bg-brand-emerald\/20 {
-            color: #00A082 !important;
+            color: #A31D1D !important;
         }
         .bg-brand-emerald, .bg-gradient-to-r.from-brand-emerald {
-            background-color: #00A082 !important;
+            background-color: #A31D1D !important;
             background-image: none !important;
             color: #FFFFFF !important;
         }
@@ -150,7 +150,7 @@
         
         /* Rose/Orange text elements should be changed to Glovo Green or Charcoal for readability */
         .text-brand-rose, .text-brand-orange {
-            color: #00A082 !important;
+            color: #A31D1D !important;
         }
         
         /* Stadium map overrides */
@@ -185,7 +185,7 @@
         }
         svg path.fill-brand-orange\/20 {
             fill: rgba(0, 160, 130, 0.2) !important;
-            stroke: #00A082 !important;
+            stroke: #A31D1D !important;
         }
         svg rect[stroke="#f43f5e"], svg rect[stroke="#8b5cf6"] {
             fill: #FFFDF9 !important;
@@ -214,23 +214,23 @@
 
     <!-- Glowing Background blobs -->
     <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#FFC244]/10 rounded-full blur-[150px] pointer-events-none"></div>
-    <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-[#00A082]/10 rounded-full blur-[150px] pointer-events-none"></div>
+    <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-[#A31D1D]/10 rounded-full blur-[150px] pointer-events-none"></div>
 
     <!-- Main Workspace Wrapper -->
-    <div class="w-full max-w-[1700px] mx-auto px-4 py-8 relative z-10">
+    <div class="w-full max-w-[1700px] mx-auto px-3 sm:px-6 py-4 sm:py-8 relative z-10">
 
         <!-- Auth Picker Screen (if not logged in) -->
-        <div id="vendor-auth" class="glass-card rounded-3xl p-8 max-w-md mx-auto text-center space-y-6 shadow-md">
-            <div class="w-16 h-16 bg-[#FFC244] rounded-2xl flex items-center justify-center mx-auto shadow-xl shadow-[#FFC244]/15 text-3xl border border-[#E0A325] flex items-center justify-center">
+        <div id="vendor-auth" class="glass-card rounded-3xl p-6 sm:p-8 max-w-md mx-auto text-center space-y-6 shadow-md">
+            <div class="w-16 h-16 bg-[#FFC244] rounded-2xl flex items-center justify-center mx-auto shadow-xl shadow-[#FFC244]/15 text-3xl border border-[#E0A325]">
                 <span>🏪</span>
             </div>
             <div class="space-y-2">
-                <h2 class="text-2xl font-bold tracking-tight text-[#2D3748] font-sans">Kitchen Staff Portal</h2>
+                <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-[#2D3748] font-sans">Kitchen Staff Portal</h2>
                 <p class="text-xs text-zinc-500">Select your food stall vendor account to log in and start receiving orders from attendees.</p>
             </div>
 
             <div class="space-y-3 pt-4 text-left">
-                <button onclick="loginAsVendor('vendor@justfeast.com')" class="w-full p-4 rounded-2xl bg-white border border-[#E2E8F0] hover:border-[#FFC244] hover:bg-[#FFFDF9] transition flex items-center justify-between shadow-sm">
+                <button onclick="loginAsVendor('vendor@justfeast.com')" class="w-full p-3.5 sm:p-4 rounded-2xl bg-white border border-[#E2E8F0] hover:border-[#FFC244] hover:bg-[#FFFDF9] transition flex items-center justify-between shadow-sm">
                     <div class="flex items-center gap-3">
                         <span class="text-2xl">🍔</span>
                         <div class="text-left">
@@ -241,7 +241,7 @@
                     <i class="fas fa-chevron-right text-zinc-400 text-xs"></i>
                 </button>
 
-                <button onclick="loginAsVendor('taco@justfeast.com')" class="w-full p-4 rounded-2xl bg-white border border-[#E2E8F0] hover:border-[#FFC244] hover:bg-[#FFFDF9] transition flex items-center justify-between shadow-sm">
+                <button onclick="loginAsVendor('taco@justfeast.com')" class="w-full p-3.5 sm:p-4 rounded-2xl bg-white border border-[#E2E8F0] hover:border-[#FFC244] hover:bg-[#FFFDF9] transition flex items-center justify-between shadow-sm">
                     <div class="flex items-center gap-3">
                         <span class="text-2xl">🌮</span>
                         <div class="text-left">
@@ -252,7 +252,7 @@
                     <i class="fas fa-chevron-right text-zinc-400 text-xs"></i>
                 </button>
 
-                <button onclick="loginAsVendor('choma@justfeast.com')" class="w-full p-4 rounded-2xl bg-white border border-[#E2E8F0] hover:border-[#FFC244] hover:bg-[#FFFDF9] transition flex items-center justify-between shadow-sm">
+                <button onclick="loginAsVendor('choma@justfeast.com')" class="w-full p-3.5 sm:p-4 rounded-2xl bg-white border border-[#E2E8F0] hover:border-[#FFC244] hover:bg-[#FFFDF9] transition flex items-center justify-between shadow-sm">
                     <div class="flex items-center gap-3">
                         <span class="text-2xl">🥩</span>
                         <div class="text-left">
@@ -266,106 +266,188 @@
         </div>
 
         <!-- Vendor Dashboard Portal -->
-        <div id="vendor-dashboard" class="hidden space-y-6">
+        <div id="vendor-dashboard" class="hidden space-y-4 sm:space-y-6">
             <!-- Header -->
-            <header class="flex flex-col md:flex-row items-center justify-between gap-4 pb-4 border-b border-[#E2E8F0]">
-                <div class="flex items-center gap-3">
-                    <span id="vendor-avatar" class="text-3xl">🏪</span>
+            <header class="flex flex-wrap items-center justify-between gap-3 bg-white p-3.5 sm:p-4 rounded-2xl border border-[#E2E8F0] shadow-sm">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white border border-[#E2E8F0] flex items-center justify-center overflow-hidden p-1 shadow-sm shrink-0">
+                        <img src="{{ asset('images/logo/jm.png') }}" alt="justFeast Logo" class="w-full h-full object-contain">
+                    </div>
                     <div>
-                        <h1 class="text-xl font-bold tracking-tight text-[#2D3748] flex items-center gap-2" id="vendor-title">
+                        <h1 class="text-base sm:text-lg font-black tracking-tight text-[#0F172A] flex items-center gap-1.5" id="vendor-title">
                             Vendor Portal
                         </h1>
-                        <p class="text-xs text-zinc-500" id="live-event-banner">Connected to concert event stalls</p>
+                        <p class="text-[10px] sm:text-xs text-[#64748B] flex items-center gap-1" id="live-event-banner">
+                            <span class="w-2 h-2 rounded-full bg-[#05A357] animate-pulse"></span> Connected to Uhuru Park Stalls
+                        </p>
                     </div>
                 </div>
 
-                <div class="flex items-center gap-3">
-                    <span class="text-xs bg-zinc-900 border border-zinc-800 px-3 py-1.5 rounded-xl text-zinc-400 font-semibold" id="staff-name-pill">Loading...</span>
-                    <button onclick="logoutVendor()" class="text-xs text-zinc-500 hover:text-zinc-400 font-bold"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                <div class="flex items-center gap-2 ml-auto sm:ml-0">
+                    <div class="flex items-center gap-1.5 bg-[#F8FAFC] border border-[#E2E8F0] px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-[#0F172A]">
+                        <span id="vendor-avatar" class="text-sm">🏪</span>
+                        <span id="staff-name-pill" class="max-w-[110px] sm:max-w-none truncate">Staff</span>
+                    </div>
+                    <button onclick="logoutVendor()" class="text-[11px] sm:text-xs bg-[#FEF2F2] hover:bg-[#FEE2E2] text-[#991B1B] border border-[#FCA5A5] px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full font-bold transition flex items-center gap-1">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
                 </div>
             </header>
 
             <!-- Dashboard Content Grid -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
 
-                <!-- Left Column (Queue & Stats) -->
-                <div class="lg:col-span-2 space-y-6">
-                    <!-- Metrics Cards -->
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="glass-card p-5 rounded-2xl">
-                            <span class="text-[9px] uppercase tracking-wider text-zinc-500 block font-bold mb-1">Active Kitchen Queue</span>
-                            <span class="text-2xl font-black text-brand-rose" id="vendor-queue-count">0 Orders</span>
+                <!-- Left Column (Queue & Metrics - 7 Cols) -->
+                <div class="lg:col-span-7 space-y-4 sm:space-y-6">
+                    <!-- Metrics Cards (4 Columns) -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
+                        <div class="bg-white border border-[#E2E8F0] p-3 sm:p-4 rounded-2xl shadow-sm relative overflow-hidden">
+                            <div class="absolute top-0 left-0 right-0 h-1 bg-[#A31D1D]"></div>
+                            <span class="text-[8px] sm:text-[9px] uppercase tracking-wider text-[#64748B] block font-extrabold mb-0.5">Kitchen Queue</span>
+                            <span class="text-base sm:text-xl font-black text-[#A31D1D]" id="vendor-queue-count">0 Active</span>
                         </div>
-                        <div class="glass-card p-5 rounded-2xl">
-                            <span class="text-[9px] uppercase tracking-wider text-zinc-500 block font-bold mb-1">Total Sales Revenue</span>
-                            <span class="text-2xl font-black text-brand-emerald" id="vendor-sales-amount">Ksh 0.00</span>
+                        <div class="bg-white border border-[#E2E8F0] p-3 sm:p-4 rounded-2xl shadow-sm relative overflow-hidden">
+                            <div class="absolute top-0 left-0 right-0 h-1 bg-[#05A357]"></div>
+                            <span class="text-[8px] sm:text-[9px] uppercase tracking-wider text-[#64748B] block font-extrabold mb-0.5">Total Sales</span>
+                            <span class="text-base sm:text-xl font-black text-[#05A357]" id="vendor-sales-amount">Ksh 0</span>
+                        </div>
+                        <div class="bg-white border border-[#E2E8F0] p-3 sm:p-4 rounded-2xl shadow-sm relative overflow-hidden">
+                            <div class="absolute top-0 left-0 right-0 h-1 bg-[#2563EB]"></div>
+                            <span class="text-[8px] sm:text-[9px] uppercase tracking-wider text-[#64748B] block font-extrabold mb-0.5">Delivered</span>
+                            <span class="text-base sm:text-xl font-black text-[#2563EB]" id="vendor-completed-count">0 Delivered</span>
+                        </div>
+                        <div class="bg-white border border-[#E2E8F0] p-3 sm:p-4 rounded-2xl shadow-sm relative overflow-hidden">
+                            <div class="absolute top-0 left-0 right-0 h-1 bg-[#FFC244]"></div>
+                            <span class="text-[8px] sm:text-[9px] uppercase tracking-wider text-[#64748B] block font-extrabold mb-0.5">Menu Items</span>
+                            <span class="text-base sm:text-xl font-black text-[#D97706]" id="vendor-menu-count">0 Items</span>
                         </div>
                     </div>
 
                     <!-- Kitchen Queue -->
-                    <div class="glass-card p-6 rounded-2xl flex flex-col h-[650px]">
-                        <h3 class="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-4"><i class="fas fa-fire text-brand-orange mr-1.5"></i> Live Kitchen Prep Queue</h3>
+                    <div class="bg-white border border-[#E2E8F0] p-4 sm:p-5 rounded-2xl flex flex-col min-h-[480px] sm:min-h-[580px] shadow-sm">
+                        <div class="flex items-center justify-between pb-3 border-b border-[#E2E8F0] mb-4">
+                            <h3 class="text-xs font-black text-[#0F172A] uppercase tracking-wider flex items-center gap-2">
+                                <i class="fas fa-fire text-[#A31D1D]"></i> Live Kitchen Dispatch Board
+                            </h3>
+                            <span class="text-[10px] bg-[#ECFDF5] text-[#047857] border border-[#A7F3D0] px-2.5 py-1 rounded-full font-bold">
+                                <i class="fas fa-sync fa-spin mr-1 text-[8px]"></i> Auto-Syncing (2s)
+                            </span>
+                        </div>
                         
                         <div id="vendor-orders-container" class="flex-1 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-4 pr-1">
                             <!-- Order cards list -->
-                            <div class="col-span-full text-center py-24 text-zinc-600 space-y-2">
-                                <i class="fas fa-utensils text-3xl"></i>
-                                <p class="text-xs">No active paid orders in the kitchen.</p>
+                            <div class="col-span-full text-center py-16 sm:py-20 text-[#64748B] space-y-3">
+                                <div class="w-14 h-14 sm:w-16 sm:h-16 bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl flex items-center justify-center mx-auto text-xl sm:text-2xl text-[#94A3B8]">
+                                    <i class="fas fa-utensils"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-[#0F172A]">Kitchen Queue Clear</h4>
+                                    <p class="text-xs text-[#64748B]">New attendee orders will appear here automatically in real time.</p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Right Column (Menu & Stock Controls) -->
-                <div class="lg:col-span-1 space-y-6">
-                    <div class="glass-card p-6 rounded-2xl flex flex-col h-[650px]">
-                        <div class="flex items-center justify-between pb-3 border-b border-zinc-800 mb-4">
-                            <h3 class="text-xs font-bold text-zinc-400 uppercase tracking-wider"><i class="fas fa-list text-[#00A082] mr-1.5"></i> Stall Menu</h3>
-                            <div class="flex gap-1 bg-zinc-950 p-1 rounded-full border border-zinc-850">
-                                <button type="button" onclick="switchVendorTab('stock')" id="btn-tab-stock" class="px-3 py-1 text-[9px] font-black rounded-full transition bg-[#FFC244] text-[#2D3748]">Stock</button>
-                                <button type="button" onclick="switchVendorTab('menu')" id="btn-tab-menu" class="px-3 py-1 text-[9px] font-black rounded-full transition text-zinc-400">Edit Menu</button>
+                <!-- Right Column (Menu & Stock Controls - 5 Cols) -->
+                <div class="lg:col-span-5 space-y-4 sm:space-y-6">
+                    <div class="bg-white border border-[#E2E8F0] p-4 sm:p-5 rounded-2xl flex flex-col min-h-[520px] sm:min-h-[660px] shadow-sm">
+                        <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-[#E2E8F0] mb-4">
+                            <h3 class="text-xs font-black text-[#0F172A] uppercase tracking-wider flex items-center gap-2">
+                                <i class="fas fa-store text-[#A31D1D]"></i> Stall Menu
+                            </h3>
+                            <div class="flex gap-1.5 items-center">
+                                <div class="flex gap-1 bg-[#F8FAFC] p-1 rounded-full border border-[#E2E8F0]">
+                                    <button type="button" onclick="switchVendorTab('stock')" id="btn-tab-stock" class="px-2.5 sm:px-3 py-1 text-[10px] font-extrabold rounded-full transition bg-[#A31D1D] text-white shadow-sm">Stock</button>
+                                    <button type="button" onclick="switchVendorTab('menu')" id="btn-tab-menu" class="px-2.5 sm:px-3 py-1 text-[10px] font-extrabold rounded-full transition text-[#64748B]">All Items</button>
+                                </div>
+                                <button type="button" onclick="toggleAddProductForm()" id="btn-header-add" class="px-2.5 sm:px-3 py-1 bg-[#A31D1D] hover:bg-[#841313] text-white text-[10px] font-extrabold rounded-full shadow-sm flex items-center gap-1">
+                                    <i class="fas fa-plus text-[9px]"></i> Add Item
+                                </button>
                             </div>
                         </div>
 
                         <!-- TAB: STOCK TOGGLE -->
                         <div id="vendor-tab-stock-content" class="flex-1 flex flex-col min-h-0">
-                            <p class="text-[10px] text-zinc-500 mb-4">Toggle stock status to instantly mark items as "Sold Out" or "Available" on customer apps.</p>
-                            <div id="vendor-stock-items" class="flex-1 overflow-y-auto space-y-3 pr-1">
+                            <p class="text-[11px] text-[#64748B] mb-3 font-medium">Toggle switches to mark items "Sold Out" or "In Stock" on customer event apps.</p>
+                            <div id="vendor-stock-items" class="flex-1 overflow-y-auto space-y-2.5 pr-1">
                                 <!-- Toggle switches checklist -->
                             </div>
                         </div>
 
                         <!-- TAB: EDIT MENU (ADD/EDIT/DELETE) -->
                         <div id="vendor-tab-menu-content" class="flex-1 flex flex-col min-h-0 hidden">
-                            <div class="flex justify-between items-center mb-3">
-                                <span class="text-[10px] text-zinc-500">Edit prices, details, or add items.</span>
-                                <button type="button" onclick="openAddProductForm()" class="px-3 py-1 bg-[#00A082] text-white text-[9px] font-black rounded-full shadow-sm"><i class="fas fa-plus mr-1"></i> Add Item</button>
-                            </div>
                             
-                            <!-- Inline Add/Edit Form -->
-                            <div id="vendor-product-form-wrap" class="bg-zinc-950 border border-zinc-850 rounded-2xl p-4 mb-4 hidden">
-                                <h4 id="product-form-title" class="text-[10px] font-black text-white uppercase tracking-wider mb-3">Add Stall Item</h4>
+                            <!-- Inline Add/Edit Form (Improved Light Theme Layout) -->
+                            <div id="vendor-product-form-wrap" class="bg-[#F8FAFC] border border-[#CBD5E1] rounded-2xl p-4 mb-4 shadow-sm hidden">
+                                <div class="flex items-center justify-between pb-2 mb-3 border-b border-[#E2E8F0]">
+                                    <h4 id="product-form-title" class="text-xs font-extrabold text-[#0F172A] uppercase tracking-wider flex items-center gap-1.5">
+                                        <i class="fas fa-utensils text-[#A31D1D]"></i> Add Stall Item
+                                    </h4>
+                                    <button type="button" onclick="closeProductForm()" class="text-zinc-400 hover:text-zinc-600 text-xs">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                
                                 <form id="vendor-product-form" onsubmit="handleSaveProduct(event)" class="space-y-3">
                                     <input type="hidden" id="form-product-id">
+                                    
                                     <div>
-                                        <label class="block text-[8px] font-bold text-zinc-500 uppercase mb-1">Item Name</label>
-                                        <input type="text" id="form-product-name" required placeholder="e.g. Classic Burger" class="w-full bg-[#1C1C24] border border-zinc-850 text-white rounded-xl px-2.5 py-1.5 text-[10px] outline-none">
+                                        <label class="block text-[9px] font-extrabold text-[#475569] uppercase mb-1">Item Name</label>
+                                        <input type="text" id="form-product-name" required placeholder="e.g. Classic Smash Burger" class="w-full bg-[#FFFFFF] border border-[#CBD5E1] focus:border-[#A31D1D] focus:ring-1 focus:ring-[#A31D1D] text-[#0F172A] placeholder-[#94A3B8] rounded-xl px-3 py-2 text-xs font-semibold outline-none transition">
                                     </div>
+                                    
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label class="block text-[9px] font-extrabold text-[#475569] uppercase mb-1">Price (Ksh)</label>
+                                            <input type="number" id="form-product-price" required min="0" placeholder="e.g. 750" class="w-full bg-[#FFFFFF] border border-[#CBD5E1] focus:border-[#A31D1D] focus:ring-1 focus:ring-[#A31D1D] text-[#0F172A] placeholder-[#94A3B8] rounded-xl px-3 py-2 text-xs font-bold outline-none transition">
+                                        </div>
+                                        <div>
+                                            <label class="block text-[9px] font-extrabold text-[#475569] uppercase mb-1">Category</label>
+                                            <select id="form-product-category" class="w-full bg-[#FFFFFF] border border-[#CBD5E1] focus:border-[#A31D1D] text-[#0F172A] rounded-xl px-2.5 py-2 text-xs font-semibold outline-none">
+                                                <option value="Mains">🍔 Burgers & Mains</option>
+                                                <option value="Sides">🍟 Sides & Snacks</option>
+                                                <option value="Drinks">🥤 Cold Drinks</option>
+                                                <option value="Desserts">🍦 Desserts</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
                                     <div>
-                                        <label class="block text-[8px] font-bold text-zinc-500 uppercase mb-1">Price (Ksh)</label>
-                                        <input type="number" id="form-product-price" required min="0" placeholder="e.g. 750" class="w-full bg-[#1C1C24] border border-zinc-850 text-white rounded-xl px-2.5 py-1.5 text-[10px] outline-none">
+                                        <label class="block text-[9px] font-extrabold text-[#475569] uppercase mb-1">Description</label>
+                                        <input type="text" id="form-product-desc" placeholder="e.g. Juicy double beef patty with cheddar cheese" class="w-full bg-[#FFFFFF] border border-[#CBD5E1] focus:border-[#A31D1D] focus:ring-1 focus:ring-[#A31D1D] text-[#0F172A] placeholder-[#94A3B8] rounded-xl px-3 py-2 text-xs font-medium outline-none transition">
                                     </div>
+
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label class="block text-[9px] font-extrabold text-[#475569] uppercase mb-1">Stock Status</label>
+                                            <select id="form-product-stock" class="w-full bg-[#FFFFFF] border border-[#CBD5E1] focus:border-[#A31D1D] text-[#0F172A] rounded-xl px-2.5 py-2 text-xs font-semibold outline-none">
+                                                <option value="in_stock">✅ In Stock</option>
+                                                <option value="out_of_stock">❌ Sold Out</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="block text-[9px] font-extrabold text-[#475569] uppercase mb-1">Prep Time</label>
+                                            <select id="form-product-preptime" class="w-full bg-[#FFFFFF] border border-[#CBD5E1] focus:border-[#A31D1D] text-[#0F172A] rounded-xl px-2.5 py-2 text-xs font-semibold outline-none">
+                                                <option value="5 mins">⚡ 5 mins (Fast)</option>
+                                                <option value="10 mins">⏱️ 10 mins (Standard)</option>
+                                                <option value="15 mins">🍳 15 mins (Gourmet)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
                                     <div>
-                                        <label class="block text-[8px] font-bold text-zinc-500 uppercase mb-1">Description</label>
-                                        <input type="text" id="form-product-desc" placeholder="e.g. Juicy beef patty with cheddar cheese" class="w-full bg-[#1C1C24] border border-zinc-850 text-white rounded-xl px-2.5 py-1.5 text-[10px] outline-none">
+                                        <label class="block text-[9px] font-extrabold text-[#475569] uppercase mb-1">Item Photo</label>
+                                        <input type="file" id="form-product-image" accept="image/*" class="w-full bg-[#FFFFFF] border border-[#CBD5E1] text-[#0F172A] rounded-xl px-2.5 py-1.5 text-[11px] outline-none">
                                     </div>
-                                    <div>
-                                        <label class="block text-[8px] font-bold text-zinc-500 uppercase mb-1">Item Image</label>
-                                        <input type="file" id="form-product-image" accept="image/*" class="w-full bg-[#1C1C24] border border-zinc-850 text-white rounded-xl px-2.5 py-1.5 text-[10px] outline-none">
-                                    </div>
-                                    <div class="flex gap-2 pt-1.5">
-                                        <button type="submit" class="flex-1 py-1.5 bg-[#FFC244] text-[#2D3748] text-[9px] font-bold rounded-full">Save Item</button>
-                                        <button type="button" onclick="closeProductForm()" class="flex-1 py-1.5 bg-zinc-900 border border-zinc-800 text-zinc-400 text-[9px] font-bold rounded-full">Cancel</button>
+
+                                    <div class="flex gap-2 pt-2">
+                                        <button type="submit" class="flex-1 py-2 bg-[#A31D1D] hover:bg-[#841313] text-white text-xs font-extrabold rounded-full shadow-md shadow-[#A31D1D]/20">
+                                            <i class="fas fa-check mr-1"></i> Save Item
+                                        </button>
+                                        <button type="button" onclick="closeProductForm()" class="px-4 py-2 bg-[#E2E8F0] hover:bg-[#CBD5E1] text-[#475569] text-xs font-extrabold rounded-full">
+                                            Cancel
+                                        </button>
                                     </div>
                                 </form>
                             </div>
@@ -583,36 +665,35 @@
             const vendor = getVendorDetails();
             if (!vendor) return;
 
+            if (vendor.products.length === 0) {
+                container.innerHTML = `<div class="text-center py-8 text-[#64748B] text-xs">No menu items listed yet</div>`;
+                return;
+            }
+
+            // Update header item counts
+            const menuCountEl = document.getElementById('vendor-menu-count');
+            if (menuCountEl) menuCountEl.textContent = `${vendor.products.length} Items`;
+
             vendor.products.forEach(p => {
                 const item = document.createElement('div');
-                item.className = 'flex justify-between items-center bg-zinc-900 px-3 py-2.5 rounded-xl border border-zinc-800 text-xs';
+                item.className = 'flex justify-between items-center bg-[#F8FAFC] p-3 rounded-2xl border border-[#E2E8F0] shadow-sm text-xs';
                 const checked = p.stock_status === 'in_stock' ? 'checked' : '';
+                const statusBadge = p.stock_status === 'in_stock' 
+                    ? `<span class="text-[9px] bg-[#ECFDF5] text-[#047857] px-2 py-0.5 rounded-full font-bold">In Stock</span>`
+                    : `<span class="text-[9px] bg-[#FEF2F2] text-[#991B1B] px-2 py-0.5 rounded-full font-bold">Sold Out</span>`;
 
                 item.innerHTML = `
-                    <span class="font-semibold text-zinc-300">${p.name}</span>
+                    <div class="flex items-center gap-2.5">
+                        <div class="font-bold text-[#0F172A]">${p.name}</div>
+                        ${statusBadge}
+                    </div>
                     <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" value="${p.id}" onchange="toggleStock(${p.id})" class="sr-only peer" ${checked}>
-                        <div class="w-7 h-4 bg-zinc-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-zinc-400 after:border-zinc-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-brand-rose"></div>
+                        <div class="w-8 h-4.5 bg-[#CBD5E1] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3.5 after:w-3.5 after:transition-all peer-checked:bg-[#05A357]"></div>
                     </label>
                 `;
                 container.appendChild(item);
             });
-        }
-
-        async function toggleStock(productId) {
-            playSound('beep');
-            try {
-                const res = await fetch(`${API_BASE}/products/${productId}/toggle-stock`, { method: 'POST' });
-                if (res.ok) {
-                    // Refresh vendor list context
-                    const response = await fetch(`${API_BASE}/vendors`);
-                    if (response.ok) {
-                        vendors = await response.json();
-                        renderStockControls();
-                        renderMenuManagement();
-                    }
-                }
-            } catch(e) {}
         }
 
         let activeVendorTab = 'stock';
@@ -626,13 +707,13 @@
             const contentMenu = document.getElementById('vendor-tab-menu-content');
 
             if (tab === 'stock') {
-                btnStock.className = 'px-3 py-1 text-[9px] font-black rounded-full transition bg-[#FFC244] text-[#2D3748]';
-                btnMenu.className = 'px-3 py-1 text-[9px] font-black rounded-full transition text-zinc-400';
+                btnStock.className = 'px-3.5 py-1 text-[10px] font-extrabold rounded-full transition bg-[#A31D1D] text-white shadow-sm';
+                btnMenu.className = 'px-3.5 py-1 text-[10px] font-extrabold rounded-full transition text-[#64748B]';
                 contentStock.classList.remove('hidden');
                 contentMenu.classList.add('hidden');
             } else {
-                btnStock.className = 'px-3 py-1 text-[9px] font-black rounded-full transition text-zinc-400';
-                btnMenu.className = 'px-3 py-1 text-[9px] font-black rounded-full transition bg-[#FFC244] text-[#2D3748]';
+                btnStock.className = 'px-3.5 py-1 text-[10px] font-extrabold rounded-full transition text-[#64748B]';
+                btnMenu.className = 'px-3.5 py-1 text-[10px] font-extrabold rounded-full transition bg-[#A31D1D] text-white shadow-sm';
                 contentStock.classList.add('hidden');
                 contentMenu.classList.remove('hidden');
                 renderMenuManagement();
@@ -649,9 +730,9 @@
 
             if (vendor.products.length === 0) {
                 container.innerHTML = `
-                    <div class="text-center py-12 text-zinc-650">
-                        <i class="fas fa-utensils text-2xl mb-1 block"></i>
-                        <span class="text-[10px]">No items in menu. Add one!</span>
+                    <div class="text-center py-12 text-[#64748B]">
+                        <i class="fas fa-utensils text-3xl mb-2 block text-[#CBD5E1]"></i>
+                        <span class="text-xs font-semibold">No items in menu. Click "Add Item" above!</span>
                     </div>
                 `;
                 return;
@@ -659,55 +740,81 @@
 
             vendor.products.forEach(p => {
                 const item = document.createElement('div');
-                item.className = 'bg-zinc-900 border border-zinc-800 rounded-xl p-3 flex flex-col gap-1.5 text-xs';
+                item.className = 'bg-white border border-[#E2E8F0] rounded-2xl p-3.5 flex flex-col gap-2 shadow-sm hover:border-[#A31D1D]/30 transition';
                 
                 const escName = p.name.replace(/'/g, "\\'");
                 const escDesc = (p.description || '').replace(/'/g, "\\'");
 
                 let visual = '';
                 if (p.image_url && p.image_url.startsWith('/')) {
-                    visual = `<img src="${API_BASE.replace('/api', '') + p.image_url}" class="w-10 h-10 object-cover rounded-lg border border-zinc-800 shrink-0" alt="${p.name}">`;
+                    visual = `<img src="${API_BASE.replace('/api', '') + p.image_url}" class="w-12 h-12 object-cover rounded-xl border border-[#E2E8F0] shrink-0" alt="${p.name}">`;
                 } else {
-                    const gradient = p.image_url || 'bg-gradient-to-br from-amber-400 to-red-500';
-                    visual = `<div class="w-10 h-10 rounded-lg ${gradient} flex items-center justify-center text-white text-[10px] font-black uppercase shrink-0">${p.name.substring(0, 2)}</div>`;
+                    const gradient = p.image_url || 'bg-gradient-to-br from-[#A31D1D] to-[#FFC244]';
+                    visual = `<div class="w-12 h-12 rounded-xl ${gradient} flex items-center justify-center text-white text-xs font-extrabold uppercase shrink-0 shadow-sm">${p.name.substring(0, 2)}</div>`;
                 }
+
+                const stockBadge = p.stock_status === 'in_stock' 
+                    ? `<span class="bg-[#ECFDF5] text-[#047857] border border-[#A7F3D0] px-2 py-0.5 rounded-full text-[9px] font-extrabold">In Stock</span>`
+                    : `<span class="bg-[#FEF2F2] text-[#991B1B] border border-[#FCA5A5] px-2 py-0.5 rounded-full text-[9px] font-extrabold">Sold Out</span>`;
 
                 item.innerHTML = `
                     <div class="flex items-center gap-3">
                         ${visual}
                         <div class="flex-1 min-w-0">
-                            <div class="font-bold text-zinc-200 truncate">${p.name}</div>
-                            <div class="text-[10px] text-zinc-500 truncate">${p.description || 'No description.'}</div>
+                            <div class="font-extrabold text-[#0F172A] text-xs truncate">${p.name}</div>
+                            <div class="text-[10px] text-[#64748B] truncate mt-0.5">${p.description || 'No description provided.'}</div>
+                            <div class="mt-1 flex items-center gap-1.5">${stockBadge}</div>
                         </div>
-                        <span class="font-black text-[#FFC244] shrink-0">Ksh ${parseFloat(p.price).toFixed(2)}</span>
+                        <div class="text-right shrink-0">
+                            <span class="font-black text-[#A31D1D] text-sm block">Ksh ${Number(p.price).toLocaleString()}</span>
+                        </div>
                     </div>
-                    <div class="flex justify-end gap-2 pt-1.5 border-t border-zinc-850">
-                        <button type="button" onclick="openEditProductForm(${p.id}, '${escName}', ${p.price}, '${escDesc}')" class="px-3 py-0.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-[8px] font-bold rounded-full">Edit</button>
-                        <button type="button" onclick="handleDeleteProduct(${p.id})" class="px-3 py-0.5 bg-red-950/40 hover:bg-red-900/60 text-red-400 text-[8px] font-bold rounded-full">Delete</button>
+                    <div class="flex justify-end gap-2 pt-2 border-t border-[#F1F5F9]">
+                        <button type="button" onclick="openEditProductForm(${p.id}, '${escName}', ${p.price}, '${escDesc}')" class="px-3.5 py-1 bg-[#F1F5F9] hover:bg-[#E2E8F0] text-[#0F172A] text-[10px] font-extrabold rounded-full transition flex items-center gap-1">
+                            <i class="fas fa-pen text-[8px] text-[#A31D1D]"></i> Edit
+                        </button>
+                        <button type="button" onclick="handleDeleteProduct(${p.id})" class="px-3.5 py-1 bg-[#FEF2F2] hover:bg-[#FEE2E2] text-[#991B1B] text-[10px] font-extrabold rounded-full transition flex items-center gap-1">
+                            <i class="fas fa-trash text-[8px]"></i> Delete
+                        </button>
                     </div>
                 `;
                 container.appendChild(item);
             });
         }
 
+        function toggleAddProductForm() {
+            const wrap = document.getElementById('vendor-product-form-wrap');
+            if (wrap.classList.contains('hidden')) {
+                switchVendorTab('menu');
+                openAddProductForm();
+            } else {
+                closeProductForm();
+            }
+        }
+
         function openAddProductForm() {
             playSound('beep');
-            document.getElementById('product-form-title').textContent = 'Add Stall Item';
+            document.getElementById('product-form-title').innerHTML = '<i class="fas fa-plus-circle text-[#A31D1D] mr-1.5"></i> Add Stall Item';
             document.getElementById('form-product-id').value = '';
             document.getElementById('form-product-name').value = '';
             document.getElementById('form-product-price').value = '';
             document.getElementById('form-product-desc').value = '';
+            document.getElementById('form-product-category').value = 'Mains';
+            document.getElementById('form-product-stock').value = 'in_stock';
+            document.getElementById('form-product-preptime').value = '10 mins';
             document.getElementById('form-product-image').value = '';
             document.getElementById('vendor-product-form-wrap').classList.remove('hidden');
         }
 
-        function openEditProductForm(id, name, price, description) {
+        function openEditProductForm(id, name, price, description, category, stockStatus) {
             playSound('beep');
-            document.getElementById('product-form-title').textContent = 'Edit Stall Item';
+            document.getElementById('product-form-title').innerHTML = '<i class="fas fa-edit text-[#A31D1D] mr-1.5"></i> Edit Stall Item';
             document.getElementById('form-product-id').value = id;
             document.getElementById('form-product-name').value = name;
             document.getElementById('form-product-price').value = price;
-            document.getElementById('form-product-desc').value = description;
+            document.getElementById('form-product-desc').value = description || '';
+            if (category) document.getElementById('form-product-category').value = category;
+            if (stockStatus) document.getElementById('form-product-stock').value = stockStatus;
             document.getElementById('form-product-image').value = '';
             document.getElementById('vendor-product-form-wrap').classList.remove('hidden');
         }
@@ -725,6 +832,8 @@
             const name = document.getElementById('form-product-name').value;
             const price = document.getElementById('form-product-price').value;
             const description = document.getElementById('form-product-desc').value;
+            const category = document.getElementById('form-product-category').value;
+            const stockStatus = document.getElementById('form-product-stock').value;
 
             const vendor = getVendorDetails();
             if (!vendor) return;
@@ -734,7 +843,8 @@
             formData.append('name', name);
             formData.append('price', price);
             formData.append('description', description);
-            formData.append('stock_status', 'in_stock');
+            formData.append('category', category);
+            formData.append('stock_status', stockStatus);
 
             const imageInput = document.getElementById('form-product-image');
             if (imageInput.files[0]) {
@@ -758,7 +868,6 @@
                 
                 if (res.ok) {
                     closeProductForm();
-                    // Reload vendors context
                     const response = await fetch(`${API_BASE}/vendors`);
                     if (response.ok) {
                         vendors = await response.json();

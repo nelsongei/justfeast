@@ -32,9 +32,15 @@ Route::get('/runner', function () {
     return view('runner');
 });
 
-Route::get('/admin', function () {
-    return view('admin');
-})->middleware(['auth', 'role:admin']);
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
+    Route::get('/', function () { return view('admin.dashboard'); })->name('admin.dashboard');
+    Route::get('/dashboard', function () { return view('admin.dashboard'); });
+    Route::get('/orders', function () { return view('admin.orders'); })->name('admin.orders');
+    Route::get('/users', function () { return view('admin.users'); })->name('admin.users');
+    Route::get('/reports', function () { return view('admin.reports'); })->name('admin.reports');
+    Route::get('/vendors', function () { return view('admin.vendors'); })->name('admin.vendors');
+    Route::get('/heatmap', function () { return view('admin.heatmap'); })->name('admin.heatmap');
+});
 
 Route::get('/simulator', function () {
     return view('dashboard');
