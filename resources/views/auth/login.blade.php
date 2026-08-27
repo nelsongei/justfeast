@@ -36,7 +36,7 @@
             overflow-x: hidden;
         }
 
-        /* Bright ambient background glows */
+        /* Ambient background glows */
         body::before {
             content: '';
             position: fixed;
@@ -58,21 +58,14 @@
         }
 
         .layout {
-            display: grid;
-            grid-template-columns: 440px 1fr;
-            gap: 2.5rem;
             width: 100%;
-            max-width: 1040px;
+            max-width: 440px;
+            margin: 0 auto;
             position: relative;
             z-index: 1;
-            align-items: start;
         }
 
-        @media (max-width: 840px) {
-            .layout { grid-template-columns: 1fr; }
-        }
-
-        /* ── Left: Login Form Card ─────────────────────────────────────────── */
+        /* ── Login Form Card ─────────────────────────────────────────── */
         .form-card {
             background: #FFFFFF;
             border: 1px solid var(--border);
@@ -80,8 +73,6 @@
             padding: 2.5rem;
             box-shadow: 0 20px 60px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(15, 23, 42, 0.04);
             animation: slideUp 0.45s ease;
-            position: sticky;
-            top: 2rem;
         }
 
         @keyframes slideUp {
@@ -139,6 +130,7 @@
             margin-bottom: 0.5rem;
         }
         input[type="email"],
+        input[type="text"],
         input[type="password"] {
             width: 100%;
             background: var(--surface2);
@@ -202,129 +194,6 @@
         }
         .btn-login:active { transform: scale(0.98); }
         .btn-login:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-
-        /* ── Right: User Directory ────────────────────────────────────────── */
-        .directory {
-            animation: slideUp 0.5s ease 0.1s both;
-        }
-
-        .dir-title {
-            font-size: 0.78rem;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 0.12em;
-            color: var(--brand);
-            margin-bottom: 1.2rem;
-            padding-left: 0.2rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .role-group { margin-bottom: 1.5rem; }
-
-        .role-label {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 0.6rem;
-        }
-        .role-pill {
-            font-size: 0.68rem;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            padding: 4px 12px;
-            border-radius: 20px;
-            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
-        }
-        .pill-admin  { background: #FEF2F2; color: #991B1B; border: 1px solid #FCA5A5; }
-        .pill-vendor { background: #FFF8E7; color: #B45309; border: 1px solid #F7E5B2; }
-        .pill-runner { background: #ECFDF5; color: #047857; border: 1px solid #A7F3D0; }
-        .pill-client { background: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE; }
-
-        .user-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .user-card {
-            background: #FFFFFF;
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 0.8rem 1.1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.9rem;
-            cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            text-align: left;
-            width: 100%;
-            font-family: inherit;
-            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
-        }
-        .user-card:hover {
-            background: #FFFDF9;
-            border-color: var(--gold);
-            transform: translateX(4px);
-            box-shadow: 0 10px 30px rgba(255, 194, 68, 0.25);
-        }
-        .user-card:active { transform: translateX(2px) scale(0.99); }
-
-        .user-avatar {
-            width: 40px; height: 40px;
-            border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 0.95rem;
-            font-weight: 900;
-            flex-shrink: 0;
-            color: #FFFFFF;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-        .avatar-admin  { background: linear-gradient(135deg, #A31D1D, #841313); }
-        .avatar-vendor { background: linear-gradient(135deg, #FFC244, #E0A325); color: #0F172A; }
-        .avatar-runner { background: linear-gradient(135deg, #05A357, #047A43); }
-        .avatar-client { background: linear-gradient(135deg, #2563EB, #1D4ED8); }
-
-        .user-info { flex: 1; min-width: 0; }
-        .user-name {
-            font-size: 0.9rem;
-            font-weight: 800;
-            color: var(--text);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .user-email {
-            font-size: 0.78rem;
-            color: var(--muted);
-            font-weight: 600;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .fill-icon {
-            color: #CBD5E1;
-            font-size: 0.8rem;
-            flex-shrink: 0;
-            transition: all 0.2s;
-        }
-        .user-card:hover .fill-icon { color: var(--brand); transform: translateX(3px); }
-
-        .hint {
-            text-align: center;
-            color: #475569;
-            font-size: 0.78rem;
-            font-weight: 700;
-            margin-top: 1.2rem;
-            padding: 0.8rem;
-            background: #FFF8E7;
-            border: 1px solid #F7E5B2;
-            border-radius: 16px;
-            box-shadow: 0 4px 12px rgba(255, 194, 68, 0.1);
-        }
     </style>
 </head>
 <body>
@@ -353,13 +222,13 @@
                 @csrf
 
                 <div class="field">
-                    <label for="email">Email Address</label>
+                    <label for="email">Email or Phone Number</label>
                     <input
-                        type="email"
+                        type="text"
                         id="email"
                         name="email"
                         value="{{ old('email') }}"
-                        placeholder="you@justfeast.com"
+                        placeholder="you@justfeast.com or 07XXXXXXXX"
                         class="{{ $errors->has('email') ? 'is-error' : '' }}"
                         required autofocus
                     >
@@ -369,7 +238,7 @@
                 </div>
 
                 <div class="field">
-                    <label for="password">Password</label>
+                    <label for="password">Password or OTP Code</label>
                     <input
                         type="password"
                         id="password"
@@ -395,80 +264,9 @@
             </form>
         </div>
 
-        {{-- ── User Directory ───────────────────────────────────────────────── --}}
-        <div class="directory">
-            <div class="dir-title">
-                <i class="fas fa-users-viewfinder text-sm"></i> Select account to log in
-            </div>
-
-            @php
-                $roleOrder = ['admin', 'vendor', 'runner', 'client'];
-                $roleIcons = ['admin' => '⚙️', 'vendor' => '🍽️', 'runner' => '🛵', 'client' => '👤'];
-            @endphp
-
-            @foreach ($roleOrder as $role)
-                @if ($users->has($role))
-                    <div class="role-group">
-                        <div class="role-label">
-                            <span class="role-pill pill-{{ $role }}">{{ ucfirst($role) }}s</span>
-                        </div>
-                        <div class="user-grid">
-                            @foreach ($users[$role] as $user)
-                                <button
-                                    class="user-card"
-                                    type="button"
-                                    onclick="fillLogin('{{ $user->email }}')"
-                                    id="user-card-{{ $user->id }}"
-                                    title="Sign in as {{ $user->name }}"
-                                >
-                                    <div class="user-avatar avatar-{{ $role }}">
-                                        {{ strtoupper(substr($user->name, 0, 1)) }}
-                                    </div>
-                                    <div class="user-info">
-                                        <div class="user-name">{{ $user->name }}</div>
-                                        <div class="user-email">{{ $user->email }}</div>
-                                    </div>
-                                    <i class="fas fa-chevron-right fill-icon"></i>
-                                </button>
-                            @endforeach
-                        </div>
-                    </div>
-                @endif
-            @endforeach
-
-            <div class="hint">🔑 All dev accounts use the password: <strong style="color:#B45309; font-weight:800;">password</strong></div>
-        </div>
-
     </div>
 
     <script>
-        window.addEventListener('DOMContentLoaded', () => {
-            localStorage.removeItem('justfeast_admin_user');
-            localStorage.removeItem('justfeast_vendor_user');
-            localStorage.removeItem('justfeast_runner_user');
-            localStorage.removeItem('justfeast_client_user');
-        });
-
-        function fillLogin(email) {
-            const emailInput    = document.getElementById('email');
-            const passwordInput = document.getElementById('password');
-
-            emailInput.value    = email;
-            passwordInput.value = 'password';
-
-            // Highlight the filled fields briefly
-            [emailInput, passwordInput].forEach(el => {
-                el.style.borderColor = '#A31D1D';
-                el.style.boxShadow   = '0 0 0 4px rgba(163, 29, 29, 0.15)';
-                setTimeout(() => {
-                    el.style.borderColor = '';
-                    el.style.boxShadow   = '';
-                }, 1200);
-            });
-
-            document.getElementById('loginBtn').focus();
-        }
-
         document.getElementById('loginForm').addEventListener('submit', function () {
             const btn = document.getElementById('loginBtn');
             btn.innerHTML = '<span>Signing in...</span> <i class="fas fa-spinner fa-spin text-xs"></i>';

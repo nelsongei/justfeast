@@ -15,43 +15,54 @@ class EventController extends Controller
         $event = Event::with('venue')->where('status', 'active')->first();
         if (!$event) {
             return response()->json([
-                'status' => 'error',
+                'status'  => 'error',
                 'message' => 'No active concert event found.',
             ], 404);
         }
         return response()->json($event);
     }
 
-    public function vendors()
+    public function vendors(Request $request)
     {
         $event = Event::where('status', 'active')->first();
         if (!$event) {
             return response()->json([
-                'status' => 'error',
+                'status'  => 'error',
                 'message' => 'No active concert event found.',
             ], 404);
         }
 
-        $vendors = Vendor::with(['products' => function($q) {
-            $q->orderBy('name');
-        }])->where('event_id', $event->id)
-           ->where('status', 'active')
-           ->get();
+        $perPage = min($request->integer('per_page', 25), 100);
+
+        $vendors = Vendor::query()
+            ->with(['products' => function($q) {
+                $q->select(['id', 'vendor_id', 'name', 'description', 'price', 'image_url', 'stock_status'])->orderBy('name');
+            }])
+            ->where('event_id', $event->id)
+            ->where('status', 'active')
+            ->paginate($perPage);
 
         return response()->json($vendors);
     }
 
     public function toggleProductStock(Request $request, $productId)
     {
+        $vendor = $request->user()->vendor;
+        if (!$vendor && $request->user()->role !== 'admin') {
+            return response()->json(['status' => 'error', 'message' => 'Vendor profile not found.'], 404);
+        }
+
         $product = Product::findOrFail($productId);
+        $this->authorize('update', $product);
+
         $newStatus = $product->stock_status === 'in_stock' ? 'out_of_stock' : 'in_stock';
-        
+
         $product->update([
             'stock_status' => $newStatus
         ]);
 
         return response()->json([
-            'status' => 'success',
+            'status'  => 'success',
             'message' => 'Product stock status updated to ' . $newStatus,
             'product' => $product
         ]);
@@ -59,17 +70,23 @@ class EventController extends Controller
 
     public function storeProduct(Request $request)
     {
+        $this->authorize('create', Product::class);
+
+        $vendor = $request->user()->vendor;
+        if (!$vendor && $request->user()->role !== 'admin') {
+            return response()->json(['status' => 'error', 'message' => 'Vendor profile not found.'], 404);
+        }
+
         $data = $request->validate([
-            'vendor_id' => 'required|exists:vendors,id',
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'price' => 'required|numeric|min:0',
+            'name'         => 'required|string|max:255',
+            'description'  => 'nullable|string',
+            'price'        => 'required|numeric|min:0',
             'stock_status' => 'required|in:in_stock,out_of_stock',
         ]);
 
         $image_url = null;
         if ($request->hasFile('image')) {
-            $file = $request->file('image');
+            $file     = $request->file('image');
             $filename = time() . '_' . $file->getClientOriginalName();
             $file->move(public_path('images/uploads'), $filename);
             $image_url = '/images/uploads/' . $filename;
@@ -84,16 +101,16 @@ class EventController extends Controller
         }
 
         $product = Product::create([
-            'vendor_id' => $data['vendor_id'],
-            'name' => $data['name'],
-            'description' => $data['description'] ?? '',
-            'price' => $data['price'],
+            'vendor_id'    => $vendor ? $vendor->id : $request->input('vendor_id'),
+            'name'         => $data['name'],
+            'description'  => $data['description'] ?? '',
+            'price'        => $data['price'],
             'stock_status' => $data['stock_status'],
-            'image_url' => $image_url,
+            'image_url'    => $image_url,
         ]);
 
         return response()->json([
-            'status' => 'success',
+            'status'  => 'success',
             'message' => 'Product created successfully',
             'product' => $product
         ]);
@@ -102,42 +119,45 @@ class EventController extends Controller
     public function updateProduct(Request $request, $id)
     {
         $product = Product::findOrFail($id);
+        $this->authorize('update', $product);
 
         $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'price' => 'required|numeric|min:0',
+            'name'         => 'required|string|max:255',
+            'description'  => 'nullable|string',
+            'price'        => 'required|numeric|min:0',
             'stock_status' => 'required|in:in_stock,out_of_stock',
         ]);
 
         if ($request->hasFile('image')) {
-            $file = $request->file('image');
+            $file     = $request->file('image');
             $filename = time() . '_' . $file->getClientOriginalName();
             $file->move(public_path('images/uploads'), $filename);
             $product->image_url = '/images/uploads/' . $filename;
         }
 
         $product->update([
-            'name' => $data['name'],
-            'description' => $data['description'],
-            'price' => $data['price'],
+            'name'         => $data['name'],
+            'description'  => $data['description'],
+            'price'        => $data['price'],
             'stock_status' => $data['stock_status'],
         ]);
 
         return response()->json([
-            'status' => 'success',
+            'status'  => 'success',
             'message' => 'Product updated successfully',
             'product' => $product
         ]);
     }
 
-    public function destroyProduct($id)
+    public function destroyProduct(Request $request, $id)
     {
         $product = Product::findOrFail($id);
+        $this->authorize('delete', $product);
+
         $product->delete();
 
         return response()->json([
-            'status' => 'success',
+            'status'  => 'success',
             'message' => 'Product deleted successfully'
         ]);
     }

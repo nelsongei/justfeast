@@ -4,118 +4,151 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Models\PaymentWebhookEvent;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class IntaSendWebhookController extends Controller
 {
     /**
-     * Handle incoming IntaSend webhook events.
-     *
-     * IntaSend sends a POST request to this endpoint whenever a payment state changes.
-     * States: PENDING → PROCESSING → COMPLETE | FAILED
+     * Handle incoming IntaSend webhook payment notifications.
+     * Enforces authenticity verification, idempotency tracking, currency validation,
+     * amount precision match (bccomp), lockForUpdate transactions, and PII-sanitized logging.
      *
      * POST /api/intasend/webhook
-     *
-     * Payload example:
-     * {
-     *   "invoice_id": "BRZKGPR",
-     *   "state": "COMPLETE",
-     *   "provider": "M-PESA",
-     *   "charges": "0.00",
-     *   "net_amount": "10.00",
-     *   "currency": "KES",
-     *   "value": "10.00",
-     *   "account": "254712345678",
-     *   "api_ref": "order-5",
-     *   "challenge": "testnet",
-     *   ...
-     * }
      */
     public function handle(Request $request)
     {
-        $payload = $request->all();
+        $invoiceId = $request->input('invoice_id');
+        $state     = strtoupper($request->input('state', ''));
+        $currency  = strtoupper($request->input('currency', 'KES'));
+        $value     = $request->input('value');
+        $apiRef    = $request->input('api_ref');
 
-        Log::info('IntaSend Webhook Received', $payload);
+        // 1. Authenticity verification via challenge secret
+        $expectedChallenge = config('intasend.challenge', env('INTASEND_CHALLENGE'));
+        $receivedChallenge = $request->header('X-IntaSend-Challenge') ?: ($request->input('challenge') ?: '');
 
-        // 1. Validate the challenge secret to ensure request is from IntaSend
-        $expectedChallenge = config('intasend.challenge');
-
-        if (!empty($expectedChallenge) && ($payload['challenge'] ?? '') !== $expectedChallenge) {
-            Log::warning('IntaSend Webhook: Invalid challenge', [
-                'received'  => $payload['challenge'] ?? 'none',
-                'expected'  => $expectedChallenge,
+        if (!empty($expectedChallenge) && !hash_equals((string) $expectedChallenge, (string) $receivedChallenge)) {
+            Log::warning('IntaSend Webhook: Authenticity challenge verification failed', [
+                'ip' => $request->ip(),
             ]);
-
-            // Return 200 to prevent IntaSend from retrying, but do nothing
-            return response()->json(['status' => 'ignored', 'reason' => 'Invalid challenge'], 200);
+            return response()->json(['status' => 'ignored', 'reason' => 'Invalid challenge token'], 200);
         }
 
-        $state  = $payload['state'] ?? null;
-        $apiRef = $payload['api_ref'] ?? null;
-
-        if (!$apiRef) {
-            Log::warning('IntaSend Webhook: Missing api_ref', $payload);
-            return response()->json(['status' => 'ignored', 'reason' => 'Missing api_ref'], 200);
+        if (!$invoiceId || !$state) {
+            return response()->json(['status' => 'ignored', 'reason' => 'Missing invoice_id or state'], 200);
         }
 
-        // 2. Find the order by api_ref (format: "order-{id}")
-        if (!preg_match('/^order-(\d+)$/', $apiRef, $matches)) {
-            Log::warning('IntaSend Webhook: api_ref does not match expected format', ['api_ref' => $apiRef]);
-            return response()->json(['status' => 'ignored', 'reason' => 'Unrecognised api_ref format'], 200);
+        // PII-Sanitized Logging: Log metadata only — zero phone numbers or customer data
+        Log::info('IntaSend Webhook Received', [
+            'invoice_id' => $invoiceId,
+            'state'      => $state,
+            'value'      => $value,
+            'currency'   => $currency,
+        ]);
+
+        // 2. Idempotency Tracking — Prevent duplicate processing of the same invoice event
+        $eventKey = $invoiceId . '_' . $state;
+
+        $webhookEvent = PaymentWebhookEvent::firstOrCreate(
+            ['event_key' => $eventKey],
+            [
+                'invoice_id' => $invoiceId,
+                'state'      => $state,
+                'status'     => 'processing',
+            ]
+        );
+
+        if (!$webhookEvent->wasRecentlyCreated) {
+            Log::info('IntaSend Webhook: Duplicate event key skipped for idempotency', ['event_key' => $eventKey]);
+            return response()->json(['status' => 'ignored', 'reason' => 'Duplicate webhook event'], 200);
         }
 
-        $orderId = (int) $matches[1];
-        $order   = Order::find($orderId);
-
-        if (!$order) {
-            Log::warning('IntaSend Webhook: Order not found', ['order_id' => $orderId]);
-            return response()->json(['status' => 'ignored', 'reason' => 'Order not found'], 200);
-        }
-
-        // 3. Handle state transitions
-        switch ($state) {
-            case 'COMPLETE':
-                if ($order->payment_status !== 'paid') {
-                    $order->update([
-                        'payment_status' => 'paid',
-                        'order_status'   => 'accepted', // Auto-move into vendor queue
-                    ]);
-
-                    Log::info('IntaSend Webhook: Order marked PAID', [
-                        'order_id'   => $orderId,
-                        'invoice_id' => $payload['invoice_id'] ?? null,
-                        'amount'     => $payload['value'] ?? null,
-                    ]);
-                }
-                break;
-
-            case 'FAILED':
-                if ($order->payment_status === 'pending') {
-                    $order->update(['payment_status' => 'failed']);
-
-                    Log::info('IntaSend Webhook: Order payment FAILED', [
-                        'order_id'      => $orderId,
-                        'failed_reason' => $payload['failed_reason'] ?? null,
-                        'failed_code'   => $payload['failed_code'] ?? null,
-                    ]);
-                }
-                break;
-
-            case 'PENDING':
-            case 'PROCESSING':
-                // Informational only — no action needed, order already in pending state
-                Log::info('IntaSend Webhook: Payment in progress', [
-                    'order_id' => $orderId,
-                    'state'    => $state,
+        // 3. Process Payment States
+        if ($state === 'COMPLETE') {
+            if ($currency !== 'KES') {
+                $webhookEvent->update(['status' => 'failed']);
+                Log::warning('IntaSend Webhook: Rejected non-KES currency payment', [
+                    'invoice_id' => $invoiceId,
+                    'currency'   => $currency,
                 ]);
-                break;
+                return response()->json(['status' => 'ignored', 'reason' => 'Invalid currency'], 200);
+            }
 
-            default:
-                Log::info('IntaSend Webhook: Unknown state received', ['state' => $state]);
+            try {
+                DB::transaction(function () use ($invoiceId, $apiRef, $value) {
+                    // Query order by intasend_invoice_id (or fallback api_ref) with lockForUpdate
+                    $query = Order::query()->lockForUpdate();
+
+                    if ($invoiceId) {
+                        $order = $query->where('intasend_invoice_id', $invoiceId)->first();
+                    }
+
+                    if (!$order && $apiRef && preg_match('/^order-(\d+)$/', $apiRef, $matches)) {
+                        $order = Order::query()->lockForUpdate()->find((int) $matches[1]);
+                    }
+
+                    if (!$order) {
+                        throw new \RuntimeException("Order not found for invoice_id {$invoiceId}");
+                    }
+
+                    // Already paid check
+                    if ($order->payment_status === 'paid') {
+                        return;
+                    }
+
+                    // Precise amount validation using bccomp
+                    if (bccomp((string) $value, (string) $order->total_amount, 2) !== 0) {
+                        throw new \RuntimeException("Payment amount mismatch: received {$value} vs order total {$order->total_amount}");
+                    }
+
+                    // Validated payment transition
+                    $order->update([
+                        'payment_status'    => 'paid',
+                        'order_status'      => 'accepted',
+                        'paid_at'           => now(),
+                        'payment_reference' => $invoiceId,
+                    ]);
+
+                    event(new \App\Events\PaymentStatusUpdated($order->fresh(), 'paid', 'accepted'));
+                });
+
+                $webhookEvent->update(['status' => 'processed']);
+
+                Log::info('IntaSend Webhook: Order payment verified and completed successfully', [
+                    'invoice_id' => $invoiceId,
+                    'value'      => $value,
+                ]);
+
+            } catch (\Exception $e) {
+                $webhookEvent->update(['status' => 'failed']);
+                Log::error('IntaSend Webhook Processing Error: ' . $e->getMessage(), ['invoice_id' => $invoiceId]);
+                return response()->json(['status' => 'error', 'reason' => $e->getMessage()], 200);
+            }
+
+        } elseif ($state === 'FAILED') {
+            try {
+                DB::transaction(function () use ($invoiceId, $apiRef) {
+                    $query = Order::query()->lockForUpdate();
+                    $order = $invoiceId ? $query->where('intasend_invoice_id', $invoiceId)->first() : null;
+
+                    if (!$order && $apiRef && preg_match('/^order-(\d+)$/', $apiRef, $matches)) {
+                        $order = Order::query()->lockForUpdate()->find((int) $matches[1]);
+                    }
+
+                    if ($order && $order->payment_status === 'pending') {
+                        $order->update(['payment_status' => 'failed']);
+                    }
+                });
+
+                $webhookEvent->update(['status' => 'processed']);
+            } catch (\Exception $e) {
+                $webhookEvent->update(['status' => 'failed']);
+            }
         }
 
-        // Always return 200 so IntaSend doesn't retry unnecessarily
         return response()->json(['status' => 'received'], 200);
     }
 }

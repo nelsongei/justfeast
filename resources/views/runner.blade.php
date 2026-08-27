@@ -226,30 +226,26 @@
             </div>
             <div class="space-y-2">
                 <h2 class="text-2xl font-bold tracking-tight text-[#2D3748] font-sans">Runner Dispatch Portal</h2>
-                <p class="text-xs text-zinc-500">Select your active runner profile to log in and start receiving delivery dispatch notifications.</p>
+                <p class="text-xs text-zinc-500">Enter your phone number to log in and start receiving delivery dispatch notifications.</p>
             </div>
 
-            <div class="space-y-3 pt-4 text-left">
-                <button onclick="loginAsRunner('runner@justfeast.com')" class="w-full p-4 rounded-2xl bg-white border border-[#E2E8F0] hover:border-[#FFC244] hover:bg-[#FFFDF9] transition flex items-center justify-between shadow-sm">
-                    <div class="flex items-center gap-3">
-                        <span class="text-xl">🏃‍♂️</span>
-                        <div>
-                            <h4 class="text-xs font-bold text-[#2D3748]">Mike Runner</h4>
-                            <p class="text-[9px] text-zinc-500 uppercase font-semibold">Stall Staging Area A</p>
-                        </div>
-                    </div>
-                    <i class="fas fa-chevron-right text-zinc-400 text-xs"></i>
+            <!-- Phone Step -->
+            <div id="runner-auth-step-phone" class="space-y-3 pt-2">
+                <input type="text" id="runner-phone-input" placeholder="+254712345678" class="w-full p-3.5 rounded-2xl bg-[#F7F9FA] border border-[#E2E8F0] text-sm text-[#2D3748] focus:border-[#FFC244] focus:outline-none font-bold text-center">
+                <button onclick="sendRunnerOTP()" class="w-full p-3.5 rounded-2xl bg-[#A31D1D] hover:bg-[#841313] text-white font-extrabold text-xs transition shadow-md">
+                    Send Verification Code
                 </button>
+            </div>
 
-                <button onclick="loginAsRunner('runner2@justfeast.com')" class="w-full p-4 rounded-2xl bg-white border border-[#E2E8F0] hover:border-[#FFC244] hover:bg-[#FFFDF9] transition flex items-center justify-between shadow-sm">
-                    <div class="flex items-center gap-3">
-                        <span class="text-xl">🏃‍♀️</span>
-                        <div>
-                            <h4 class="text-xs font-bold text-[#2D3748]">Jane Runner</h4>
-                            <p class="text-[9px] text-zinc-500 uppercase font-semibold">Stall Staging Area B</p>
-                        </div>
-                    </div>
-                    <i class="fas fa-chevron-right text-zinc-400 text-xs"></i>
+            <!-- OTP Step -->
+            <div id="runner-auth-step-otp" class="hidden space-y-3 pt-2">
+                <p class="text-[11px] text-zinc-500 font-semibold" id="runner-otp-status-text">Code sent to phone</p>
+                <input type="text" id="runner-otp-input" placeholder="Enter 6-Digit Code" maxlength="6" class="w-full p-3.5 rounded-2xl bg-[#F7F9FA] border border-[#E2E8F0] text-base text-[#2D3748] focus:border-[#FFC244] focus:outline-none font-black text-center tracking-widest">
+                <button onclick="verifyRunnerOTP()" class="w-full p-3.5 rounded-2xl bg-[#05A357] hover:bg-[#048245] text-white font-extrabold text-xs transition shadow-md">
+                    Verify & Access Portal
+                </button>
+                <button onclick="resetRunnerAuthForm()" class="text-[10px] text-zinc-500 hover:text-zinc-700 block mx-auto font-bold pt-1">
+                    ← Change Phone Number
                 </button>
             </div>
         </div>
@@ -356,37 +352,90 @@
             } catch(e) {}
         }
 
+        // ── Auth helpers ──────────────────────────────────────────────────────
+        function getToken() {
+            try {
+                const s = localStorage.getItem('justfeast_runner_user');
+                return s ? JSON.parse(s).__token : null;
+            } catch(e) { return null; }
+        }
+
+        async function authFetch(url, options = {}) {
+            const token = getToken();
+            options.headers = options.headers || {};
+            if (token) options.headers['Authorization'] = `Bearer ${token}`;
+            const res = await fetch(url, options);
+            if (res.status === 401) {
+                localStorage.removeItem('justfeast_runner_user');
+                window.location.reload();
+            }
+            return res;
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             // Session check
             const saved = localStorage.getItem('justfeast_runner_user');
-            if (laravelUser) {
-                currentUser = laravelUser;
-                localStorage.setItem('justfeast_runner_user', JSON.stringify(currentUser));
-                showDashboard();
-            } else if (saved) {
-                currentUser = JSON.parse(saved);
-                showDashboard();
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    if (parsed && parsed.id) {
+                        currentUser = parsed;
+                        showDashboard();
+                    }
+                } catch(e) { localStorage.removeItem('justfeast_runner_user'); }
             }
 
             pollingInterval = setInterval(syncDeliveries, 2000);
         });
 
-        async function loginAsRunner(email) {
+        async function sendRunnerOTP() {
+            const phone = document.getElementById('runner-phone-input').value.trim();
+            if (!phone) { alert('Please enter your phone number.'); return; }
             try {
-                const res = await fetch(`${API_BASE}/auth/login-as`, {
+                const res = await fetch(`${API_BASE}/auth/login`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email })
+                    body: JSON.stringify({ phone })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    playSound('beep');
+                    document.getElementById('runner-otp-status-text').textContent = data.message;
+                    document.getElementById('runner-auth-step-phone').classList.add('hidden');
+                    document.getElementById('runner-auth-step-otp').classList.remove('hidden');
+                } else {
+                    alert(data.message || 'Error sending OTP');
+                }
+            } catch(e) { alert('Network error'); }
+        }
+
+        async function verifyRunnerOTP() {
+            const phone = document.getElementById('runner-phone-input').value.trim();
+            const code = document.getElementById('runner-otp-input').value.trim();
+            if (!code || code.length < 6) { alert('Please enter the 6-digit code.'); return; }
+
+            try {
+                const res = await fetch(`${API_BASE}/auth/verify`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone, code })
                 });
                 const data = await res.json();
                 if (res.ok) {
                     playSound('success');
                     currentUser = data.user;
-                    localStorage.setItem('justfeast_runner_user', JSON.stringify(currentUser));
+                    localStorage.setItem('justfeast_runner_user', JSON.stringify({ ...currentUser, __token: data.token }));
                     showDashboard();
                     syncDeliveries();
+                } else {
+                    alert(data.message || 'Verification failed');
                 }
-            } catch(e) {}
+            } catch(e) { alert('Network error'); }
+        }
+
+        function resetRunnerAuthForm() {
+            document.getElementById('runner-auth-step-otp').classList.add('hidden');
+            document.getElementById('runner-auth-step-phone').classList.remove('hidden');
         }
 
         function showDashboard() {
@@ -414,7 +463,7 @@
         async function syncDeliveries() {
             if (!currentUser) return;
             try {
-                const res = await fetch(`${API_BASE}/runner/deliveries?user_id=${currentUser.id}`);
+                const res = await authFetch(`${API_BASE}/runner/deliveries`);
                 if (res.ok) {
                     const deliveries = await res.json();
                     renderDeliveries(deliveries);
@@ -483,8 +532,8 @@
         async function updateDeliveryStatus(delId, status) {
             playSound('success');
             try {
-                const res = await fetch(`${API_BASE}/runner/deliveries/${delId}/status`, {
-                    method: 'POST',
+                const res = await authFetch(`${API_BASE}/runner/deliveries/${delId}/status`, {
+                    method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ status })
                 });
@@ -496,13 +545,13 @@
 
         async function verifyRunnerDelivery() {
             try {
-                const res = await fetch(`${API_BASE}/runner/deliveries?user_id=${currentUser.id}`);
+                const res = await authFetch(`${API_BASE}/runner/deliveries`);
                 if (res.ok) {
                     const deliveries = await res.json();
                     if (deliveries.length > 0) {
                         const delId = deliveries[0].id;
                         const pin = document.getElementById('runner-pin-input').value;
-                        const verifyRes = await fetch(`${API_BASE}/runner/deliveries/${delId}/verify`, {
+                        const verifyRes = await authFetch(`${API_BASE}/runner/deliveries/${delId}/verify`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ pin })

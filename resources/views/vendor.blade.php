@@ -226,41 +226,26 @@
             </div>
             <div class="space-y-2">
                 <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-[#2D3748] font-sans">Kitchen Staff Portal</h2>
-                <p class="text-xs text-zinc-500">Select your food stall vendor account to log in and start receiving orders from attendees.</p>
+                <p class="text-xs text-zinc-500">Enter your phone number to log in via secure SMS OTP verification.</p>
             </div>
 
-            <div class="space-y-3 pt-4 text-left">
-                <button onclick="loginAsVendor('vendor@justfeast.com')" class="w-full p-3.5 sm:p-4 rounded-2xl bg-white border border-[#E2E8F0] hover:border-[#FFC244] hover:bg-[#FFFDF9] transition flex items-center justify-between shadow-sm">
-                    <div class="flex items-center gap-3">
-                        <span class="text-2xl">🍔</span>
-                        <div class="text-left">
-                            <h4 class="text-xs font-bold text-[#2D3748]">Burger World</h4>
-                            <p class="text-[9px] text-zinc-500 uppercase tracking-wider font-semibold">Gourmet Smash Burgers</p>
-                        </div>
-                    </div>
-                    <i class="fas fa-chevron-right text-zinc-400 text-xs"></i>
+            <!-- Phone Step -->
+            <div id="vendor-auth-step-phone" class="space-y-3 pt-2">
+                <input type="text" id="vendor-phone-input" placeholder="+254712345678" class="w-full p-3.5 rounded-2xl bg-[#F7F9FA] border border-[#E2E8F0] text-sm text-[#2D3748] focus:border-[#FFC244] focus:outline-none font-bold text-center">
+                <button onclick="sendVendorOTP()" class="w-full p-3.5 rounded-2xl bg-[#A31D1D] hover:bg-[#841313] text-white font-extrabold text-xs transition shadow-md">
+                    Send Verification Code
                 </button>
+            </div>
 
-                <button onclick="loginAsVendor('taco@justfeast.com')" class="w-full p-3.5 sm:p-4 rounded-2xl bg-white border border-[#E2E8F0] hover:border-[#FFC244] hover:bg-[#FFFDF9] transition flex items-center justify-between shadow-sm">
-                    <div class="flex items-center gap-3">
-                        <span class="text-2xl">🌮</span>
-                        <div class="text-left">
-                            <h4 class="text-xs font-bold text-[#2D3748]">Taco Fiesta</h4>
-                            <p class="text-[9px] text-zinc-500 uppercase tracking-wider font-semibold">Mexican Tacos & Churros</p>
-                        </div>
-                    </div>
-                    <i class="fas fa-chevron-right text-zinc-400 text-xs"></i>
+            <!-- OTP Step -->
+            <div id="vendor-auth-step-otp" class="hidden space-y-3 pt-2">
+                <p class="text-[11px] text-zinc-500 font-semibold" id="vendor-otp-status-text">Code sent to phone</p>
+                <input type="text" id="vendor-otp-input" placeholder="Enter 6-Digit Code" maxlength="6" class="w-full p-3.5 rounded-2xl bg-[#F7F9FA] border border-[#E2E8F0] text-base text-[#2D3748] focus:border-[#FFC244] focus:outline-none font-black text-center tracking-widest">
+                <button onclick="verifyVendorOTP()" class="w-full p-3.5 rounded-2xl bg-[#05A357] hover:bg-[#048245] text-white font-extrabold text-xs transition shadow-md">
+                    Verify & Access Dashboard
                 </button>
-
-                <button onclick="loginAsVendor('choma@justfeast.com')" class="w-full p-3.5 sm:p-4 rounded-2xl bg-white border border-[#E2E8F0] hover:border-[#FFC244] hover:bg-[#FFFDF9] transition flex items-center justify-between shadow-sm">
-                    <div class="flex items-center gap-3">
-                        <span class="text-2xl">🥩</span>
-                        <div class="text-left">
-                            <h4 class="text-xs font-bold text-[#2D3748]">Choma Zone</h4>
-                            <p class="text-[9px] text-zinc-500 uppercase tracking-wider font-semibold">Nyama Choma & Passion Juice</p>
-                        </div>
-                    </div>
-                    <i class="fas fa-chevron-right text-zinc-400 text-xs"></i>
+                <button onclick="resetVendorAuthForm()" class="text-[10px] text-zinc-500 hover:text-zinc-700 block mx-auto font-bold pt-1">
+                    ← Change Phone Number
                 </button>
             </div>
         </div>
@@ -490,18 +475,43 @@
             } catch(e) {}
         }
 
+        // ── Auth helpers ──────────────────────────────────────────────────────
+        function getToken() {
+            try {
+                const s = localStorage.getItem('justfeast_vendor_user');
+                return s ? JSON.parse(s).__token : null;
+            } catch(e) { return null; }
+        }
+
+        /**
+         * Authenticated fetch — injects Authorization: Bearer <token>.
+         * Clears session and reloads on 401.
+         */
+        async function authFetch(url, options = {}) {
+            const token = getToken();
+            options.headers = options.headers || {};
+            if (token) options.headers['Authorization'] = `Bearer ${token}`;
+            const res = await fetch(url, options);
+            if (res.status === 401) {
+                localStorage.removeItem('justfeast_vendor_user');
+                window.location.reload();
+            }
+            return res;
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             loadVendors();
 
-            // Session check
+            // Session check — restore from localStorage
             const saved = localStorage.getItem('justfeast_vendor_user');
-            if (laravelUser) {
-                currentUser = laravelUser;
-                localStorage.setItem('justfeast_vendor_user', JSON.stringify(currentUser));
-                showDashboard();
-            } else if (saved) {
-                currentUser = JSON.parse(saved);
-                showDashboard();
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    if (parsed && parsed.id) {
+                        currentUser = parsed;
+                        showDashboard();
+                    }
+                } catch(e) { localStorage.removeItem('justfeast_vendor_user'); }
             }
 
             pollingInterval = setInterval(syncQueue, 2000);
@@ -519,22 +529,54 @@
             } catch(e) {}
         }
 
-        async function loginAsVendor(email) {
+        async function sendVendorOTP() {
+            const phone = document.getElementById('vendor-phone-input').value.trim();
+            if (!phone) { alert('Please enter your phone number.'); return; }
             try {
-                const res = await fetch(`${API_BASE}/auth/login-as`, {
+                const res = await fetch(`${API_BASE}/auth/login`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email })
+                    body: JSON.stringify({ phone })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    playSound('beep');
+                    document.getElementById('vendor-otp-status-text').textContent = data.message;
+                    document.getElementById('vendor-auth-step-phone').classList.add('hidden');
+                    document.getElementById('vendor-auth-step-otp').classList.remove('hidden');
+                } else {
+                    alert(data.message || 'Error sending OTP');
+                }
+            } catch(e) { alert('Network error'); }
+        }
+
+        async function verifyVendorOTP() {
+            const phone = document.getElementById('vendor-phone-input').value.trim();
+            const code = document.getElementById('vendor-otp-input').value.trim();
+            if (!code || code.length < 6) { alert('Please enter the 6-digit code.'); return; }
+
+            try {
+                const res = await fetch(`${API_BASE}/auth/verify`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone, code })
                 });
                 const data = await res.json();
                 if (res.ok) {
                     playSound('success');
                     currentUser = data.user;
-                    localStorage.setItem('justfeast_vendor_user', JSON.stringify(currentUser));
+                    localStorage.setItem('justfeast_vendor_user', JSON.stringify({ ...currentUser, __token: data.token }));
                     showDashboard();
                     syncQueue();
+                } else {
+                    alert(data.message || 'Verification failed');
                 }
-            } catch(e) {}
+            } catch(e) { alert('Network error'); }
+        }
+
+        function resetVendorAuthForm() {
+            document.getElementById('vendor-auth-step-otp').classList.add('hidden');
+            document.getElementById('vendor-auth-step-phone').classList.remove('hidden');
         }
 
         function showDashboard() {
@@ -575,7 +617,7 @@
         async function syncQueue() {
             if (!currentUser) return;
             try {
-                const qRes = await fetch(`${API_BASE}/orders/vendor?user_id=${currentUser.id}`);
+                const qRes = await authFetch(`${API_BASE}/vendor/orders`);
                 if (qRes.ok) {
                     const queue = await qRes.json();
                     renderQueue(queue);
@@ -646,8 +688,8 @@
         async function updateStatus(orderId, status) {
             playSound('success');
             try {
-                const res = await fetch(`${API_BASE}/orders/${orderId}/status`, {
-                    method: 'POST',
+                const res = await authFetch(`${API_BASE}/vendor/orders/${orderId}/status`, {
+                    method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ status })
                 });
@@ -851,47 +893,57 @@
                 formData.append('image', imageInput.files[0]);
             }
 
-            let url = `${API_BASE}/products`;
+            let url = `${API_BASE}/vendor/products`;
             if (id) {
-                url = `${API_BASE}/products/${id}`;
+                url = `${API_BASE}/vendor/products/${id}`;
                 formData.append('_method', 'PUT');
             }
 
             try {
-                const res = await fetch(url, {
+                const res = await authFetch(url, {
                     method: 'POST',
-                    headers: { 
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
                     body: formData
                 });
-                
+
                 if (res.ok) {
                     closeProductForm();
                     const response = await fetch(`${API_BASE}/vendors`);
                     if (response.ok) {
                         vendors = await response.json();
-                        renderStockControls();
-                        renderMenuManagement();
                     }
+                    renderStockControls();
+                    renderMenuManagement();
                 }
             } catch(e) {}
         }
 
-        async function handleDeleteProduct(id) {
+        async function toggleStock(productId) {
+            try {
+                const res = await authFetch(`${API_BASE}/vendor/products/${productId}/stock`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                if (res.ok) {
+                    const response = await fetch(`${API_BASE}/vendors`);
+                    if (response.ok) {
+                        vendors = await response.json();
+                    }
+                    renderStockControls();
+                    renderMenuManagement();
+                }
+            } catch(e) {}
+        }
+
+        async function handleDeleteProduct(productId) {
             if (!confirm('Are you sure you want to delete this menu item?')) return;
             playSound('beep');
 
             try {
-                const res = await fetch(`${API_BASE}/products/${id}`, {
-                    method: 'DELETE',
-                    headers: { 
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    }
+                const res = await authFetch(`${API_BASE}/vendor/products/${productId}`, {
+                    method: 'DELETE'
                 });
 
                 if (res.ok) {
-                    // Reload vendors context
                     const response = await fetch(`${API_BASE}/vendors`);
                     if (response.ok) {
                         vendors = await response.json();

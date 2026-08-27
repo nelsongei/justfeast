@@ -12,53 +12,63 @@ use App\Http\Controllers\API\IntaSendWebhookController;
 |--------------------------------------------------------------------------
 | API Routes
 |--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
 */
 
-// Authentication
-Route::post('/auth/login', [AuthController::class, 'login']);
-Route::post('/auth/verify', [AuthController::class, 'verify']);
-Route::post('/auth/login-as', [AuthController::class, 'loginAs']);
-
-// Events & Vendors
+// ── Public: Product browsing (required before login) ─────────────────────────
 Route::get('/events/active', [EventController::class, 'index']);
-Route::get('/vendors', [EventController::class, 'vendors']);
-Route::post('/products/{id}/toggle-stock', [EventController::class, 'toggleProductStock']);
-Route::post('/products', [EventController::class, 'storeProduct']);
-Route::put('/products/{id}', [EventController::class, 'updateProduct']);
-Route::delete('/products/{id}', [EventController::class, 'destroyProduct']);
+Route::get('/vendors',       [EventController::class, 'vendors']);
 
-// Orders (Customer & Vendor operations)
-Route::post('/orders', [OrderController::class, 'store']);
-Route::get('/orders/active', [OrderController::class, 'active']);
-Route::get('/orders/vendor', [OrderController::class, 'vendorOrders']);
-Route::get('/orders/{id}', [OrderController::class, 'show']);
-Route::post('/orders/{id}/pay', [OrderController::class, 'pay']);
-Route::post('/orders/{id}/test-pay', [OrderController::class, 'testPay']);
-Route::get('/orders/{id}/payment-status', [OrderController::class, 'checkPaymentStatus']);
-Route::post('/orders/{id}/status', [OrderController::class, 'updateStatus']);
+// ── Authentication (OTP flow) ─────────────────────────────────────────────────
+Route::prefix('auth')->group(function () {
+    Route::post('/login',  [AuthController::class, 'login'])
+        ->middleware('throttle:otp');
 
-// Runner Operations
-Route::get('/runner/deliveries', [RunnerController::class, 'index']);
-Route::post('/runner/deliveries/{id}/status', [RunnerController::class, 'updateStatus']);
-Route::post('/runner/deliveries/{id}/location', [RunnerController::class, 'updateLocation']);
-Route::post('/runner/deliveries/{id}/verify', [RunnerController::class, 'verifyDelivery']);
+    Route::post('/verify', [AuthController::class, 'verify'])
+        ->middleware('throttle:otp-verify');
+});
 
-// Admin Operations
-Route::get('/admin/stats', [AdminController::class, 'stats']);
-Route::get('/admin/orders', [AdminController::class, 'orders']);
-Route::get('/admin/users', [AdminController::class, 'users']);
-Route::post('/admin/users', [AdminController::class, 'createUser']);
-Route::get('/admin/reports', [AdminController::class, 'reports']);
+// ── Sanctum-protected routes ──────────────────────────────────────────────────
+Route::middleware('auth:sanctum')->group(function () {
 
-/*
-|--------------------------------------------------------------------------
-| IntaSend Webhook (No auth — IntaSend POSTs directly to this endpoint)
-| Challenge secret is validated inside the controller itself.
-|--------------------------------------------------------------------------
-*/
-Route::post('/intasend/webhook', [IntaSendWebhookController::class, 'handle']);
+    // Customer — order management
+    Route::get('/orders/active',                [OrderController::class, 'active']);
+    Route::post('/orders',                      [OrderController::class, 'store']);
+    Route::get('/orders/{order}',               [OrderController::class, 'show']);
+    Route::post('/orders/{order}/pay',          [OrderController::class, 'pay']);
+    Route::get('/orders/{order}/payment-status',[OrderController::class, 'checkPaymentStatus']);
+
+    // ── Vendor ────────────────────────────────────────────────────────────────
+    Route::middleware('role:vendor')->prefix('vendor')->group(function () {
+        Route::get('/orders',                         [OrderController::class,  'vendorOrders']);
+        Route::patch('/orders/{order}/status',        [OrderController::class,  'updateStatus']);
+
+        Route::post('/products',                      [EventController::class,  'storeProduct']);
+        Route::put('/products/{product}',             [EventController::class,  'updateProduct']);
+        Route::delete('/products/{product}',          [EventController::class,  'destroyProduct']);
+        Route::patch('/products/{product}/stock',     [EventController::class,  'toggleProductStock']);
+    });
+
+    // ── Runner ────────────────────────────────────────────────────────────────
+    Route::middleware('role:runner')->prefix('runner')->group(function () {
+        Route::get('/deliveries',                                [RunnerController::class, 'index']);
+        Route::patch('/deliveries/{delivery}/status',            [RunnerController::class, 'updateStatus']);
+        Route::patch('/deliveries/{delivery}/location',          [RunnerController::class, 'updateLocation'])
+            ->middleware('throttle:location');
+        Route::post('/deliveries/{delivery}/verify',             [RunnerController::class, 'verifyDelivery'])
+            ->middleware('throttle:delivery-pin');
+    });
+
+    // ── Admin ─────────────────────────────────────────────────────────────────
+    Route::middleware('role:admin')->prefix('admin')->group(function () {
+        Route::get('/stats',   [AdminController::class, 'stats']);
+        Route::get('/orders',  [AdminController::class, 'orders']);
+        Route::get('/users',   [AdminController::class, 'users']);
+        Route::post('/users',  [AdminController::class, 'createUser']);
+        Route::get('/reports', [AdminController::class, 'reports']);
+    });
+});
+
+// ── IntaSend Webhook (no Sanctum — IntaSend POSTs directly) ──────────────────
+// Challenge secret validated inside the controller.
+Route::post('/intasend/webhook', [IntaSendWebhookController::class, 'handle'])
+    ->middleware('throttle:webhooks');

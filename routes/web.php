@@ -24,13 +24,13 @@ Route::get('/', function () {
     return view('client');
 });
 
-Route::get('/vendor', function () {
-    return view('vendor');
-});
+Route::middleware(['auth', 'role:vendor'])
+    ->get('/vendor', fn () => view('vendor'))
+    ->name('vendor.dashboard');
 
-Route::get('/runner', function () {
-    return view('runner');
-});
+Route::middleware(['auth', 'role:runner'])
+    ->get('/runner', fn () => view('runner'))
+    ->name('runner.dashboard');
 
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('/', function () { return view('admin.dashboard'); })->name('admin.dashboard');

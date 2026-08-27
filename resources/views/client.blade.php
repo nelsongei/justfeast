@@ -1123,12 +1123,13 @@
         // Always show the marketplace main wrapper
         document.getElementById('cust-main').classList.remove('hidden');
 
-        // Session check & Purge Stale Default Account
+        // Purge stale mock-token sessions (had no real token)
         const saved = localStorage.getItem('justfeast_client_user');
         if (saved) {
             try {
                 const parsed = JSON.parse(saved);
-                if (parsed && (parsed.name === 'John Customer' || parsed.email === 'customer@justfeast.com')) {
+                if (parsed && (parsed.name === 'John Customer' || parsed.email === 'customer@justfeast.com' || !parsed.__token)) {
+                    // Old mock-token sessions have no __token — clear them
                     localStorage.removeItem('justfeast_client_user');
                     currentUser = null;
                 } else {
@@ -1136,15 +1137,6 @@
                 }
             } catch (e) {
                 localStorage.removeItem('justfeast_client_user');
-            }
-        }
-        if (laravelUser) {
-            if (laravelUser.name === 'John Customer' || laravelUser.email === 'customer@justfeast.com') {
-                localStorage.removeItem('justfeast_client_user');
-                currentUser = null;
-            } else {
-                currentUser = laravelUser;
-                localStorage.setItem('justfeast_client_user', JSON.stringify(currentUser));
             }
         }
         updateAuthHeader();
@@ -1275,8 +1267,30 @@
         } catch (e) {
         }
     }
+    // ── Auth helpers ───────────────────────────────────────────────────
+    function getToken() {
+        try {
+            const s = localStorage.getItem('justfeast_client_user');
+            return s ? JSON.parse(s).__token : null;
+        } catch(e) { return null; }
+    }
 
-    let selectedCategory = 'all';
+    /**
+     * Authenticated fetch — injects Authorization: Bearer <token>.
+     * On 401, clears session and reloads.
+     */
+    async function authFetch(url, options = {}) {
+        const token = getToken();
+        options.headers = options.headers || {};
+        if (token) options.headers['Authorization'] = `Bearer ${token}`;
+        const res = await fetch(url, options);
+        if (res.status === 401) {
+            currentUser = null;
+            localStorage.removeItem('justfeast_client_user');
+            updateAuthHeader();
+        }
+        return res;
+    }
 
     function getProductCategory(p) {
         const name = p.name.toLowerCase();
@@ -1662,7 +1676,8 @@
             if (res.ok) {
                 playSound('success');
                 currentUser = data.user;
-                localStorage.setItem('justfeast_client_user', JSON.stringify(currentUser));
+                // Store user + token together
+                localStorage.setItem('justfeast_client_user', JSON.stringify({ ...currentUser, __token: data.token }));
                 updateAuthHeader();
                 closeAuthModal();
                 checkActiveOrderOnLogin();
@@ -1678,30 +1693,7 @@
         }
     }
 
-    async function quickLogin(email) {
-        try {
-            const res = await fetch(`${API_BASE}/auth/login-as`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({email})
-            });
-            const data = await res.json();
-            if (res.ok) {
-                playSound('success');
-                currentUser = data.user;
-                localStorage.setItem('justfeast_client_user', JSON.stringify(currentUser));
-                updateAuthHeader();
-                closeAuthModal();
-                checkActiveOrderOnLogin();
 
-                // Auto checkout if basket & seat are set
-                if (basket.length > 0 && selectedSeat) {
-                    checkoutOrder();
-                }
-            }
-        } catch (e) {
-        }
-    }
 
     function logoutCustomer() {
         currentUser = null;
@@ -1946,14 +1938,13 @@
 
     async function createOrderAndLaunchIntaSend(total) {
         const payload = {
-            user_id:       currentUser.id,
             vendor_id:     basket[0].vendorId,
             seat_location: selectedSeat,
             items:         basket.map(i => ({product_id: i.id, quantity: i.quantity}))
         };
 
         try {
-            const res = await fetch(`${API_BASE}/orders`, {
+            const res = await authFetch(`${API_BASE}/orders`, {
                 method:  'POST',
                 headers: {'Content-Type': 'application/json'},
                 body:    JSON.stringify(payload)
@@ -2038,15 +2029,10 @@
         playSound('success');
         showIntaSendState('pending');
 
-        try {
-            await fetch(`${API_BASE}/orders/${currentOrderId}/test-pay`, { method: 'POST' });
-        } catch (e) {
-            console.error(e);
-        }
-
+        // Poll payment-status instead of hitting test-pay (which is removed)
         setTimeout(async () => {
             try {
-                const orderRes = await fetch(`${API_BASE}/orders/${currentOrderId}`);
+                const orderRes = await authFetch(`${API_BASE}/orders/${currentOrderId}`);
                 const orderData = await orderRes.json();
                 activeOrder = { order: orderData };
                 basket = [];
@@ -2071,7 +2057,7 @@
         paymentPollTimer = setInterval(async () => {
             attempts++;
             try {
-                const res = await fetch(`${API_BASE}/orders/${orderId}/payment-status`);
+                const res = await authFetch(`${API_BASE}/orders/${orderId}/payment-status`);
                 const data = await res.json();
 
                 if (data.payment_status === 'paid') {
@@ -2079,7 +2065,7 @@
                     paymentPollTimer = null;
 
                     // Fetch full order and transition to tracker
-                    const orderRes = await fetch(`${API_BASE}/orders/${orderId}`);
+                    const orderRes = await authFetch(`${API_BASE}/orders/${orderId}`);
                     const orderData = await orderRes.json();
                     activeOrder = {order: orderData};
                     basket = [];
@@ -2113,9 +2099,10 @@
     async function checkActiveOrderOnLogin() {
         if (!currentUser) return;
         try {
-            const res = await fetch(`${API_BASE}/orders/active?user_id=${currentUser.id}`);
+            const res = await authFetch(`${API_BASE}/orders/active`);
             if (res.ok) {
-                const order = await res.json();
+                const data = await res.json();
+                const order = data.order;
                 if (order && order.id) {
                     activeOrder = {order: order};
                     document.getElementById('cust-main').classList.add('hidden');
@@ -2130,7 +2117,7 @@
     async function syncActiveOrder() {
         if (!activeOrder || !activeOrder.order) return;
         try {
-            const res = await fetch(`${API_BASE}/orders/${activeOrder.order.id}`);
+            const res = await authFetch(`${API_BASE}/orders/${activeOrder.order.id}`);
             if (res.ok) {
                 const updated = await res.json();
                 updateRadarUI(updated);

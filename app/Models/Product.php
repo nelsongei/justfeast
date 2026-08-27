@@ -17,6 +17,9 @@ class Product extends Model
         'price',
         'image_url',
         'stock_status',
+        'stock_quantity',
+        'reserved_quantity',
+        'version',
     ];
 
     public function vendor(): BelongsTo

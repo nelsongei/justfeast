@@ -45,7 +45,11 @@ class IntaSendService
             'narrative'    => 'Payment for Order #' . $order->id,
         ];
 
-        Log::info('IntaSend STK Push Request', ['order_id' => $order->id, 'payload' => $payload]);
+        Log::info('IntaSend STK Push Request', [
+            'order_id'     => $order->id,
+            'amount'       => $order->total_amount,
+            'phone_masked' => substr($phone, 0, 6) . '****',
+        ]);
 
         try {
             $response = Http::withToken($this->secretKey)
@@ -54,7 +58,11 @@ class IntaSendService
 
             $body = $response->json();
 
-            Log::info('IntaSend STK Push Response', ['order_id' => $order->id, 'status' => $response->status(), 'body' => $body]);
+            Log::info('IntaSend STK Push Response', [
+                'order_id'   => $order->id,
+                'status'     => $response->status(),
+                'invoice_id' => $body['invoice']['invoice_id'] ?? null,
+            ]);
 
             if ($response->successful() && isset($body['invoice']['invoice_id'])) {
                 return [

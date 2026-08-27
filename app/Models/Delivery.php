@@ -16,6 +16,9 @@ class Delivery extends Model
         'pickup_time',
         'delivered_time',
         'verification_pin',
+        'verification_pin_hash',
+        'verification_attempts',
+        'pin_expires_at',
         'status',
         'runner_latitude',
         'runner_longitude',
@@ -23,9 +26,10 @@ class Delivery extends Model
     ];
 
     protected $casts = [
-        'pickup_time' => 'datetime',
+        'pickup_time'    => 'datetime',
         'delivered_time' => 'datetime',
-        'arrived_at' => 'datetime',
+        'pin_expires_at' => 'datetime',
+        'arrived_at'     => 'datetime',
     ];
 
     public function order(): BelongsTo

@@ -10,65 +10,116 @@ use App\Models\Vendor;
 use App\Models\User;
 use App\Models\Delivery;
 use App\Services\IntaSendService;
+use App\Services\RunnerAllocationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 
 class OrderController extends Controller
 {
-    // Place a new order
+    /**
+     * POST /api/orders
+     * Place a new order on behalf of the authenticated customer.
+     * Enforces pessimistic row locking (lockForUpdate), exact stock quantity tracking,
+     * vendor product ownership validation, and idempotency key checks.
+     */
     public function store(Request $request)
     {
         $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'vendor_id' => 'required|exists:vendors,id',
-            'seat_location' => 'required|array',
-            'seat_location.type' => 'nullable|string|in:seat,gps',
-            'seat_location.section' => 'required_without:seat_location.latitude|string',
-            'seat_location.row' => 'required_without:seat_location.latitude|string',
-            'seat_location.seat' => 'required_without:seat_location.latitude|string',
-            'seat_location.latitude' => 'required_if:seat_location.type,gps|numeric',
-            'seat_location.longitude' => 'required_if:seat_location.type,gps|numeric',
-            'seat_location.description' => 'nullable|string',
-            'items' => 'required|array|min:1',
-            'items.*.product_id' => 'required|exists:products,id',
-            'items.*.quantity' => 'required|integer|min:1',
+            'vendor_id'                => 'required|exists:vendors,id',
+            'seat_location'            => 'required|array',
+            'seat_location.type'       => 'nullable|string|in:seat,gps',
+            'seat_location.section'    => 'required_without:seat_location.latitude|string',
+            'seat_location.row'        => 'required_without:seat_location.latitude|string',
+            'seat_location.seat'       => 'required_without:seat_location.latitude|string',
+            'seat_location.latitude'   => 'required_if:seat_location.type,gps|numeric',
+            'seat_location.longitude'  => 'required_if:seat_location.type,gps|numeric',
+            'seat_location.description'=> 'nullable|string',
+            'items'                    => 'required|array|min:1',
+            'items.*.product_id'       => 'required|exists:products,id',
+            'items.*.quantity'         => 'required|integer|min:1',
         ]);
+
+        $idempotencyKey = $request->header('Idempotency-Key') ?: $request->input('idempotency_key');
+        $userId         = $request->user()->id;
+
+        if ($idempotencyKey) {
+            $existingOrder = Order::query()
+                ->where('user_id', $userId)
+                ->where('idempotency_key', $idempotencyKey)
+                ->first();
+
+            if ($existingOrder) {
+                return response()->json([
+                    'status'  => 'success',
+                    'message' => 'Order already placed.',
+                    'order'   => $existingOrder->load('items.product'),
+                ], 200);
+            }
+        }
 
         try {
             DB::beginTransaction();
 
-            $totalAmount = 0;
+            $totalAmount   = 0;
             $itemsToCreate = [];
 
             foreach ($request->items as $item) {
-                $product = Product::findOrFail($item['product_id']);
-                
-                if ($product->stock_status !== 'in_stock') {
-                    throw new \Exception("Item '{$product->name}' is currently out of stock!");
+                $product = Product::query()
+                    ->whereKey($item['product_id'])
+                    ->where('vendor_id', $request->vendor_id)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (!$product) {
+                    throw ValidationException::withMessages([
+                        'items' => "Selected product #{$item['product_id']} does not belong to vendor #{$request->vendor_id}.",
+                    ]);
                 }
 
-                $price = $product->price;
-                $subtotal = $price * $item['quantity'];
+                if ($product->stock_status === 'out_of_stock' || $product->stock_quantity < $item['quantity']) {
+                    throw ValidationException::withMessages([
+                        'items' => "{$product->name} has insufficient stock.",
+                    ]);
+                }
+
+                $product->decrement('stock_quantity', $item['quantity']);
+                $product->increment('version');
+
+                if ($product->fresh()->stock_quantity <= 0) {
+                    $product->update(['stock_status' => 'out_of_stock']);
+                }
+
+                $price       = $product->price;
+                $subtotal    = $price * $item['quantity'];
                 $totalAmount += $subtotal;
 
                 $itemsToCreate[] = [
                     'product_id' => $product->id,
-                    'quantity' => $item['quantity'],
-                    'price' => $price,
+                    'quantity'   => $item['quantity'],
+                    'price'      => $price,
                 ];
             }
 
-            // Create Order
+            $loc = $request->seat_location;
+
             $order = Order::create([
-                'user_id' => $request->user_id,
-                'vendor_id' => $request->vendor_id,
-                'seat_location' => $request->seat_location,
-                'total_amount' => $totalAmount,
-                'payment_status' => 'pending',
-                'order_status' => 'created',
+                'user_id'         => $userId,
+                'vendor_id'       => $request->vendor_id,
+                'seat_location'   => $loc,
+                'seat_type'       => $loc['type'] ?? 'seat',
+                'seat_section'    => $loc['section'] ?? null,
+                'seat_row'        => $loc['row'] ?? null,
+                'seat_number'     => $loc['seat'] ?? null,
+                'latitude'        => isset($loc['latitude']) ? floatval($loc['latitude']) : null,
+                'longitude'       => isset($loc['longitude']) ? floatval($loc['longitude']) : null,
+                'total_amount'    => $totalAmount,
+                'payment_status'  => 'pending',
+                'order_status'    => 'created',
+                'idempotency_key' => $idempotencyKey,
             ]);
 
-            // Create Order Items
             foreach ($itemsToCreate as $itemData) {
                 $itemData['order_id'] = $order->id;
                 OrderItem::create($itemData);
@@ -77,227 +128,198 @@ class OrderController extends Controller
             DB::commit();
 
             return response()->json([
-                'status' => 'success',
+                'status'  => 'success',
                 'message' => 'Order created successfully. Please complete payment.',
-                'order' => Order::with('items.product')->find($order->id),
+                'order'   => Order::with('items.product')->find($order->id),
             ]);
 
+        } catch (ValidationException $ve) {
+            DB::rollBack();
+            throw $ve;
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
-                'status' => 'error',
+                'status'  => 'error',
                 'message' => $e->getMessage(),
             ], 400);
         }
     }
 
-    // Get order status
-    public function show($id)
-    {
-        $order = Order::with(['items.product', 'vendor', 'runner', 'delivery'])->findOrFail($id);
-        return response()->json($order);
-    }
-
-    // Get active order for customer
+    /**
+     * GET /api/orders/active
+     * Fetch active order for customer.
+     */
     public function active(Request $request)
     {
-        $userId = $request->query('user_id');
-        if (!$userId) {
-            return response()->json(['status' => 'error', 'message' => 'User ID is required.'], 400);
-        }
-
-        $order = Order::with(['items.product', 'vendor', 'runner', 'delivery'])
-            ->where('user_id', $userId)
-            ->whereIn('order_status', ['created', 'accepted', 'preparing', 'ready', 'runner_assigned', 'en_route'])
-            ->orderBy('created_at', 'desc')
+        $user  = $request->user();
+        $order = Order::query()
+            ->where('user_id', $user->id)
+            ->latest()
+            ->with(['vendor:id,business_name,logo_url', 'items.product', 'runner:id,name,phone', 'delivery'])
             ->first();
 
         if (!$order) {
-            return response()->json(['status' => 'success', 'order' => null]);
+            return response()->json(['status' => 'empty', 'message' => 'No active order found.'], 200);
         }
 
         return response()->json($order);
     }
 
     /**
-     * Initiate M-Pesa STK Push via IntaSend.
-     *
-     * POST /api/orders/{id}/pay
-     * Body: { "phone": "0712345678", "email": "user@example.com", "name": "John Doe" }
-     *
-     * Returns 202 Accepted with the IntaSend invoice_id.
-     * The order payment_status stays 'pending' until the webhook confirms payment.
+     * GET /api/orders/{order}
      */
-    public function pay(Request $request, $id)
+    public function show(Request $request, Order $order)
     {
-        $order = Order::findOrFail($id);
+        $this->authorize('view', $order);
+        return response()->json($order->load(['vendor', 'items.product', 'runner', 'delivery']));
+    }
 
-        if ($order->payment_status === 'paid') {
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Order has already been paid!',
-                'order' => $order,
+    /**
+     * POST /api/orders/{order}/pay
+     */
+    public function pay(Request $request, Order $order, IntaSendService $intaSend)
+    {
+        $this->authorize('pay', $order);
+
+        $user      = $request->user();
+        $phone     = IntaSendService::formatPhone($request->input('phone', $user->phone ?? '0700000000'));
+        $nameParts = explode(' ', trim($user->name ?? 'Customer Account'), 2);
+        $firstName = $nameParts[0];
+        $lastName  = $nameParts[1] ?? 'User';
+
+        $result = $intaSend->initiateSTKPush($order, $phone, $user->email, $firstName, $lastName);
+
+        if ($result['success'] && isset($result['invoice_id'])) {
+            $order->update([
+                'intasend_invoice_id' => $result['invoice_id'],
+                'intasend_ref'        => $result['api_ref'],
             ]);
         }
 
-        $request->validate([
-            'phone' => 'required|string|min:9',
-            'email' => 'nullable|email',
-            'name'  => 'nullable|string|max:100',
-        ]);
-
-        // Parse name into first/last
-        $fullName  = trim($request->input('name', 'Customer'));
-        $nameParts = explode(' ', $fullName, 2);
-        $firstName = $nameParts[0];
-        $lastName  = $nameParts[1] ?? '-';
-
-        $email = $request->input('email', 'noreply@justfeast.com');
-        $phone = IntaSendService::formatPhone($request->phone);
-
-        $intaSend = new IntaSendService();
-        $result = $intaSend->initiateSTKPush($order, $phone, $email, $firstName, $lastName);
-
-        if (!$result['success']) {
-            return response()->json([
-                'status'  => 'error',
-                'message' => $result['message'],
-            ], 422);
-        }
-
-        // Store the IntaSend invoice ID for tracking/webhook matching
-        $order->update([
-            'intasend_invoice_id' => $result['invoice_id'],
-            'intasend_ref'        => 'order-' . $order->id,
-        ]);
-
         return response()->json([
-            'status'     => 'success',
-            'message'    => 'M-Pesa STK Push sent to ' . $request->phone . '. Please check your phone and enter your PIN to complete payment.',
-            'invoice_id' => $result['invoice_id'],
-            'order'      => Order::with('items.product')->find($id),
-        ], 202);
-    }
-
-    /**
-     * Test / Sandbox direct payment approval.
-     */
-    public function testPay(Request $request, $id)
-    {
-        $order = Order::findOrFail($id);
-        $order->update([
-            'payment_status' => 'paid',
-            'order_status'   => 'accepted',
-        ]);
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Payment approved successfully!',
-            'order' => $order
+            'status'     => $result['success'] ? 'success' : 'error',
+            'message'    => $result['message'],
+            'invoice_id' => $result['invoice_id'] ?? null,
+            'order_id'   => $order->id,
         ]);
     }
 
     /**
-     * Poll the IntaSend payment status for a given order.
-     *
-     * GET /api/orders/{id}/payment-status
-     *
-     * Returns the current IntaSend state (PENDING, PROCESSING, COMPLETE, FAILED).
-     * The frontend can poll this endpoint after initiating payment.
+     * GET /api/orders/{order}/payment-status
+     * Returns payment status and calculates exponential backoff polling interval: 2s -> 3s -> 5s -> 8s -> 15s -> 30s
      */
-    public function checkPaymentStatus($id)
+    public function checkPaymentStatus(Request $request, Order $order, IntaSendService $intaSend)
     {
-        $order = Order::findOrFail($id);
+        $this->authorize('view', $order);
+
+        $backoffSchedule  = [2, 3, 5, 8, 15, 30];
+        $attempt          = min(max(1, $request->integer('attempt', 1)), count($backoffSchedule));
+        $nextPollInterval = $backoffSchedule[$attempt - 1];
 
         if ($order->payment_status === 'paid') {
             return response()->json([
-                'status'         => 'success',
-                'payment_status' => 'paid',
-                'intasend_state' => 'COMPLETE',
-                'order_status'   => $order->order_status,
+                'status'                       => 'success',
+                'payment_status'               => 'paid',
+                'order_status'                 => $order->order_status,
+                'next_poll_interval_seconds'   => 0, // Terminal state reached, stop polling
             ]);
         }
 
         if (!$order->intasend_invoice_id) {
             return response()->json([
-                'status'  => 'error',
-                'message' => 'No payment has been initiated for this order.',
-            ], 400);
-        }
-
-        $intaSend = new IntaSendService();
-        $result = $intaSend->checkPaymentStatus($order->intasend_invoice_id);
-
-        // If IntaSend confirms complete, update the order proactively
-        // (acts as a fallback if webhook was missed)
-        if ($result['success'] && $result['state'] === 'COMPLETE' && $order->payment_status !== 'paid') {
-            $order->update([
-                'payment_status' => 'paid',
-                'order_status'   => 'accepted',
+                'status'                       => 'pending',
+                'payment_status'               => $order->payment_status,
+                'order_status'                 => $order->order_status,
+                'next_poll_interval_seconds'   => $nextPollInterval,
             ]);
         }
 
-        if ($result['success'] && $result['state'] === 'FAILED' && $order->payment_status !== 'failed') {
-            $order->update(['payment_status' => 'failed']);
+        $result     = $intaSend->checkPaymentStatus($order->intasend_invoice_id);
+        $freshOrder = $order->fresh();
+
+        if ($result['success'] && $result['state'] === 'COMPLETE' && $freshOrder->payment_status === 'paid') {
+            event(new \App\Events\PaymentStatusUpdated($freshOrder, 'paid', $freshOrder->order_status));
         }
 
         return response()->json([
-            'status'         => $result['success'] ? 'success' : 'error',
-            'payment_status' => $order->fresh()->payment_status,
-            'intasend_state' => $result['state'],
-            'order_status'   => $order->fresh()->order_status,
+            'status'                       => $result['success'] ? 'success' : 'error',
+            'payment_status'               => $freshOrder->payment_status,
+            'intasend_state'               => $result['state'],
+            'order_status'                 => $freshOrder->order_status,
+            'next_poll_interval_seconds'   => $freshOrder->payment_status === 'paid' ? 0 : $nextPollInterval,
         ]);
     }
 
-    // Get orders for specific Vendor
+    /**
+     * GET /api/vendor/orders
+     * Return all paid orders scoped to the authenticated vendor account.
+     */
     public function vendorOrders(Request $request)
     {
-        $vendorUserId = $request->query('user_id');
-        if (!$vendorUserId) {
-            return response()->json(['status' => 'error', 'message' => 'Vendor User ID is required.'], 400);
-        }
+        $vendor = $request->user()->vendor;
 
-        $vendor = Vendor::where('user_id', $vendorUserId)->first();
         if (!$vendor) {
-            return response()->json(['status' => 'error', 'message' => 'Vendor not found.'], 404);
+            return response()->json(['status' => 'error', 'message' => 'Vendor profile not found.'], 404);
         }
 
-        $orders = Order::with(['items.product', 'user', 'delivery'])
+        $perPage = min($request->integer('per_page', 25), 100);
+
+        $orders = Order::query()
             ->where('vendor_id', $vendor->id)
-            ->whereIn('payment_status', ['paid']) // Only show paid orders to vendors
-            ->orderBy('created_at', 'desc')
-            ->get();
+            ->whereIn('payment_status', ['paid'])
+            ->latest()
+            ->with(['items.product', 'user:id,name,email,phone', 'delivery'])
+            ->cursorPaginate($perPage);
 
         return response()->json($orders);
     }
 
-    // Update order status (Vendor triggers preparing and ready)
-    public function updateStatus(Request $request, $id)
+    /**
+     * PATCH /api/vendor/orders/{order}/status
+     * Vendor updates order to 'preparing' or 'ready'.
+     * Allocates runner fairly using RunnerAllocationService and generates 6-digit secure delivery PIN.
+     */
+    public function updateStatus(Request $request, Order $order, RunnerAllocationService $allocationService)
     {
+        $vendor = $request->user()->vendor;
+
+        if (!$vendor) {
+            return response()->json(['status' => 'error', 'message' => 'Vendor profile not found.'], 404);
+        }
+
+        // Strict query ownership check + Policy authorization
+        $order = Order::query()
+            ->where('vendor_id', $vendor->id)
+            ->findOrFail($order->id);
+
+        $this->authorize('update', $order);
+
         $request->validate([
             'status' => 'required|in:preparing,ready',
         ]);
 
-        $order = Order::findOrFail($id);
-        $newStatus = $request->status;
-
+        $newStatus  = $request->status;
         $updateData = ['order_status' => $newStatus];
 
         if ($newStatus === 'ready') {
-            // Assign a random runner who is seeded
-            $runner = User::where('role', 'runner')->inRandomOrder()->first();
+            $runner = $allocationService->allocateRunnerForOrder($order);
             if ($runner) {
-                $updateData['runner_id'] = $runner->id;
+                $updateData['runner_id']    = $runner->id;
                 $updateData['order_status'] = 'runner_assigned';
 
-                // Create a Delivery record with a secret 4-digit PIN for security confirmation
-                $pin = str_pad(rand(1000, 9999), 4, '0', STR_PAD_LEFT);
+                // Cryptographically generate 6-digit delivery PIN
+                $pin     = (string) random_int(100000, 999999);
+                $pinHash = Hash::make($pin);
+
                 Delivery::updateOrCreate(
                     ['order_id' => $order->id],
                     [
-                        'runner_id' => $runner->id,
-                        'verification_pin' => $pin,
-                        'status' => 'pending'
+                        'runner_id'             => $runner->id,
+                        'verification_pin'      => $pin,
+                        'verification_pin_hash' => $pinHash,
+                        'verification_attempts' => 0,
+                        'pin_expires_at'        => now()->addMinutes(60),
+                        'status'                => 'pending',
                     ]
                 );
             }
@@ -306,9 +328,9 @@ class OrderController extends Controller
         $order->update($updateData);
 
         return response()->json([
-            'status' => 'success',
+            'status'  => 'success',
             'message' => 'Order status updated to ' . $order->order_status,
-            'order' => Order::with(['items.product', 'runner', 'delivery'])->find($id)
+            'order'   => Order::with(['items.product', 'runner', 'delivery'])->find($order->id),
         ]);
     }
 }

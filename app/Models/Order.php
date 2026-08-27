@@ -17,15 +17,25 @@ class Order extends Model
         'vendor_id',
         'runner_id',
         'seat_location',
+        'seat_type',
+        'seat_section',
+        'seat_row',
+        'seat_number',
+        'latitude',
+        'longitude',
         'total_amount',
         'payment_status',
+        'paid_at',
+        'payment_reference',
         'order_status',
         'intasend_invoice_id',
         'intasend_ref',
+        'idempotency_key',
     ];
 
     protected $casts = [
         'seat_location' => 'array',
+        'paid_at'       => 'datetime',
     ];
 
     public function user(): BelongsTo

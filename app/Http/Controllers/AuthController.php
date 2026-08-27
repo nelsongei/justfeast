@@ -15,11 +15,7 @@ class AuthController extends Controller
             return $this->redirectByRole(Auth::user()->role);
         }
 
-        $users = User::orderBy('role')->orderBy('name')
-            ->get(['id', 'name', 'email', 'role'])
-            ->groupBy('role');
-
-        return view('auth.login', compact('users'));
+        return view('auth.login');
     }
 
     /** Handle login form submission */

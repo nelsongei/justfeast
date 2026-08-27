@@ -795,7 +795,7 @@
             if (saved) {
                 try {
                     const parsed = JSON.parse(saved);
-                    if (parsed && (parsed.name === 'John Customer' || parsed.email === 'customer@justfeast.com')) {
+                    if (parsed && (parsed.name === 'John Customer' || parsed.email === 'customer@justfeast.com' || !parsed.__token)) {
                         localStorage.removeItem('justfeast_client_user');
                         currentUser = null;
                     } else {
@@ -879,6 +879,32 @@
                     `;
                 }
             }
+        }
+
+        // ── Auth helpers ───────────────────────────────────────────────────
+        function getToken() {
+            try {
+                const s = localStorage.getItem('justfeast_client_user');
+                return s ? JSON.parse(s).__token : null;
+            } catch(e) { return null; }
+        }
+
+        function getTokenFor(key) {
+            try {
+                const s = localStorage.getItem(key);
+                return s ? JSON.parse(s).__token : null;
+            } catch(e) { return null; }
+        }
+
+        /**
+         * Authenticated fetch helper.
+         * Accepts an optional localStorage key to read the token from (defaults to client user).
+         */
+        async function authFetch(url, options = {}, tokenKey = 'justfeast_client_user') {
+            const token = getTokenFor(tokenKey);
+            options.headers = options.headers || {};
+            if (token) options.headers['Authorization'] = `Bearer ${token}`;
+            return await fetch(url, options);
         }
 
         // Fetch active event metadata
@@ -1242,6 +1268,7 @@
                 if (res.ok) {
                     playSoundNotification('success');
                     currentUser = data.user;
+                    localStorage.setItem('justfeast_client_user', JSON.stringify({ ...currentUser, __token: data.token }));
                     updateAuthHeader();
                     closeAuthModal();
                     
@@ -1260,34 +1287,7 @@
             }
         }
  
-        // Demo quick accounts switcher
-        async function quickLogin(email) {
-            try {
-                const res = await fetch('/api/auth/login-as', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email })
-                });
- 
-                const data = await res.json();
-                if (res.ok) {
-                    playSoundNotification('success');
-                    currentUser = data.user;
-                    updateAuthHeader();
-                    closeAuthModal();
- 
-                    // Sync other dashboards if connected
-                    syncRealTimeEngine();
- 
-                    // Auto checkout if basket & seat are set
-                    if (basket.length > 0 && selectedSeat) {
-                        checkoutOrder();
-                    }
-                }
-            } catch (e) {
-                console.error(e);
-            }
-        }
+
  
         function logoutCustomer() {
             currentUser = null;
@@ -1551,16 +1551,15 @@
  
             await new Promise(resolve => setTimeout(resolve, 2000));
  
-            // Place actual order first in database
+            // Place actual order in database
             const orderPayload = {
-                user_id: currentUser.id,
                 vendor_id: basket[0].vendorId,
                 seat_location: selectedSeat,
                 items: basket.map(i => ({ product_id: i.id, quantity: i.quantity }))
             };
  
             try {
-                const res = await fetch('/api/orders', {
+                const res = await authFetch('/api/orders', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(orderPayload)
@@ -1571,7 +1570,7 @@
                     const orderId = data.order.id;
  
                     // Trigger M-Pesa simulated payment callback endpoint
-                    const payRes = await fetch(`/api/orders/${orderId}/pay`, {
+                    const payRes = await authFetch(`/api/orders/${orderId}/pay`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ phone: currentUser.phone })
@@ -1632,7 +1631,7 @@
             if (activeOrder && activeOrder.order) {
                 const orderId = activeOrder.order.id;
                 try {
-                    const res = await fetch(`/api/orders/${orderId}`);
+                    const res = await authFetch(`/api/orders/${orderId}`);
                     if (res.ok) {
                         const updated = await res.json();
                         updateCustomerRadarUI(updated);
@@ -1642,42 +1641,27 @@
 
             // B. Vendor portal queue update
             try {
-                // We use mock user Alex Vendor email
-                const vendorUserRes = await fetch('/api/auth/login-as', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: activeVendorUser })
-                });
-
-                if (vendorUserRes.ok) {
-                    const vendorData = await vendorUserRes.json();
-                    const vendorUser = vendorData.user;
-
-                    document.getElementById('vendor-assigned-name').textContent = `${vendorUser.name} (Assigned Staff)`;
-
-                    // Load active vendor queue
-                    const qRes = await fetch(`/api/orders/vendor?user_id=${vendorUser.id}`);
+                const vendorToken = getTokenFor('justfeast_vendor_user');
+                if (vendorToken) {
+                    window._vendorToken = vendorToken;
+                    const qRes = await fetch('/api/vendor/orders', {
+                        headers: { 'Authorization': `Bearer ${vendorToken}` }
+                    });
                     if (qRes.ok) {
                         const queue = await qRes.json();
-                        renderVendorQueue(queue, vendorUser);
+                        renderVendorQueue(queue, { name: 'Kitchen Staff' });
                     }
                 }
             } catch (e) { console.log(e); }
 
             // C. Runner App deliveries
             try {
-                const runnerUserRes = await fetch('/api/auth/login-as', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: activeRunnerUser })
-                });
-
-                if (runnerUserRes.ok) {
-                    const runnerData = await runnerUserRes.json();
-                    const runnerUser = runnerData.user;
-
-                    // Fetch assigned deliveries
-                    const dRes = await fetch(`/api/runner/deliveries?user_id=${runnerUser.id}`);
+                const runnerToken = getTokenFor('justfeast_runner_user');
+                if (runnerToken) {
+                    window._runnerToken = runnerToken;
+                    const dRes = await fetch('/api/runner/deliveries', {
+                        headers: { 'Authorization': `Bearer ${runnerToken}` }
+                    });
                     if (dRes.ok) {
                         const deliveries = await dRes.json();
                         renderRunnerDeliveries(deliveries);
@@ -1687,7 +1671,9 @@
 
             // D. Admin Dashboard metrics & heatmap updates
             try {
-                const adminStatsRes = await fetch('/api/admin/stats');
+                const adminToken = getTokenFor('justfeast_admin_user');
+                const adminHeaders = adminToken ? { 'Authorization': `Bearer ${adminToken}` } : {};
+                const adminStatsRes = await fetch('/api/admin/stats', { headers: adminHeaders });
                 if (adminStatsRes.ok) {
                     const stats = await adminStatsRes.json();
                     updateAdminDashboardUI(stats);
@@ -1843,10 +1829,15 @@
 
         async function updateVendorOrderStatus(orderId, status) {
             playSoundNotification('success');
+            const token = window._vendorToken;
+            if (!token) { syncRealTimeEngine(); return; }
             try {
-                const res = await fetch(`/api/orders/${orderId}/status`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                const res = await fetch(`/api/vendor/orders/${orderId}/status`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
                     body: JSON.stringify({ status })
                 });
 
@@ -1882,8 +1873,13 @@
 
         async function toggleStock(productId) {
             playSoundNotification('beep');
+            const token = window._vendorToken;
+            if (!token) return;
             try {
-                const res = await fetch(`/api/products/${productId}/toggle-stock`, { method: 'POST' });
+                const res = await fetch(`/api/vendor/products/${productId}/stock`, {
+                    method: 'PATCH',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
                 if (res.ok) {
                     loadVendors(); // reload menus
                 }
@@ -2025,9 +2021,13 @@
                         const progress = totalDistance > 0 ? Math.min(100, Math.round(((totalDistance - currentRemainingDistance) / totalDistance) * 100)) : 100;
 
                         try {
+                            const locToken = window._runnerToken;
                             const locRes = await fetch(`/api/runner/deliveries/${activeDel.id}/location`, {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
+                                method: 'PATCH',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': locToken ? `Bearer ${locToken}` : ''
+                                },
                                 body: JSON.stringify({ latitude: runnerLat, longitude: runnerLng })
                             });
 
@@ -2040,8 +2040,11 @@
                                     runnerLng = targetLng;
 
                                     await fetch(`/api/runner/deliveries/${activeDel.id}/location`, {
-                                        method: 'POST',
-                                        headers: { 'Content-Type': 'application/json' },
+                                        method: 'PATCH',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'Authorization': locToken ? `Bearer ${locToken}` : ''
+                                        },
                                         body: JSON.stringify({ latitude: targetLat, longitude: targetLng })
                                     });
 
@@ -2073,10 +2076,14 @@
 
         async function updateRunnerDelivery(delId, status) {
             playSoundNotification('success');
+            const token = window._runnerToken;
             try {
                 const res = await fetch(`/api/runner/deliveries/${delId}/status`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': token ? `Bearer ${token}` : ''
+                    },
                     body: JSON.stringify({ status })
                 });
 
@@ -2087,43 +2094,40 @@
         }
 
         async function verifyRunnerDelivery() {
-            // Find active delivery ID
-            const runnerUserRes = await fetch('/api/auth/login-as', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: activeRunnerUser })
-            });
+            const token = window._runnerToken;
+            if (!token) return;
 
-            if (runnerUserRes.ok) {
-                const runnerData = await runnerUserRes.json();
-                const runnerUser = runnerData.user;
-
-                const dRes = await fetch(`/api/runner/deliveries?user_id=${runnerUser.id}`);
+            try {
+                const dRes = await fetch('/api/runner/deliveries', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
                 if (dRes.ok) {
                     const deliveries = await dRes.json();
                     if (deliveries.length > 0) {
                         const delId = deliveries[0].id;
                         const pin = document.getElementById('runner-pin-input').value;
 
-                        try {
-                            const verifyRes = await fetch(`/api/runner/deliveries/${delId}/verify`, {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ pin })
-                            });
+                        const verifyRes = await fetch(`/api/runner/deliveries/${delId}/verify`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: JSON.stringify({ pin })
+                        });
 
-                            if (verifyRes.ok) {
-                                playSoundNotification('success');
-                                alert("🎉 Delivery verified successfully! Confetti triggered!");
-                                document.getElementById('runner-pin-input').value = '';
-                                syncRealTimeEngine();
-                            } else {
-                                const err = await verifyRes.json();
-                                alert(err.message);
-                            }
-                        } catch (e) { console.error(e); }
+                        if (verifyRes.ok) {
+                            playSoundNotification('success');
+                            alert("🎉 Delivery verified successfully! Confetti triggered!");
+                            document.getElementById('runner-pin-input').value = '';
+                            syncRealTimeEngine();
+                        } else {
+                            const err = await verifyRes.json();
+                            alert(err.message);
+                        }
                     }
                 }
+            } catch (e) { console.error(e); }
         }
 
         let html5QrcodeScanner = null;
@@ -2176,30 +2180,23 @@
 
         async function simulateQRScan() {
             playSoundNotification('beep');
-            
-            const runnerUserRes = await fetch('/api/auth/login-as', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: activeRunnerUser })
+            const token = window._runnerToken;
+            if (!token) { alert('No active runner session.'); return; }
+
+            const dRes = await fetch('/api/runner/deliveries', {
+                headers: { 'Authorization': `Bearer ${token}` }
             });
-
-            if (runnerUserRes.ok) {
-                const runnerData = await runnerUserRes.json();
-                const runnerUser = runnerData.user;
-
-                const dRes = await fetch(`/api/runner/deliveries?user_id=${runnerUser.id}`);
-                if (dRes.ok) {
-                    const deliveries = await dRes.json();
-                    if (deliveries.length > 0) {
-                        const activeDel = deliveries[0];
-                        const pin = activeDel.verification_pin;
-                        document.getElementById('runner-pin-input').value = pin;
-                        
-                        alert(`[SIMULATION] Scanned QR Code containing payload: "justfeast-delivery-verify:${activeDel.id}:${pin}". PIN has been autofilled.`);
-                        verifyRunnerDelivery();
-                    } else {
-                        alert("No active deliveries found to scan!");
-                    }
+            if (dRes.ok) {
+                const deliveries = await dRes.json();
+                if (deliveries.length > 0) {
+                    const activeDel = deliveries[0];
+                    const pin = activeDel.verification_pin;
+                    document.getElementById('runner-pin-input').value = pin;
+                    alert(`[SIMULATION] Scanned QR Code: "justfeast-delivery-verify:${activeDel.id}:${pin}". PIN autofilled.`);
+                    verifyRunnerDelivery();
+                } else {
+                    alert("No active deliveries found to scan!");
+                }
                 }
             }
         }
