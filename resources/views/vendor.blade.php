@@ -657,6 +657,11 @@
                 else if (o.order_status === 'preparing') badgeClass = 'bg-brand-orange/20 text-brand-orange animate-pulse';
                 else badgeClass = 'bg-brand-emerald/20 text-brand-emerald';
 
+                const loc = o.seat_location || {};
+                const locText = (loc.type === 'gps' || loc.latitude)
+                    ? `GPS Pin: ${loc.description || (parseFloat(loc.latitude).toFixed(4) + ', ' + parseFloat(loc.longitude).toFixed(4))}`
+                    : `${loc.section || 'Seat'}, Row ${loc.row || ''}, Seat ${loc.seat || ''}`;
+
                 card.innerHTML = `
                     <div class="flex justify-between items-start">
                         <div>
@@ -669,7 +674,7 @@
                         ${o.items.map(item => `<div>• ${item.quantity}x ${item.product.name}</div>`).join('')}
                     </div>
                     <div class="flex justify-between items-center text-[10px] text-zinc-500">
-                        <span>Seat Coordinates: <strong class="text-white">${o.seat_location.section}, Row ${o.seat_location.row}, Seat ${o.seat_location.seat}</strong></span>
+                        <span>Location: <strong class="text-white">${locText}</strong></span>
                         <span class="font-extrabold text-brand-rose">Ksh ${parseFloat(o.total_amount).toLocaleString()}</span>
                     </div>
                     <div class="pt-1">

@@ -1080,12 +1080,64 @@
     let basket = [];
     let activeOrder = null;
     let hasBeepedForArrival = false;
-    let selectedSeat = null;
+    const defaultSeat = {
+        type: 'gps',
+        latitude: -1.28817042,
+        longitude: 36.81647301,
+        description: 'Uhuru Park, Main Stage Grounds'
+    };
+    let selectedSeat = defaultSeat;
     let leafletMap = null;
     let leafletMarker = null;
     let activeSeatingMode = 'gps';
     let pollingInterval = null;
     let audioCtx = null;
+
+    function applySeatToUI(seatObj) {
+        if (!seatObj) return;
+        if (seatObj.type === 'gps') {
+            const lat = seatObj.latitude;
+            const lng = seatObj.longitude;
+            const desc = seatObj.description || '';
+            const labelEl = document.getElementById('selected-seat-label');
+            const subEl = document.getElementById('selected-seat-sub');
+            if (labelEl) labelEl.textContent = "GPS Location Pin";
+            if (subEl) subEl.textContent = `${lat.toFixed(5)}, ${lng.toFixed(5)}${desc ? ' — ' + desc : ''}`;
+
+            const locationText = `GPS Pin: ${desc || (lat.toFixed(4) + ', ' + lng.toFixed(4))}`;
+            const cartLoc = document.getElementById('cart-location-text');
+            const desktopLoc = document.getElementById('desktop-cart-location-text');
+            const heroLoc = document.getElementById('selected-seat-hero');
+            if (cartLoc) cartLoc.textContent = locationText;
+            if (desktopLoc) desktopLoc.textContent = locationText;
+            if (heroLoc) heroLoc.textContent = locationText;
+
+            const latInput = document.getElementById('gps-lat-input');
+            const lngInput = document.getElementById('gps-lng-input');
+            const descInput = document.getElementById('gps-desc-input');
+            if (latInput) latInput.value = lat.toFixed(8);
+            if (lngInput) lngInput.value = lng.toFixed(8);
+            if (descInput && desc) descInput.value = desc;
+        } else {
+            const {section, row, seat} = seatObj;
+            const labelEl = document.getElementById('selected-seat-label');
+            const subEl = document.getElementById('selected-seat-sub');
+            if (labelEl) labelEl.textContent = section || 'Stadium Seat';
+            if (subEl) subEl.textContent = `${row || ''} — ${seat || ''}`;
+            const locationText = `${section || ''}, ${row || ''}, ${seat || ''}`;
+            const cartLoc = document.getElementById('cart-location-text');
+            const desktopLoc = document.getElementById('desktop-cart-location-text');
+            const heroLoc = document.getElementById('selected-seat-hero');
+            if (cartLoc) cartLoc.textContent = locationText;
+            if (desktopLoc) desktopLoc.textContent = locationText;
+            if (heroLoc) heroLoc.textContent = locationText;
+        }
+        const statusPill = document.getElementById('seat-status-pill');
+        if (statusPill) {
+            statusPill.textContent = "Configured";
+            statusPill.className = "text-[9px] bg-brand-emerald/20 text-brand-emerald px-2.5 py-0.5 rounded-full font-bold border border-brand-emerald/30";
+        }
+    }
 
     function playSound(type) {
         try {
@@ -1141,37 +1193,18 @@
         }
         updateAuthHeader();
 
-        // Location recovery
+        // Location recovery or default setup
         const savedSeat = localStorage.getItem('justfeast_selected_seat');
         if (savedSeat) {
             try {
                 selectedSeat = JSON.parse(savedSeat);
-                if (selectedSeat.type === 'gps') {
-                    const lat = selectedSeat.latitude;
-                    const lng = selectedSeat.longitude;
-                    const desc = selectedSeat.description || '';
-                    document.getElementById('selected-seat-label').textContent = "GPS Location Pin";
-                    document.getElementById('selected-seat-sub').textContent = `${lat.toFixed(5)}, ${lng.toFixed(5)}${desc ? ' — ' + desc : ''}`;
-
-                    const locationText = `GPS Pin: ${desc || (lat.toFixed(4) + ', ' + lng.toFixed(4))}`;
-                    document.getElementById('cart-location-text').textContent = locationText;
-                    document.getElementById('desktop-cart-location-text').textContent = locationText;
-                    document.getElementById('selected-seat-hero').textContent = locationText;
-                } else {
-                    const {section, row, seat} = selectedSeat;
-                    document.getElementById('selected-seat-label').textContent = section || 'Stadium Seat';
-                    document.getElementById('selected-seat-sub').textContent = `${row || ''} — ${seat || ''}`;
-                    const locationText = `${section || ''}, ${row || ''}, ${seat || ''}`;
-                    document.getElementById('cart-location-text').textContent = locationText;
-                    document.getElementById('desktop-cart-location-text').textContent = locationText;
-                    document.getElementById('selected-seat-hero').textContent = locationText;
-                }
-                document.getElementById('seat-status-pill').textContent = "Configured";
-                document.getElementById('seat-status-pill').className = "text-[9px] bg-brand-emerald/20 text-brand-emerald px-2.5 py-0.5 rounded-full font-bold border border-brand-emerald/30";
             } catch (e) {
-                console.error("Error recovering seat/location:", e);
+                selectedSeat = defaultSeat;
             }
+        } else {
+            selectedSeat = defaultSeat;
         }
+        applySeatToUI(selectedSeat);
 
         pollingInterval = setInterval(syncActiveOrder, 2000);
         checkPWAPrompt();
@@ -1752,7 +1785,19 @@
 
     function initLeafletMap() {
         setTimeout(() => {
-            const center = [-1.28817042, 36.81647301];
+            const center = (selectedSeat && selectedSeat.type === 'gps' && selectedSeat.latitude)
+                ? [selectedSeat.latitude, selectedSeat.longitude]
+                : [-1.28817042, 36.81647301];
+
+            if (selectedSeat && selectedSeat.type === 'gps') {
+                const latInput = document.getElementById('gps-lat-input');
+                const lngInput = document.getElementById('gps-lng-input');
+                const descInput = document.getElementById('gps-desc-input');
+                if (latInput) latInput.value = selectedSeat.latitude.toFixed(8);
+                if (lngInput) lngInput.value = selectedSeat.longitude.toFixed(8);
+                if (descInput && selectedSeat.description) descInput.value = selectedSeat.description;
+            }
+
             if (!leafletMap) {
                 leafletMap = L.map('modal-leaflet-map').setView(center, 16);
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -1774,6 +1819,8 @@
                     document.getElementById('gps-lng-input').value = e.latlng.lng.toFixed(8);
                 });
             } else {
+                leafletMarker.setLatLng(center);
+                leafletMap.setView(center, 16);
                 leafletMap.invalidateSize();
             }
         }, 150);

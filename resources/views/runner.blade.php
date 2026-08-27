@@ -494,7 +494,12 @@
             verifyBox.classList.remove('hidden');
             mapGuide.classList.remove('hidden');
 
-            document.getElementById('runner-target-section-tag').textContent = `${activeDel.order.seat_location.section} - ROW ${activeDel.order.seat_location.row} - SEAT ${activeDel.order.seat_location.seat}`;
+            const loc = activeDel.order.seat_location || {};
+            const locText = (loc.type === 'gps' || loc.latitude)
+                ? `GPS Pin: ${loc.description || (parseFloat(loc.latitude).toFixed(4) + ', ' + parseFloat(loc.longitude).toFixed(4))}`
+                : `${loc.section || 'Seat'} - ROW ${loc.row || ''} - SEAT ${loc.seat || ''}`;
+
+            document.getElementById('runner-target-section-tag').textContent = locText;
 
             const card = document.createElement('div');
             card.className = 'bg-zinc-900 border border-zinc-800 p-4 rounded-2xl space-y-3 shadow-lg';
@@ -519,7 +524,7 @@
                     <p class="font-bold text-white text-xs">${activeDel.order.vendor.business_name} Stall</p>
 
                     <p class="text-zinc-500 pt-1">Destination coordinates:</p>
-                    <p class="font-extrabold text-brand-orange text-xs">${activeDel.order.seat_location.section}, Row ${activeDel.order.seat_location.row}, Seat ${activeDel.order.seat_location.seat}</p>
+                    <p class="font-extrabold text-brand-orange text-xs">${locText}</p>
                 </div>
 
                 <div class="pt-1.5">
