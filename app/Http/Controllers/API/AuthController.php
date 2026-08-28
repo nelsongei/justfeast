@@ -14,37 +14,42 @@ class AuthController extends Controller
 
     /**
      * POST /api/auth/login
-     * Accept a phone number, generate + send an OTP via SMS.
-     * NOTE: User account creation is deferred until phone number verification.
+     * Accept phone number, optional name, and optional email.
+     * Generates a system OTP and returns it directly in response (SMS bypass).
      */
     public function login(Request $request)
     {
         $request->validate([
             'phone' => 'required|string|min:9|max:20',
+            'name'  => 'nullable|string|max:100',
+            'email' => 'nullable|email|max:150',
         ]);
 
         $phone = $request->phone;
 
-        // Generate cryptographic OTP and dispatch via SMS service
-        $this->otpService->generateAndSend($phone);
+        // Generate cryptographic 6-digit system OTP
+        $code = $this->otpService->generateAndSend($phone);
 
         return response()->json([
             'status'  => 'success',
-            'message' => 'Verification code sent via SMS to ' . $phone . '.',
+            'message' => 'System verification code generated.',
+            'otp'     => $code,
             'phone'   => $phone,
         ]);
     }
 
     /**
      * POST /api/auth/verify
-     * Verify the OTP code. On successful verification, create/retrieve the User account
-     * and issue a Sanctum token named with the client's User-Agent.
+     * Verify the OTP code. On successful verification, register/update the User account
+     * with name, phone, and email, then issue a Sanctum access token.
      */
     public function verify(Request $request)
     {
         $request->validate([
             'phone' => 'required|string',
             'code'  => 'required|string|size:6',
+            'name'  => 'nullable|string|max:100',
+            'email' => 'nullable|email|max:150',
         ]);
 
         $phone = $request->phone;
@@ -59,16 +64,33 @@ class AuthController extends Controller
             ], 422);
         }
 
-        // Deferred User Creation: Register or retrieve account ONLY after phone is verified
-        $user = User::firstOrCreate(
-            ['phone' => $phone],
-            [
-                'name'     => 'Guest (' . substr($phone, -4) . ')',
-                'email'    => 'phone_' . preg_replace('/\D/', '', $phone) . '@justfeast.com',
+        // Register or retrieve user account after verification
+        $user = User::where('phone', $phone)->first();
+
+        $defaultName  = $request->filled('name') ? trim($request->name) : 'Customer (' . substr($phone, -4) . ')';
+        $defaultEmail = $request->filled('email') ? trim($request->email) : 'customer_' . preg_replace('/\D/', '', $phone) . '@justfeast.co.ke';
+
+        if (!$user) {
+            $user = User::create([
+                'phone'    => $phone,
+                'name'     => $defaultName,
+                'email'    => $defaultEmail,
                 'role'     => 'customer',
                 'password' => Hash::make(bin2hex(random_bytes(16))),
-            ]
-        );
+            ]);
+        } else {
+            // Update name and email if provided during login/registration
+            $updates = [];
+            if ($request->filled('name')) {
+                $updates['name'] = trim($request->name);
+            }
+            if ($request->filled('email')) {
+                $updates['email'] = trim($request->email);
+            }
+            if (!empty($updates)) {
+                $user->update($updates);
+            }
+        }
 
         // Revoke prior tokens and issue fresh Sanctum token using User-Agent device name
         $user->tokens()->delete();
@@ -78,7 +100,7 @@ class AuthController extends Controller
         return response()->json([
             'status'  => 'success',
             'message' => 'Authentication successful.',
-            'user'    => $user,
+            'user'    => $user->fresh(),
             'token'   => $token,
         ]);
     }

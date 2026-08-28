@@ -972,31 +972,41 @@
 <!-- Authentication Modal Overlay (OTP Login) -->
 <div id="auth-modal-overlay"
      class="hidden fixed inset-0 bg-[#2D3748]/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <!-- Auth Screen -->
+    <!-- Auth / Registration Screen -->
     <div id="cust-auth"
-         class="w-full max-w-[360px] bg-white rounded-[32px] p-8 shadow-2xl border border-[#E2E8F0] relative">
-        <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-zinc-400 hover:text-zinc-600"><i
-                class="fas fa-times"></i></button>
-        <div class="text-center space-y-6">
-            <div
-                class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mx-auto shadow-xl shadow-zinc-100/15 border border-zinc-200 overflow-hidden">
-                <img src="{{ asset('images/logo/jm.png') }}" alt="justFeast Logo" class="h-12 w-auto object-contain">
+         class="w-full max-w-[380px] bg-white rounded-[32px] p-7 shadow-2xl border border-[#E2E8F0] relative">
+        <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-zinc-400 hover:text-zinc-600"><i class="fas fa-times"></i></button>
+        <div class="text-center space-y-5">
+            <div class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center mx-auto shadow-lg shadow-zinc-100 border border-zinc-200 overflow-hidden">
+                <img src="{{ asset('images/logo/jm.png') }}" alt="justFeast Logo" class="h-10 w-auto object-contain">
             </div>
-            <div class="space-y-2">
-                <h2 class="text-xl font-black text-[#2D3748]">Concert Seat Delivery</h2>
-                <p class="text-xs text-zinc-500 px-2 leading-relaxed font-medium">Get food, drinks, and snacks delivered
-                    directly to your stadium seat during the concert!</p>
+            <div class="space-y-1">
+                <h2 class="text-xl font-black text-[#2D3748]">Customer Registration</h2>
+                <p class="text-xs text-zinc-500 font-medium">Enter your details to log in or create an account for stadium seat delivery.</p>
             </div>
-            <div class="space-y-4 text-left">
+            <div class="space-y-3.5 text-left">
                 <div>
-                    <label class="block text-[9px] font-black text-zinc-500 mb-1.5 uppercase tracking-wider">Enter Phone Number</label>
-                    <input type="text" id="cust-phone-input" placeholder="e.g. 0712345678"
-                           class="w-full px-4 py-3 rounded-xl bg-[#F7F9FA] border border-[#E2E8F0] text-[#2D3748] text-sm focus:outline-none focus:border-[#00A082]"
+                    <label class="block text-[9px] font-black text-zinc-500 mb-1 uppercase tracking-wider">Full Name</label>
+                    <input type="text" id="cust-name-input" placeholder="e.g. John Doe"
+                           class="w-full px-4 py-3 rounded-xl bg-[#F7F9FA] border border-[#E2E8F0] text-[#2D3748] text-xs font-bold focus:outline-none focus:border-[#05A357] transition"
+                           value="">
+                </div>
+                <div>
+                    <label class="block text-[9px] font-black text-zinc-500 mb-1 uppercase tracking-wider">Phone Number *</label>
+                    <input type="tel" id="cust-phone-input" placeholder="e.g. 0712345678"
+                           class="w-full px-4 py-3 rounded-xl bg-[#F7F9FA] border border-[#E2E8F0] text-[#2D3748] text-xs font-bold focus:outline-none focus:border-[#05A357] transition"
+                           value="">
+                </div>
+                <div>
+                    <label class="block text-[9px] font-black text-zinc-500 mb-1 uppercase tracking-wider">Email Address (Optional)</label>
+                    <input type="email" id="cust-email-input" placeholder="e.g. john@example.com"
+                           class="w-full px-4 py-3 rounded-xl bg-[#F7F9FA] border border-[#E2E8F0] text-[#2D3748] text-xs font-bold focus:outline-none focus:border-[#05A357] transition"
                            value="">
                 </div>
                 <button onclick="sendOTP()"
-                        class="w-full py-3.5 rounded-full bg-[#00A082] text-white font-bold text-xs hover:bg-[#008A70] transition shadow-md shadow-[#00A082]/10 border-0 cursor-pointer">
-                    Send Verification OTP
+                        class="w-full py-3.5 rounded-full bg-[#05A357] hover:bg-[#047A43] text-white font-black text-xs transition shadow-md shadow-[#05A357]/20 border-0 cursor-pointer flex items-center justify-center gap-2">
+                    <i class="fas fa-key text-xs"></i>
+                    <span>Generate Verification OTP</span>
                 </button>
             </div>
         </div>
@@ -1004,27 +1014,36 @@
 
     <!-- OTP Screen -->
     <div id="cust-otp"
-         class="hidden w-full max-w-[360px] bg-white rounded-[32px] p-8 shadow-2xl border border-[#E2E8F0] relative">
-        <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-zinc-400 hover:text-zinc-600"><i
-                class="fas fa-times"></i></button>
-        <div class="text-center space-y-6">
-            <h3 class="text-xl font-black text-[#2D3748]">Confirm OTP</h3>
-            <p class="text-xs text-zinc-500" id="otp-phone-text">We sent a verification SMS to your phone</p>
-            <div class="space-y-4 text-left">
+         class="hidden w-full max-w-[380px] bg-white rounded-[32px] p-7 shadow-2xl border border-[#E2E8F0] relative">
+        <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-zinc-400 hover:text-zinc-600"><i class="fas fa-times"></i></button>
+        <div class="text-center space-y-5">
+            <h3 class="text-xl font-black text-[#2D3748]">Confirm OTP Code</h3>
+            
+            <!-- System OTP Display Banner -->
+            <div class="bg-[#05A357]/10 border border-[#05A357]/30 rounded-2xl p-4 text-center space-y-1">
+                <p class="text-[9px] uppercase tracking-widest text-[#05A357] font-black">System Generated OTP Code</p>
+                <p class="text-3xl font-black tracking-widest text-[#05A357]" id="generated-otp-display">------</p>
+                <button onclick="autoFillOTP()" class="mt-1 text-[11px] font-bold text-[#05A357] underline hover:text-[#047A43] cursor-pointer inline-flex items-center gap-1">
+                    <i class="fas fa-magic"></i> Auto-fill Code
+                </button>
+            </div>
+
+            <p class="text-xs text-zinc-500 font-medium" id="otp-phone-text">Verification code generated for your account.</p>
+            <div class="space-y-3.5 text-left">
                 <div>
-                    <label class="block text-[9px] font-black text-zinc-500 mb-1.5 uppercase tracking-wider">Enter
-                        4-Digit Code</label>
-                    <input type="text" id="cust-otp-input" placeholder="Enter 1234"
-                           class="w-full px-4 py-3 rounded-xl bg-[#F7F9FA] border border-[#E2E8F0] text-[#2D3748] text-center text-lg tracking-widest font-bold focus:outline-none focus:border-[#00A082]"
+                    <label class="block text-[9px] font-black text-zinc-500 mb-1 uppercase tracking-wider">Enter 6-Digit Code</label>
+                    <input type="text" id="cust-otp-input" placeholder="e.g. 123456" maxlength="6"
+                           class="w-full px-4 py-3 rounded-xl bg-[#F7F9FA] border border-[#E2E8F0] text-[#2D3748] text-center text-xl tracking-widest font-black focus:outline-none focus:border-[#05A357] transition"
                            value="">
                 </div>
                 <button onclick="verifyOTP()"
-                        class="w-full py-3.5 rounded-full bg-[#00A082] text-white font-bold text-xs hover:bg-[#008A70] transition shadow-md shadow-[#00A082]/10 border-0 cursor-pointer">
-                    Verify Code
+                        class="w-full py-3.5 rounded-full bg-[#05A357] hover:bg-[#047A43] text-white font-black text-xs transition shadow-md shadow-[#05A357]/20 border-0 cursor-pointer flex items-center justify-center gap-2">
+                    <i class="fas fa-check-circle text-xs"></i>
+                    <span>Verify Code & Login</span>
                 </button>
                 <button onclick="showAuthScreen()"
-                        class="w-full py-2 rounded-full text-zinc-400 hover:text-zinc-600 text-xs font-bold text-center transition">
-                    Go Back
+                        class="w-full py-2 rounded-full text-zinc-400 hover:text-zinc-700 text-xs font-bold text-center transition cursor-pointer">
+                    <i class="fas fa-arrow-left mr-1"></i> Edit Registration Details
                 </button>
             </div>
         </div>
@@ -1685,39 +1704,74 @@
         renderVendors();
     }
 
+    let lastGeneratedOTP = '';
+
     async function sendOTP() {
-        const phone = document.getElementById('cust-phone-input').value;
+        const name  = document.getElementById('cust-name-input').value.trim();
+        const phone = document.getElementById('cust-phone-input').value.trim();
+        const email = document.getElementById('cust-email-input').value.trim();
+
         if (!phone) {
-            alert("Please enter phone number!");
+            alert("Please enter a valid phone number!");
             return;
         }
+
         try {
             const res = await fetch(`${API_BASE}/auth/login`, {
-                method: 'POST',
+                method:  'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({phone})
+                body:    JSON.stringify({ phone, name, email })
             });
-            if (res.ok) {
+            const data = await res.json();
+
+            if (res.ok && data.status === 'success') {
                 playSound('beep');
-                document.getElementById('otp-phone-text').textContent = `Verification SMS sent to ${phone}`;
+                lastGeneratedOTP = data.otp || '';
+
+                // Display system-generated OTP on screen
+                document.getElementById('generated-otp-display').textContent = lastGeneratedOTP || '------';
+                document.getElementById('otp-phone-text').textContent = `Verification code generated for ${phone}`;
+
+                // Auto-fill OTP input field for 1-click verification
+                document.getElementById('cust-otp-input').value = lastGeneratedOTP;
+
                 document.getElementById('cust-auth').classList.add('hidden');
                 document.getElementById('cust-otp').classList.remove('hidden');
+            } else {
+                alert(data.message || 'Failed to generate verification OTP.');
             }
         } catch (e) {
+            alert('Network error connecting to authentication server.');
+        }
+    }
+
+    function autoFillOTP() {
+        if (lastGeneratedOTP) {
+            document.getElementById('cust-otp-input').value = lastGeneratedOTP;
+            playSound('beep');
         }
     }
 
     async function verifyOTP() {
-        const phone = document.getElementById('cust-phone-input').value;
-        const code = document.getElementById('cust-otp-input').value;
+        const name  = document.getElementById('cust-name-input').value.trim();
+        const phone = document.getElementById('cust-phone-input').value.trim();
+        const email = document.getElementById('cust-email-input').value.trim();
+        const code  = document.getElementById('cust-otp-input').value.trim();
+
+        if (!code) {
+            alert("Please enter the 6-digit OTP code!");
+            return;
+        }
+
         try {
             const res = await fetch(`${API_BASE}/auth/verify`, {
-                method: 'POST',
+                method:  'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({phone, code})
+                body:    JSON.stringify({ phone, code, name, email })
             });
             const data = await res.json();
-            if (res.ok) {
+
+            if (res.ok && data.status === 'success') {
                 playSound('success');
                 currentUser = data.user;
                 // Store user + token together
@@ -1731,9 +1785,10 @@
                     checkoutOrder();
                 }
             } else {
-                alert(data.message);
+                alert(data.message || 'OTP verification failed.');
             }
         } catch (e) {
+            alert('Network error verifying code.');
         }
     }
 

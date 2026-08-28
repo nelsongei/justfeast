@@ -31,8 +31,8 @@ class OtpService
             ]
         );
 
-        // Send via SMS service out-of-band
-        $this->smsService->sendOtp($phone, $plainCode);
+        // Log system generated OTP locally
+        Log::channel('single')->info("[System OTP Generated] Phone: {$phone} | Code: {$plainCode}");
 
         return $plainCode;
     }
