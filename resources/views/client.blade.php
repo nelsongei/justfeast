@@ -620,11 +620,9 @@
                                 </p>
                             </div>
                         </div>
-                        <div id="cust-profile-action" class="shrink-0">
                             <button onclick="openAuthModal()" class="px-3.5 py-1.5 bg-[#FFC244] hover:bg-[#E0A325] text-[#0F172A] rounded-full text-xs font-black transition border border-[#E0A325] shadow-xs cursor-pointer">
-                                Log In
+                                Register / Log In
                             </button>
-                        </div>
                     </div>
 
                     <!-- Desktop Cart Basket Tray -->
@@ -1290,19 +1288,19 @@
                 sidebarPassBadge.className = 'bg-slate-100 text-slate-500 text-[8.5px] font-black uppercase px-2 py-0.5 rounded-full shrink-0 border border-slate-200';
             }
             if (sidebarStatusText) {
-                sidebarStatusText.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-slate-300"></span> Tap Log In to order`;
+                sidebarStatusText.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-slate-300"></span> Tap Register / Log In to order`;
             }
             if (sidebarAction) {
                 sidebarAction.innerHTML = `
                         <button onclick="openAuthModal()" class="px-3.5 py-1.5 bg-[#FFC244] hover:bg-[#E0A325] text-[#0F172A] rounded-full text-xs font-black transition border border-[#E0A325] shadow-xs cursor-pointer">
-                            Log In
+                            Register / Log In
                         </button>
                     `;
             }
             if (authButtonsContainer) {
                 authButtonsContainer.innerHTML = `
                         <button onclick="openAuthModal()" class="px-3.5 sm:px-5 py-1.5 sm:py-2.5 text-[10px] sm:text-xs font-black text-[#2D3748] bg-[#FFC244] hover:bg-[#E0A325] border border-[#E0A325] rounded-full transition shadow-sm cursor-pointer focus:outline-none whitespace-nowrap">
-                            Log In
+                            Register / Log In
                         </button>
                     `;
             }
