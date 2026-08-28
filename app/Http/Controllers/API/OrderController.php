@@ -9,7 +9,7 @@ use App\Models\Product;
 use App\Models\Vendor;
 use App\Models\User;
 use App\Models\Delivery;
-use App\Services\IntaSendService;
+use App\Services\MpesaDarajaService;
 use App\Services\RunnerAllocationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -176,31 +176,28 @@ class OrderController extends Controller
 
     /**
      * POST /api/orders/{order}/pay
+     * Triggers an M-Pesa STK Push prompt to the customer's phone number.
      */
-    public function pay(Request $request, Order $order, IntaSendService $intaSend)
+    public function pay(Request $request, Order $order, MpesaDarajaService $mpesaService)
     {
         $this->authorize('pay', $order);
 
-        $user      = $request->user();
-        $phone     = IntaSendService::formatPhone($request->input('phone', $user->phone ?? '0700000000'));
-        $nameParts = explode(' ', trim($user->name ?? 'Customer Account'), 2);
-        $firstName = $nameParts[0];
-        $lastName  = $nameParts[1] ?? 'User';
+        $user   = $request->user();
+        $phone  = MpesaDarajaService::formatPhone($request->input('phone', $user->phone ?? '0700000000'));
+        $result = $mpesaService->initiateStkPush($order, $phone);
 
-        $result = $intaSend->initiateSTKPush($order, $phone, $user->email, $firstName, $lastName);
-
-        if ($result['success'] && isset($result['invoice_id'])) {
+        if ($result['success'] && isset($result['checkout_request_id'])) {
             $order->update([
-                'intasend_invoice_id' => $result['invoice_id'],
-                'intasend_ref'        => $result['api_ref'],
+                'mpesa_checkout_request_id' => $result['checkout_request_id'],
+                'mpesa_merchant_request_id' => $result['merchant_request_id'] ?? null,
             ]);
         }
 
         return response()->json([
-            'status'     => $result['success'] ? 'success' : 'error',
-            'message'    => $result['message'],
-            'invoice_id' => $result['invoice_id'] ?? null,
-            'order_id'   => $order->id,
+            'status'              => $result['success'] ? 'success' : 'error',
+            'message'             => $result['message'],
+            'checkout_request_id' => $result['checkout_request_id'] ?? null,
+            'order_id'            => $order->id,
         ]);
     }
 
@@ -208,7 +205,7 @@ class OrderController extends Controller
      * GET /api/orders/{order}/payment-status
      * Returns payment status and calculates exponential backoff polling interval: 2s -> 3s -> 5s -> 8s -> 15s -> 30s
      */
-    public function checkPaymentStatus(Request $request, Order $order, IntaSendService $intaSend)
+    public function checkPaymentStatus(Request $request, Order $order, MpesaDarajaService $mpesaService)
     {
         $this->authorize('view', $order);
 
@@ -218,35 +215,43 @@ class OrderController extends Controller
 
         if ($order->payment_status === 'paid') {
             return response()->json([
-                'status'                       => 'success',
-                'payment_status'               => 'paid',
-                'order_status'                 => $order->order_status,
-                'next_poll_interval_seconds'   => 0, // Terminal state reached, stop polling
+                'status'                     => 'success',
+                'payment_status'             => 'paid',
+                'order_status'               => $order->order_status,
+                'next_poll_interval_seconds' => 0, // Terminal state reached
             ]);
         }
 
-        if (!$order->intasend_invoice_id) {
+        if (!$order->mpesa_checkout_request_id) {
             return response()->json([
-                'status'                       => 'pending',
-                'payment_status'               => $order->payment_status,
-                'order_status'                 => $order->order_status,
-                'next_poll_interval_seconds'   => $nextPollInterval,
+                'status'                     => 'pending',
+                'payment_status'             => $order->payment_status,
+                'order_status'               => $order->order_status,
+                'next_poll_interval_seconds' => $nextPollInterval,
             ]);
         }
 
-        $result     = $intaSend->checkPaymentStatus($order->intasend_invoice_id);
+        $result     = $mpesaService->queryStkPushStatus($order->mpesa_checkout_request_id);
         $freshOrder = $order->fresh();
 
-        if ($result['success'] && $result['state'] === 'COMPLETE' && $freshOrder->payment_status === 'paid') {
+        if ($result['success'] && ((string) ($result['result_code'] ?? '')) === '0' && $freshOrder->payment_status === 'pending') {
+            $freshOrder->update([
+                'payment_status'    => 'paid',
+                'order_status'      => 'accepted',
+                'paid_at'           => now(),
+                'payment_reference' => $order->mpesa_checkout_request_id,
+            ]);
+            $freshOrder = $freshOrder->fresh();
             event(new \App\Events\PaymentStatusUpdated($freshOrder, 'paid', $freshOrder->order_status));
         }
 
         return response()->json([
-            'status'                       => $result['success'] ? 'success' : 'error',
-            'payment_status'               => $freshOrder->payment_status,
-            'intasend_state'               => $result['state'],
-            'order_status'                 => $freshOrder->order_status,
-            'next_poll_interval_seconds'   => $freshOrder->payment_status === 'paid' ? 0 : $nextPollInterval,
+            'status'                     => $result['success'] ? 'success' : 'error',
+            'payment_status'             => $freshOrder->payment_status,
+            'mpesa_result_code'          => $result['result_code'],
+            'mpesa_result_desc'          => $result['result_desc'],
+            'order_status'               => $freshOrder->order_status,
+            'next_poll_interval_seconds' => $freshOrder->payment_status === 'paid' ? 0 : $nextPollInterval,
         ]);
     }
 

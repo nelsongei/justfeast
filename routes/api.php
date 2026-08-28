@@ -6,7 +6,7 @@ use App\Http\Controllers\API\EventController;
 use App\Http\Controllers\API\OrderController;
 use App\Http\Controllers\API\RunnerController;
 use App\Http\Controllers\API\AdminController;
-use App\Http\Controllers\API\IntaSendWebhookController;
+use App\Http\Controllers\API\MpesaCallbackController;
 
 /*
 |--------------------------------------------------------------------------
@@ -68,7 +68,6 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 });
 
-// ── IntaSend Webhook (no Sanctum — IntaSend POSTs directly) ──────────────────
-// Challenge secret validated inside the controller.
-Route::post('/intasend/webhook', [IntaSendWebhookController::class, 'handle'])
+// ── Safaricom M-Pesa Callback (no Sanctum — Safaricom POSTs directly) ────────
+Route::post('/mpesa/callback', [MpesaCallbackController::class, 'handle'])
     ->middleware('throttle:webhooks');

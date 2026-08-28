@@ -30,8 +30,8 @@ return new class extends Migration
             if (!$hasIndex('orders', 'orders_payment_created_index')) {
                 $table->index(['payment_status', 'created_at'], 'orders_payment_created_index');
             }
-            if (!$hasIndex('orders', 'orders_intasend_invoice_id_unique')) {
-                $table->unique('intasend_invoice_id', 'orders_intasend_invoice_id_unique');
+            if (Schema::hasColumn('orders', 'mpesa_checkout_request_id') && !$hasIndex('orders', 'orders_mpesa_checkout_request_id_unique')) {
+                $table->unique('mpesa_checkout_request_id', 'orders_mpesa_checkout_request_id_unique');
             }
         });
 

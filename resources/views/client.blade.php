@@ -9,8 +9,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- IntaSend Payment WebSDK -->
-    <script src="https://unpkg.com/intasend-inlinejs-sdk@3.0.2/build/intasend-inline.js"></script>
+    <!-- Safaricom M-Pesa Express Payment Integration -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
           rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -128,20 +127,10 @@
         }
 
         .hero-panel {
-            background: linear-gradient(135deg, #A31D1D 0%, #841313 50%, #630C0C 100%);
+            background: #A31D1D;
             position: relative;
             overflow: hidden;
             box-shadow: 0 20px 40px -10px rgba(163, 29, 29, 0.35);
-        }
-
-        .hero-panel::before {
-            content: '';
-            position: absolute;
-            inset: -20%;
-            background:
-                radial-gradient(circle at 75% 30%, rgba(255, 194, 68, 0.25), transparent 18rem),
-                linear-gradient(120deg, transparent 0% 46%, rgba(255, 255, 255, 0.07) 47% 49%, transparent 50% 100%);
-            pointer-events: none;
         }
 
         .floating-food {
@@ -329,7 +318,7 @@
     <!-- App Header -->
     <header class="jf-card rounded-[24px] sm:rounded-[32px] px-3 sm:px-5 md:px-7 py-3 md:py-4 mb-6 flex items-center justify-between sticky top-3 z-40 border border-white/40 shadow-2xl backdrop-blur-xl bg-white/80">
         <div class="flex items-center gap-2 sm:gap-3.5 min-w-0">
-            <div class="w-9 h-9 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-gradient-to-br from-[#A31D1D] to-[#841313] p-0.5 shadow-lg shadow-[#A31D1D]/20 flex items-center justify-center overflow-hidden shrink-0 group hover:scale-105 transition duration-300">
+            <div class="w-9 h-9 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-[#A31D1D] p-0.5 shadow-lg shadow-[#A31D1D]/20 flex items-center justify-center overflow-hidden shrink-0 group hover:scale-105 transition duration-300">
                 <div class="w-full h-full bg-white rounded-[10px] sm:rounded-[14px] flex items-center justify-center p-1">
                     <img src="{{ asset('images/logo/jm.png') }}" alt="justFeast Logo" class="h-5 sm:h-8 w-auto object-contain">
                 </div>
@@ -387,7 +376,7 @@
                         <div class="space-y-3 sm:space-y-4">
                             <h2 class="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[0.98] sm:leading-[0.95] text-white">
                                 Never miss a beat.<br class="hidden md:block">
-                                Food <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#FFC244] to-[#FF9100]">finds your seat.</span>
+                                Food <span class="text-[#FFC244]">finds your seat.</span>
                             </h2>
                             <p class="text-slate-200/90 text-xs sm:text-sm md:text-base leading-relaxed max-w-xl font-medium">
                                 Pin your precise location on the map, choose your favorite concert meals, pay instantly with M-Pesa, and track your runner in real-time.
@@ -406,7 +395,7 @@
                                 </span>
                             </button>
                             <a href="#vendors"
-                               class="btn-glow inline-flex justify-center items-center gap-2 sm:gap-2.5 bg-gradient-to-r from-[#FFC244] to-[#E0A325] hover:from-[#E0A325] hover:to-[#C28916] text-[#0F172A] px-5 sm:px-8 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl md:rounded-full text-xs sm:text-sm font-black transition-all shadow-lg">
+                               class="btn-glow inline-flex justify-center items-center gap-2 sm:gap-2.5 bg-[#FFC244] hover:bg-[#E0A325] text-[#0F172A] px-5 sm:px-8 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl md:rounded-full text-xs sm:text-sm font-black transition-all shadow-lg">
                                 Explore Vendors <i class="fas fa-arrow-right text-xs"></i>
                             </a>
                         </div>
@@ -439,7 +428,7 @@
                             <div class="absolute inset-0 stadium-bowl rounded-full border border-white/20 opacity-80 shadow-2xl"></div>
 
                             <!-- Center stage node -->
-                            <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 sm:w-52 sm:h-52 rounded-full bg-gradient-to-tr from-[#FFC244] to-[#FF9100] shadow-2xl flex items-center justify-center text-[#0F172A] text-center p-4 sm:p-6 border-4 border-white/30 z-10">
+                            <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 sm:w-52 sm:h-52 rounded-full bg-[#FFC244] shadow-2xl flex items-center justify-center text-[#0F172A] text-center p-4 sm:p-6 border-4 border-white/30 z-10">
                                 <div>
                                     <div class="w-9 h-9 sm:w-12 sm:h-12 mx-auto bg-[#0F172A] text-[#FFC244] rounded-full flex items-center justify-center mb-1.5 sm:mb-2 shadow-lg">
                                         <i class="fas fa-music text-sm sm:text-xl"></i>
@@ -497,7 +486,7 @@
                         <span class="text-xs text-slate-400 font-bold">Fast seat delivery</span>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div class="bg-gradient-to-br from-[#FFF8E7] to-[#FFF3D6] rounded-[28px] p-5 border border-[#F7E5B2] hover:shadow-md transition">
+                        <div class="bg-[#FFF8E7] rounded-[28px] p-5 border border-[#F7E5B2] hover:shadow-md transition">
                             <div class="w-11 h-11 rounded-2xl bg-[#FFC244] text-[#0F172A] flex items-center justify-center mb-3 shadow-md shadow-[#FFC244]/30">
                                 <i class="fas fa-map-location-dot text-lg"></i>
                             </div>
@@ -592,7 +581,7 @@
                     </div>
 
                     <!-- Live Event Promo Banner -->
-                    <div class="relative overflow-hidden rounded-[36px] bg-gradient-to-r from-[#A31D1D] via-[#841313] to-[#630C0C] p-6 md:p-7 flex flex-col md:flex-row md:items-center justify-between gap-5 text-white shadow-xl shadow-[#A31D1D]/20 border border-white/10">
+                    <div class="relative overflow-hidden rounded-[36px] bg-[#A31D1D] p-6 md:p-7 flex flex-col md:flex-row md:items-center justify-between gap-5 text-white shadow-xl shadow-[#A31D1D]/20 border border-white/10">
                         <div class="absolute -right-8 -top-10 text-[180px] opacity-10 pointer-events-none">🎤</div>
                         <div class="relative z-10 space-y-2">
                             <span class="inline-flex items-center gap-1.5 bg-[#FFC244] text-[#0F172A] text-[9.5px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-sm">
@@ -616,7 +605,7 @@
                     <!-- User Profile Card -->
                     <div class="jf-card rounded-[32px] p-4 flex items-center justify-between border border-slate-200/90 shadow-sm bg-white hover:shadow-md transition">
                         <div class="flex items-center gap-3.5">
-                            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#A31D1D] via-[#FFC244] to-[#FF9100] p-0.5 shadow-md shadow-[#A31D1D]/15 flex items-center justify-center overflow-hidden shrink-0">
+                            <div class="w-12 h-12 rounded-2xl bg-[#A31D1D] p-0.5 shadow-md shadow-[#A31D1D]/15 flex items-center justify-center overflow-hidden shrink-0">
                                 <div class="w-full h-full bg-white rounded-[14px] flex items-center justify-center text-[#0F172A] font-black text-sm">
                                     <i class="fas fa-user-tag text-[#A31D1D]"></i>
                                 </div>
@@ -706,12 +695,12 @@
 
                             <!-- Checkout Action Button -->
                             <button onclick="checkoutOrder()"
-                                    class="w-full py-4 bg-gradient-to-r from-[#A31D1D] via-[#841313] to-[#630C0C] hover:from-[#841313] hover:to-[#4D0707] text-white rounded-full text-xs font-black shadow-xl shadow-[#A31D1D]/25 hover:shadow-2xl transition-all flex items-center justify-center gap-2.5 cursor-pointer hover:scale-[1.02] active:scale-[0.98]">
+                                    class="w-full py-4 bg-[#A31D1D] hover:bg-[#841313] text-white rounded-full text-xs font-black shadow-xl shadow-[#A31D1D]/25 hover:shadow-2xl transition-all flex items-center justify-center gap-2.5 cursor-pointer hover:scale-[1.02] active:scale-[0.98]">
                                 <span class="inline-flex items-center justify-center bg-white px-2.5 py-0.5 rounded-full h-7 overflow-hidden shadow-xs">
                                     <img src="{{ asset('images/logo/mpesa.png') }}" alt="M-Pesa" class="h-5 w-auto object-contain scale-110">
                                 </span>
                                 <span class="text-white/40 text-xs">·</span>
-                                <span class="font-black tracking-tight text-white">Pay via IntaSend M-Pesa</span>
+                                <span class="font-black tracking-tight text-white">Pay via M-Pesa STK Push</span>
                                 <i class="fas fa-arrow-right text-xs text-[#FFC244]"></i>
                             </button>
                         </div>
@@ -830,7 +819,7 @@
                     <img src="{{ asset('images/logo/mpesa.png') }}" alt="M-Pesa" class="h-6 w-auto object-contain scale-110">
                 </span>
                 <span class="text-white/30 text-xs">·</span>
-                <span class="font-black tracking-tight">IntaSend Checkout</span>
+                <span class="font-black tracking-tight">M-Pesa STK Push</span>
                 <i class="fas fa-arrow-right ml-1 text-xs text-[#FFC244]"></i>
             </button>
         </div>
@@ -838,7 +827,7 @@
 </div>
 
 <footer class="mt-10 bg-[#0B1117] text-white relative overflow-hidden">
-    <div class="h-1 bg-gradient-to-r from-[#FFC244] via-[#A31D1D] to-[#FFC244]"></div>
+    <div class="h-1 bg-[#A31D1D]"></div>
     <div class="max-w-[1480px] mx-auto px-5 md:px-8 py-12 grid grid-cols-1 md:grid-cols-12 gap-8">
         <div class="md:col-span-5 space-y-4">
             <div class="flex items-center gap-3">
@@ -887,71 +876,93 @@
         </div>
     </div>
 </footer>
-<!-- IntaSend Payment Overlay -->
-<div id="intasend-payment-overlay"
+<!-- M-Pesa Payment Overlay -->
+<div id="mpesa-payment-overlay"
      class="hidden fixed inset-0 bg-[#111827]/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div
-        class="w-full max-w-[420px] bg-white rounded-[32px] shadow-2xl border border-[#E2E8F0] overflow-hidden">
+    <div class="w-full max-w-[420px] bg-white rounded-[32px] shadow-2xl border border-[#E2E8F0] overflow-hidden">
 
         <!-- Modal header -->
-        <div class="bg-gradient-to-r from-[#111827] to-[#05A357] px-6 py-4 flex items-center justify-between">
+        <div class="bg-[#05A357] px-6 py-4 flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <span
-                    class="inline-flex items-center justify-center bg-white px-2 rounded-full h-8 w-14 overflow-hidden">
-                    <img src="{{ asset('images/logo/mpesa.png') }}" alt="M-Pesa"
-                         class="h-6 w-auto object-contain scale-110"
-                         onerror="this.outerHTML='<span class=\'text-[#05A357] font-black text-[9px]\'>M-PESA</span>'">
+                <span class="inline-flex items-center justify-center bg-white px-2.5 py-1 rounded-full h-8 overflow-hidden shadow-xs border border-emerald-200">
+                    <img src="{{ asset('images/logo/mpesa.png') }}" alt="M-Pesa" class="h-6 w-auto object-contain"
+                         onerror="this.outerHTML='<span class=\'text-[#05A357] font-black text-[11px]\'>M-PESA</span>'">
                 </span>
-                <span class="text-white/30">·</span>
-                <span class="text-white font-black text-sm tracking-tight">IntaSend Checkout</span>
+                <span class="text-white/40">·</span>
+                <span class="text-white font-black text-sm tracking-tight">M-Pesa Express Checkout</span>
             </div>
-            <button onclick="closeIntaSendOverlay()" class="text-white/60 hover:text-white text-lg leading-none">&times;</button>
+            <button onclick="closeMpesaOverlay()" class="text-white/80 hover:text-white text-xl font-bold leading-none cursor-pointer">&times;</button>
         </div>
 
-        <!-- Order summary -->
+        <!-- Order summary & states -->
         <div class="px-6 py-5 space-y-4">
-            <div class="text-center space-y-1">
-                <p class="text-[10px] uppercase tracking-widest text-zinc-400 font-black">Pay securely via</p>
-                <p class="text-2xl font-black text-[#111827]" id="intasend-amount-display">Ksh 0</p>
-                <p class="text-xs text-zinc-500">M-Pesa · Card · Google Pay · Bank</p>
+            <div class="text-center space-y-1.5">
+                <p class="text-[10px] uppercase tracking-widest text-zinc-400 font-black">Total Payment</p>
+                <p class="text-3xl font-black text-[#05A357]" id="mpesa-amount-display">Ksh 0</p>
+                <div class="inline-flex items-center gap-1.5 bg-[#05A357]/10 text-[#05A357] px-3 py-1 rounded-full text-xs font-black">
+                    <img src="{{ asset('images/logo/mpesa.png') }}" alt="M-Pesa" class="h-4 w-auto object-contain"
+                         onerror="this.outerHTML='<span class=\'text-[#05A357] font-black text-[9px]\'>M-PESA</span>'">
+                    <span>Lipa Na M-Pesa STK Push</span>
+                </div>
             </div>
 
-            <!-- Loading state (while creating order) -->
-            <div id="intasend-loading-state" class="text-center py-6 space-y-3">
-                <div class="relative w-12 h-12 mx-auto">
+            <!-- Input state (Enter / Confirm phone number) -->
+            <div id="mpesa-input-state" class="space-y-4 pt-2">
+                <div>
+                    <label class="block text-xs font-black text-zinc-700 mb-1.5">M-Pesa Phone Number</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400 text-sm font-bold"><i class="fas fa-phone text-[#05A357]"></i></span>
+                        <input type="tel" id="mpesa-phone-input" placeholder="e.g. 0712345678"
+                               class="w-full pl-10 pr-4 py-3 bg-zinc-50 border border-zinc-200 rounded-2xl text-sm font-bold text-zinc-800 focus:outline-none focus:border-[#05A357] focus:bg-white transition">
+                    </div>
+                    <p class="text-[10px] text-zinc-400 mt-1 font-medium">You will receive an M-Pesa PIN prompt on this phone.</p>
+                </div>
+
+                <button onclick="triggerMpesaStkPush()"
+                        class="w-full py-4 bg-[#05A357] hover:bg-[#047A43] text-white rounded-2xl text-sm font-black shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2.5 cursor-pointer">
+                    <span class="bg-white px-2 py-0.5 rounded-full inline-flex items-center justify-center shadow-xs">
+                        <img src="{{ asset('images/logo/mpesa.png') }}" alt="M-Pesa" class="h-4.5 w-auto object-contain"
+                             onerror="this.outerHTML='<span class=\'text-[#05A357] font-black text-[9px]\'>M-PESA</span>'">
+                    </span>
+                    <span>Pay with M-Pesa Express</span>
+                    <i class="fas fa-arrow-right text-xs"></i>
+                </button>
+            </div>
+
+            <!-- Loading state (Creating order & sending STK Push) -->
+            <div id="mpesa-loading-state" class="hidden text-center py-6 space-y-3">
+                <div class="relative w-14 h-14 mx-auto flex items-center justify-center">
                     <div class="absolute inset-0 border-4 border-[#05A357]/20 rounded-full"></div>
                     <div class="absolute inset-0 border-4 border-[#05A357] border-t-transparent rounded-full animate-spin"></div>
+                    <img src="{{ asset('images/logo/mpesa.png') }}" alt="M-Pesa" class="h-5 w-auto object-contain"
+                         onerror="this.outerHTML='<span class=\'text-[#05A357] font-black text-[9px]\'>M-PESA</span>'">
                 </div>
-                <p class="text-xs text-zinc-500 font-bold">Preparing your order...</p>
+                <p class="text-xs text-zinc-600 font-bold" id="mpesa-loading-msg">Sending M-Pesa prompt to phone...</p>
             </div>
 
-            <!-- IntaSend button container (rendered after order is created) -->
-            <div id="intasend-button-container" class="hidden space-y-3">
-                <p class="text-[10px] text-zinc-400 text-center font-bold">Choose your preferred payment method below:</p>
-                <!-- IntaSend injects its button here -->
-                <div id="intasend-btn-target" class="flex flex-col gap-2.5"></div>
-                <p class="text-[9px] text-zinc-300 text-center">Powered by IntaSend · 256-bit encrypted</p>
-            </div>
-
-            <!-- Payment pending state (after user completes IntaSend checkout) -->
-            <div id="intasend-pending-state" class="hidden text-center py-4 space-y-3">
-                <div class="w-12 h-12 mx-auto bg-[#FFC244]/10 rounded-full flex items-center justify-center">
-                    <i class="fas fa-clock text-[#FFC244] text-xl"></i>
+            <!-- Pending / Prompt Sent state -->
+            <div id="mpesa-pending-state" class="hidden text-center py-4 space-y-3">
+                <div class="w-16 h-16 mx-auto bg-[#05A357]/10 rounded-full flex items-center justify-center animate-bounce border border-[#05A357]/20 p-2">
+                    <img src="{{ asset('images/logo/mpesa.png') }}" alt="M-Pesa" class="h-8 w-auto object-contain"
+                         onerror="this.outerHTML='<i class=\'fas fa-mobile-screen-button text-2xl text-[#05A357]\'></i>'">
                 </div>
-                <p class="text-sm font-black text-[#111827]">Confirming payment...</p>
-                <p class="text-xs text-zinc-400">This may take a few seconds. Please wait.</p>
+                <div>
+                    <p class="text-base font-black text-[#111827]">Check Your Phone!</p>
+                    <p class="text-xs text-zinc-500 mt-1" id="mpesa-prompt-phone-label">Enter your M-Pesa PIN on your phone to authorize payment.</p>
+                </div>
                 <div class="h-1.5 w-full bg-zinc-100 rounded-full overflow-hidden">
-                    <div class="h-full bg-[#05A357] rounded-full animate-pulse" style="width:60%"></div>
+                    <div class="h-full bg-[#05A357] rounded-full animate-pulse" style="width:75%"></div>
                 </div>
+                <p class="text-[10px] text-zinc-400 font-medium">Waiting for M-Pesa confirmation...</p>
             </div>
 
             <!-- Error state -->
-            <div id="intasend-error-state" class="hidden text-center py-4 space-y-3">
+            <div id="mpesa-error-state" class="hidden text-center py-4 space-y-3">
                 <div class="w-12 h-12 mx-auto bg-red-50 rounded-full flex items-center justify-center">
-                    <i class="fas fa-times text-red-400 text-xl"></i>
+                    <i class="fas fa-times text-red-500 text-xl"></i>
                 </div>
-                <p class="text-sm font-black text-red-600" id="intasend-error-msg">Payment failed</p>
-                <button onclick="closeIntaSendOverlay()" class="text-xs text-zinc-500 underline">Close and try again</button>
+                <p class="text-sm font-black text-red-600" id="mpesa-error-msg">Payment failed</p>
+                <button onclick="showMpesaState('input')" class="px-4 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-xs font-bold rounded-xl transition cursor-pointer">Try Again</button>
             </div>
         </div>
     </div>
@@ -1391,7 +1402,7 @@
         <!-- Top row: Logo, vendor details, and status badges -->
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-5 border-b border-slate-100 pb-5">
             <div class="flex items-center gap-4.5">
-                <div class="w-16 h-16 rounded-[22px] bg-gradient-to-br from-slate-100 to-slate-200/80 border border-slate-200 shadow-inner flex items-center justify-center text-3xl shrink-0 group-hover:scale-105 transition-transform duration-300">
+                <div class="w-16 h-16 rounded-[22px] bg-slate-100 border border-slate-200 shadow-inner flex items-center justify-center text-3xl shrink-0 group-hover:scale-105 transition-transform duration-300">
                     ${vendor.logo_url || '🍔'}
                 </div>
                 <div>
@@ -1462,7 +1473,7 @@
                 if (p.image_url && p.image_url.startsWith('/')) {
                     imageTag = `<img src="${API_BASE.replace('/api', '') + p.image_url}" class="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500" alt="${p.name}">`;
                 } else {
-                    const gradient = p.image_url || 'bg-gradient-to-br from-amber-400 via-orange-500 to-red-500';
+                    const gradient = p.image_url || 'bg-[#A31D1D]';
                     imageTag = `
                             <div class="w-full h-full ${gradient} flex flex-col items-center justify-center text-white p-4 text-center">
                                 <span class="text-2xl font-black uppercase tracking-wider">${p.name.substring(0, 2)}</span>
@@ -1928,10 +1939,9 @@
         closeSeatModal();
     }
 
-    // ─── IntaSend Checkout Flow ─────────────────────────────────────────────
+    // ─── Safaricom M-Pesa Express Checkout Flow ──────────────────────────────
     let currentOrderId = null;       // order ID pending payment
     let paymentPollTimer = null;     // polling interval for payment confirmation
-    const INTASEND_PUB_KEY = '{{ config('intasend.publishable_key') }}';
 
     function checkoutOrder() {
         if (basket.length === 0) {
@@ -1951,194 +1961,141 @@
         let total = 0;
         basket.forEach(i => total += i.price * i.quantity);
 
-        // Show the IntaSend overlay in loading state
-        document.getElementById('intasend-amount-display').textContent = `Ksh ${total.toLocaleString()}`;
-        showIntaSendState('loading');
-        document.getElementById('intasend-payment-overlay').classList.remove('hidden');
+        document.getElementById('mpesa-amount-display').textContent = `Ksh ${total.toLocaleString()}`;
 
-        // Step 1: Create the order in the backend
-        createOrderAndLaunchIntaSend(total);
+        // Pre-fill user's registered phone number if present
+        const phoneInput = document.getElementById('mpesa-phone-input');
+        if (phoneInput) {
+            phoneInput.value = currentUser.phone || '';
+        }
+
+        showMpesaState('input');
+        document.getElementById('mpesa-payment-overlay').classList.remove('hidden');
     }
 
-    function showIntaSendState(state) {
-        ['loading', 'button', 'pending', 'error'].forEach(s => {
-            const el = document.getElementById(`intasend-${s}-state`) ||
-                       document.getElementById(`intasend-${s === 'button' ? 'button-container' : s + '-state'}`);
+    function showMpesaState(state) {
+        ['input', 'loading', 'pending', 'error'].forEach(s => {
+            const el = document.getElementById(`mpesa-${s}-state`);
             if (el) el.classList.add('hidden');
         });
-        // map state names to element IDs
-        const idMap = {
-            loading: 'intasend-loading-state',
-            button:  'intasend-button-container',
-            pending: 'intasend-pending-state',
-            error:   'intasend-error-state',
-        };
-        const target = document.getElementById(idMap[state]);
+        const target = document.getElementById(`mpesa-${state}-state`);
         if (target) target.classList.remove('hidden');
     }
 
-    function closeIntaSendOverlay() {
-        document.getElementById('intasend-payment-overlay').classList.add('hidden');
+    function closeMpesaOverlay() {
+        document.getElementById('mpesa-payment-overlay').classList.add('hidden');
         if (paymentPollTimer) clearInterval(paymentPollTimer);
         paymentPollTimer = null;
     }
 
-    async function createOrderAndLaunchIntaSend(total) {
-        const payload = {
-            vendor_id:     basket[0].vendorId,
-            seat_location: selectedSeat,
-            items:         basket.map(i => ({product_id: i.id, quantity: i.quantity}))
-        };
+    async function triggerMpesaStkPush() {
+        const phone = document.getElementById('mpesa-phone-input').value.trim();
+        if (!phone) {
+            alert("Please enter a valid M-Pesa phone number!");
+            return;
+        }
+
+        showMpesaState('loading');
+        document.getElementById('mpesa-loading-msg').textContent = "Sending STK Push prompt to your phone...";
 
         try {
-            const res = await authFetch(`${API_BASE}/orders`, {
+            // Step 1: Create Order if not already created
+            if (!currentOrderId) {
+                const payload = {
+                    vendor_id:     basket[0].vendorId,
+                    seat_location: selectedSeat,
+                    items:         basket.map(i => ({product_id: i.id, quantity: i.quantity}))
+                };
+
+                const orderRes = await authFetch(`${API_BASE}/orders`, {
+                    method:  'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body:    JSON.stringify(payload)
+                });
+                const orderData = await orderRes.json();
+
+                if (!orderRes.ok) {
+                    showMpesaState('error');
+                    document.getElementById('mpesa-error-msg').textContent = orderData.message || 'Failed to create order.';
+                    return;
+                }
+                currentOrderId = orderData.order.id;
+            }
+
+            // Step 2: Trigger STK Push API call
+            const payRes = await authFetch(`${API_BASE}/orders/${currentOrderId}/pay`, {
                 method:  'POST',
                 headers: {'Content-Type': 'application/json'},
-                body:    JSON.stringify(payload)
+                body:    JSON.stringify({ phone })
             });
-            const data = await res.json();
+            const payData = await payRes.json();
 
-            if (!res.ok) {
-                showIntaSendState('error');
-                document.getElementById('intasend-error-msg').textContent = data.message || 'Failed to create order.';
+            if (!payRes.ok || payData.status === 'error') {
+                showMpesaState('error');
+                document.getElementById('mpesa-error-msg').textContent = payData.message || 'Failed to trigger M-Pesa STK Push.';
                 return;
             }
 
-            currentOrderId = data.order.id;
+            // Step 3: STK Push initiated successfully -> Transition to pending prompt state
+            playSound('beep');
+            showMpesaState('pending');
+            document.getElementById('mpesa-prompt-phone-label').textContent = `M-Pesa PIN prompt sent to ${phone}. Enter PIN to confirm.`;
 
-            // Step 2: Mount IntaSend Payment Button
-            mountIntaSendButton(currentOrderId, total);
+            // Step 4: Poll payment status until confirmed
+            confirmOrderFromMpesa(currentOrderId);
 
         } catch (e) {
-            showIntaSendState('error');
-            document.getElementById('intasend-error-msg').textContent = 'A network error occurred. Please try again.';
+            showMpesaState('error');
+            document.getElementById('mpesa-error-msg').textContent = 'Network error during payment initiation. Please try again.';
         }
     }
 
-    function mountIntaSendButton(orderId, amount) {
-        const btnTarget = document.getElementById('intasend-btn-target');
-        btnTarget.innerHTML = '';
+    async function confirmOrderFromMpesa(orderId) {
+        if (paymentPollTimer) clearInterval(paymentPollTimer);
 
-        const btn = document.createElement('button');
-        btn.id = 'intaSendPayBtn';
-        btn.className = 'w-full py-4 bg-[#05A357] hover:bg-[#047A43] text-white rounded-2xl text-sm font-black shadow-lg transition flex items-center justify-center gap-2 cursor-pointer';
-        btn.innerHTML = '<i class="fas fa-lock mr-1"></i> Pay Now — All Methods Accepted';
-
-        btnTarget.appendChild(btn);
-        showIntaSendState('button');
-
-        btn.onclick = () => {
-            console.log("Triggering IntaSend checkout modal for Order #", orderId);
-            try {
-                if (window.IntaSend) {
-                    const key = INTASEND_PUB_KEY || 'ISPubKey_test_a1043e77-4048-42e0-bc5a-6ddab866e421';
-                    const intaSend = new window.IntaSend({
-                        publicAPIKey: key,
-                        live: false,
-                    });
-
-                    intaSend
-                        .on('COMPLETE', async (response) => {
-                            playSound('success');
-                            showIntaSendState('pending');
-                            await approveDemoPayment();
-                        })
-                        .on('FAILED', (response) => {
-                            showIntaSendState('error');
-                            document.getElementById('intasend-error-msg').textContent =
-                                response.failed_reason || 'Payment was not completed. Please try again.';
-                        });
-
-                    intaSend.run({
-                        amount: String(amount),
-                        currency: 'KES',
-                        email: (currentUser && currentUser.email) ? currentUser.email : 'customer@justfeast.co.ke',
-                        first_name: ((currentUser && currentUser.name) ? currentUser.name : 'Customer').split(' ')[0],
-                        last_name: ((currentUser && currentUser.name) ? currentUser.name : '').split(' ').slice(1).join(' ') || 'User',
-                        phone_number: (currentUser && currentUser.phone) ? currentUser.phone : '254700000000',
-                        api_ref: `order-${orderId}`,
-                        host: window.location.origin,
-                        comment: `Payment for Order #${orderId}`
-                    });
-                    return;
-                }
-            } catch (e) {
-                console.error("IntaSend run error:", e);
-            }
-
-            // Fallback for sandbox / offline test mode
-            approveDemoPayment();
-        };
-    }
-
-    async function approveDemoPayment() {
-        if (!currentOrderId) return;
-        playSound('success');
-        showIntaSendState('pending');
-
-        // Poll payment-status instead of hitting test-pay (which is removed)
-        setTimeout(async () => {
-            try {
-                const orderRes = await authFetch(`${API_BASE}/orders/${currentOrderId}`);
-                const orderData = await orderRes.json();
-                activeOrder = { order: orderData };
-                basket = [];
-                renderBasket();
-
-                closeIntaSendOverlay();
-                document.getElementById('cust-main').classList.add('hidden');
-                document.getElementById('cust-tracker').classList.remove('hidden');
-                updateRadarUI(orderData);
-                syncActiveOrder();
-            } catch(err) {
-                console.error("Order transition error:", err);
-            }
-        }, 600);
-    }
-
-    async function confirmOrderFromIntaSend(orderId) {
-        // Poll our backend to confirm the order is marked 'paid' (webhook may have fired by now)
         let attempts = 0;
-        const maxAttempts = 20; // 20 × 3s = 60s max wait
+        const maxAttempts = 25; // 25 × 3s = 75s max poll duration
 
         paymentPollTimer = setInterval(async () => {
             attempts++;
             try {
-                const res = await authFetch(`${API_BASE}/orders/${orderId}/payment-status`);
+                const res = await authFetch(`${API_BASE}/orders/${orderId}/payment-status?attempt=${attempts}`);
                 const data = await res.json();
 
                 if (data.payment_status === 'paid') {
                     clearInterval(paymentPollTimer);
                     paymentPollTimer = null;
+                    playSound('success');
 
-                    // Fetch full order and transition to tracker
+                    // Fetch complete order details and transition to radar tracker
                     const orderRes = await authFetch(`${API_BASE}/orders/${orderId}`);
                     const orderData = await orderRes.json();
-                    activeOrder = {order: orderData};
+                    activeOrder = { order: orderData };
                     basket = [];
                     renderBasket();
 
-                    closeIntaSendOverlay();
+                    closeMpesaOverlay();
+                    currentOrderId = null;
                     document.getElementById('cust-main').classList.add('hidden');
                     document.getElementById('cust-tracker').classList.remove('hidden');
                     updateRadarUI(orderData);
                     syncActiveOrder();
 
-                } else if (data.payment_status === 'failed' || data.intasend_state === 'FAILED') {
+                } else if (data.payment_status === 'failed') {
                     clearInterval(paymentPollTimer);
                     paymentPollTimer = null;
-                    showIntaSendState('error');
-                    document.getElementById('intasend-error-msg').textContent = 'Payment failed. Please try again.';
+                    showMpesaState('error');
+                    document.getElementById('mpesa-error-msg').textContent = 'M-Pesa payment was cancelled or failed. Please try again.';
 
                 } else if (attempts >= maxAttempts) {
                     clearInterval(paymentPollTimer);
                     paymentPollTimer = null;
-                    showIntaSendState('error');
-                    document.getElementById('intasend-error-msg').textContent =
-                        'Payment confirmation is taking longer than expected. Please contact support or try again.';
+                    showMpesaState('error');
+                    document.getElementById('mpesa-error-msg').textContent =
+                        'M-Pesa confirmation timed out. If you entered your PIN, your order will update automatically.';
                 }
             } catch (e) {
-                // network hiccup — keep trying
+                // Ignore transient network hiccups while polling
             }
         }, 3000);
     }
@@ -2437,7 +2394,7 @@
                     const category = getProductCategory(p);
                     let visual = p.image_url && p.image_url.startsWith('/')
                         ? `<img src="${API_BASE.replace('/api', '') + p.image_url}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="${p.name}">`
-                        : `<div class="w-full h-full bg-gradient-to-br from-[#FFF8E7] via-white to-[#E9F7EE] flex items-center justify-center"><span class="text-7xl drop-shadow-sm">${category === 'drinks' ? '🥤' : category === 'snacks' ? '🍿' : '🍔'}</span></div>`;
+                        : `<div class="w-full h-full bg-[#FFF8E7] flex items-center justify-center"><span class="text-7xl drop-shadow-sm">${category === 'drinks' ? '🥤' : category === 'snacks' ? '🍿' : '🍔'}</span></div>`;
 
                     productGrid += `
                         <article class="group bg-white rounded-[30px] border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition duration-300 flex flex-col">
@@ -2492,7 +2449,7 @@
 
                     <!-- Circular Glovo Bubble Avatar -->
                     <div class="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full bg-white border-2 border-slate-200 group-hover:border-[#05A357] shadow-md group-hover:shadow-2xl transition-all duration-300 flex items-center justify-center overflow-hidden relative group-hover:scale-105">
-                        <div class="w-full h-full bg-gradient-to-br from-[#FFF8E7] via-white to-[#E9F7EE] flex items-center justify-center p-2">
+                        <div class="w-full h-full bg-[#FFF8E7] flex items-center justify-center p-2">
                             <span class="text-4xl sm:text-5xl md:text-6xl drop-shadow-sm group-hover:scale-110 transition-transform duration-300">${vendorEmoji}</span>
                         </div>
                         <span class="absolute bottom-1.5 sm:bottom-2 bg-white/90 backdrop-blur text-[#0F172A] text-[8.5px] sm:text-[9.5px] font-black px-2 py-0.5 rounded-full shadow-sm border border-slate-200">

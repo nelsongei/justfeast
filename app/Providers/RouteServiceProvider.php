@@ -52,7 +52,7 @@ class RouteServiceProvider extends ServiceProvider
             );
         });
 
-        // IntaSend webhook — 60 per minute per IP
+        // Safaricom M-Pesa webhook callback rate limiter — 60 per minute per IP
         RateLimiter::for('webhooks', function (Request $request) {
             return Limit::perMinute(60)->by($request->ip());
         });

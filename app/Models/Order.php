@@ -28,8 +28,9 @@ class Order extends Model
         'paid_at',
         'payment_reference',
         'order_status',
-        'intasend_invoice_id',
-        'intasend_ref',
+        'mpesa_checkout_request_id',
+        'mpesa_merchant_request_id',
+        'mpesa_receipt_number',
         'idempotency_key',
     ];
 

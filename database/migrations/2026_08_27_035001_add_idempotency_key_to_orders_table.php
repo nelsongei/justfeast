@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->string('idempotency_key')->nullable()->after('intasend_ref');
+            $table->string('idempotency_key')->nullable()->after('payment_status');
             $table->unique(['user_id', 'idempotency_key']);
         });
     }

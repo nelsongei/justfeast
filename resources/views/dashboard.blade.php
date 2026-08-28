@@ -114,7 +114,7 @@
     <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-brand-pink/10 rounded-full blur-[150px] pointer-events-none"></div>
 
     <!-- PWA Installation Banner -->
-    <div id="pwa-install-banner" class="hidden bg-gradient-to-r from-brand-rose to-brand-orange px-4 py-2 text-center text-sm font-semibold flex items-center justify-between shadow-lg relative z-50">
+    <div id="pwa-install-banner" class="hidden bg-brand-rose px-4 py-2 text-center text-sm font-semibold flex items-center justify-between shadow-lg relative z-50">
         <span>✨ Experience justFeast Seat Delivery as a full PWA app!</span>
         <div class="flex items-center gap-2">
             <button onclick="installPWA()" class="bg-white text-zinc-900 px-3 py-1 rounded-full text-xs font-bold hover:bg-zinc-100 transition">Install App</button>
@@ -129,7 +129,7 @@
                 <img src="{{ asset('images/logo/jm.png') }}" alt="justFeast Logo" class="h-7 md:h-8 w-auto object-contain">
             </div>
             <div class="min-w-0">
-                <h1 class="text-base md:text-xl font-bold tracking-tight bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent flex items-center gap-2">
+                <h1 class="text-base md:text-xl font-bold tracking-tight text-white flex items-center gap-2">
                     JUSTFEAST <span class="text-[9px] md:text-xs bg-brand-rose/20 text-brand-rose px-2 py-0.5 rounded-full font-semibold border border-brand-rose/30 whitespace-nowrap">Concert Delivery PWA</span>
                 </h1>
                 <p class="text-[10px] md:text-xs text-zinc-500 truncate max-w-[200px] md:max-w-none" id="live-event-banner">Loading active event...</p>
@@ -233,7 +233,7 @@
                         <!-- Marketplace / Seating / Menu Portal -->
                         <div id="cust-main" class="space-y-5">
                             <!-- Glovo Hero Landing Fold inside simulator phone -->
-                            <div id="glovo-hero-fold" class="text-center py-5 px-3 relative overflow-hidden bg-gradient-to-b from-[#FFC244]/15 to-transparent rounded-2xl border border-[#FFC244]/10 mb-2">
+                            <div id="glovo-hero-fold" class="text-center py-5 px-3 relative overflow-hidden bg-[#FFC244]/15 rounded-2xl border border-[#FFC244]/10 mb-2">
                                 <h3 class="text-sm font-black text-white leading-tight">What shall we deliver to you?</h3>
                                 <p class="text-[8px] text-zinc-400 mt-1 max-w-[200px] mx-auto leading-relaxed">Skip the stadium queues. Order snacks delivered directly to your location!</p>
                                 
@@ -391,7 +391,7 @@
                                 <span class="text-xs text-zinc-400">Total:</span>
                                 <span class="text-sm font-extrabold text-brand-rose" id="cart-tray-total">Ksh 0.00</span>
                             </div>
-                            <button onclick="checkoutOrder()" class="w-full py-2.5 bg-gradient-to-r from-brand-rose to-brand-orange text-white rounded-xl text-xs font-bold hover:from-brand-purple transition shadow-lg">
+                            <button onclick="checkoutOrder()" class="w-full py-2.5 bg-brand-rose text-white rounded-xl text-xs font-bold hover:bg-brand-orange transition shadow-lg">
                                 Order & Pay via M-Pesa
                             </button>
                         </div>
@@ -1031,22 +1031,21 @@
  
                 let rating = "4.8";
                 let deliveryTime = "10-15 min";
-                let coverImg = 'bg-gradient-to-r from-[#FFC244]/20 to-[#FFD885]/10';
+                let coverImg = 'bg-[#FFC244]/15';
                 
                 if (vendor.id === 1) { 
                     rating = "4.9"; 
                     deliveryTime = "8-12 min"; 
-                    coverImg = 'bg-gradient-to-r from-[#FFC244]/20 to-[#E0A325]/20';
+                    coverImg = 'bg-[#FFC244]/20';
                 } else if (vendor.id === 2) { 
                     rating = "4.7"; 
                     deliveryTime = "12-18 min"; 
-                    coverImg = 'bg-gradient-to-r from-[#A31D1D]/10 to-[#008A70]/20';
+                    coverImg = 'bg-[#A31D1D]/15';
                 }
  
                 const headerCard = `
                     <div class="relative overflow-hidden rounded-2xl border border-zinc-800 bg-[#1C1C24] shadow-sm">
                         <div class="h-16 ${coverImg} relative z-0">
-                            <div class="absolute inset-0 bg-gradient-to-t from-[#1C1C24] via-transparent to-transparent"></div>
                         </div>
                         <div class="p-3 pt-0 relative z-10 flex items-end justify-between gap-2 -mt-6">
                             <div class="flex items-end gap-2">
@@ -1074,7 +1073,7 @@
                     if (p.image_url && p.image_url.startsWith('/')) {
                         imageTag = `<img src="${API_BASE.replace('/api', '') + p.image_url}" class="w-full h-full object-cover" alt="${p.name}">`;
                     } else {
-                        const gradient = p.image_url || 'bg-gradient-to-br from-amber-400 to-red-500';
+                        const gradient = p.image_url || 'bg-[#A31D1D]';
                         imageTag = `
                             <div class="w-full h-full ${gradient} flex items-center justify-center text-white text-[10px] font-black uppercase">
                                 ${p.name.substring(0, 2)}
