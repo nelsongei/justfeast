@@ -25,19 +25,19 @@ class EventController extends Controller
     public function vendors(Request $request)
     {
         $event = Event::where('status', 'active')->first();
-        if (!$event) {
-            return response()->json([
-                'status'  => 'error',
-                'message' => 'No active concert event found.',
-            ], 404);
-        }
 
         $query = Vendor::query()
             ->with(['products' => function($q) {
                 $q->select(['id', 'vendor_id', 'name', 'description', 'price', 'image_url', 'stock_status'])->orderBy('name');
             }])
-            ->where('event_id', $event->id)
             ->where('status', 'active');
+
+        if ($event) {
+            $query->where(function($q) use ($event) {
+                $q->where('event_id', $event->id)
+                  ->orWhereNull('event_id');
+            });
+        }
 
         if ($request->has('page') || $request->has('per_page')) {
             $perPage = min($request->integer('per_page', 25), 100);

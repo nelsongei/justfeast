@@ -1443,30 +1443,55 @@
 
         const searchVal = document.getElementById('menu-search').value.toLowerCase();
 
+        if (!vendors || vendors.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-16 px-4 bg-white rounded-[32px] border border-slate-200/90 shadow-sm space-y-3">
+                    <div class="w-16 h-16 rounded-full bg-amber-50 text-[#A31D1D] mx-auto flex items-center justify-center text-2xl shadow-inner">
+                        🏪
+                    </div>
+                    <h3 class="text-base font-black text-[#0F172A]">No active food stalls found</h3>
+                    <p class="text-xs text-slate-500 max-w-sm mx-auto font-medium">Stalls registered by admins will appear here automatically.</p>
+                </div>
+            `;
+            return;
+        }
+
+        let renderedCount = 0;
+
         vendors.forEach(vendor => {
-            const matchingProducts = vendor.products.filter(p => {
-                const matchesSearch = p.name.toLowerCase().includes(searchVal) || p.description.toLowerCase().includes(searchVal);
+            const vendorProducts = vendor.products || [];
+            const matchingProducts = vendorProducts.filter(p => {
+                const matchesSearch = p.name.toLowerCase().includes(searchVal) || (p.description && p.description.toLowerCase().includes(searchVal));
                 const matchesCategory = selectedCategory === 'all' || getProductCategory(p) === selectedCategory;
                 return matchesSearch && matchesCategory;
             });
 
-            if (matchingProducts.length === 0) return;
+            // If user is actively searching/filtering and no items match, hide this vendor
+            if ((searchVal !== '' || selectedCategory !== 'all') && matchingProducts.length === 0) {
+                return;
+            }
+
+            renderedCount++;
 
             const stallSection = document.createElement('div');
             stallSection.className = 'space-y-4 mb-8';
 
             let rating = "4.8";
             let deliveryTime = "10-15 min";
-            let coverImg = 'bg-gradient-to-r from-[#FFC244]/20 to-[#FFD885]/10';
 
             if (vendor.id === 1) {
                 rating = "4.9";
                 deliveryTime = "8-12 min";
-                coverImg = 'bg-gradient-to-r from-[#FFC244]/20 to-[#E0A325]/20';
             } else if (vendor.id === 2) {
                 rating = "4.7";
                 deliveryTime = "12-18 min";
-                coverImg = 'bg-gradient-to-r from-[#00A082]/10 to-[#008A70]/20';
+            }
+
+            let logoTag = '🍔';
+            if (vendor.logo_url && (vendor.logo_url.startsWith('/') || vendor.logo_url.startsWith('http'))) {
+                logoTag = `<img src="${vendor.logo_url}" class="w-full h-full object-cover rounded-[20px]" alt="${vendor.business_name}">`;
+            } else if (vendor.logo_url) {
+                logoTag = vendor.logo_url;
             }
 
             const headerCard = `
@@ -1474,8 +1499,8 @@
         <!-- Top row: Logo, vendor details, and status badges -->
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-5 border-b border-slate-100 pb-5">
             <div class="flex items-center gap-4.5">
-                <div class="w-16 h-16 rounded-[22px] bg-slate-100 border border-slate-200 shadow-inner flex items-center justify-center text-3xl shrink-0 group-hover:scale-105 transition-transform duration-300">
-                    ${vendor.logo_url || '🍔'}
+                <div class="w-16 h-16 rounded-[22px] bg-slate-100 border border-slate-200 shadow-inner flex items-center justify-center text-3xl shrink-0 group-hover:scale-105 transition-transform duration-300 overflow-hidden">
+                    ${logoTag}
                 </div>
                 <div>
                     <div class="flex items-center gap-2.5 flex-wrap">
@@ -1537,62 +1562,81 @@
     </div>
 `;
 
-            let productsHtml = '<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 mt-4">';
+            let productsHtml = '';
+            if (matchingProducts.length > 0) {
+                productsHtml = '<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 mt-4">';
+                matchingProducts.forEach(p => {
+                    const out = p.stock_status !== 'in_stock';
+                    let imageTag = '';
+                    if (p.image_url && p.image_url.startsWith('/')) {
+                        imageTag = `<img src="${API_BASE.replace('/api', '') + p.image_url}" class="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500" alt="${p.name}">`;
+                    } else {
+                        const gradient = p.image_url || 'bg-[#A31D1D]';
+                        imageTag = `
+                                <div class="w-full h-full ${gradient} flex flex-col items-center justify-center text-white p-4 text-center">
+                                    <span class="text-2xl font-black uppercase tracking-wider">${p.name.substring(0, 2)}</span>
+                                </div>
+                            `;
+                    }
 
-            matchingProducts.forEach(p => {
-                const out = p.stock_status !== 'in_stock';
-                let imageTag = '';
-                if (p.image_url && p.image_url.startsWith('/')) {
-                    imageTag = `<img src="${API_BASE.replace('/api', '') + p.image_url}" class="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500" alt="${p.name}">`;
-                } else {
-                    const gradient = p.image_url || 'bg-[#A31D1D]';
-                    imageTag = `
-                            <div class="w-full h-full ${gradient} flex flex-col items-center justify-center text-white p-4 text-center">
-                                <span class="text-2xl font-black uppercase tracking-wider">${p.name.substring(0, 2)}</span>
+                    productsHtml += `
+                            <div class="product-card-hover group bg-white rounded-[26px] border border-[#E2E8F0] overflow-hidden flex flex-col h-full relative">
+                                <div class="h-44 relative overflow-hidden bg-slate-100 flex-shrink-0">
+                                    ${imageTag}
+                                    <span class="absolute top-3 left-3 bg-white/95 backdrop-blur-md text-[9.5px] font-black text-[#0F172A] px-3 py-1 rounded-full uppercase tracking-wider shadow-sm border border-slate-200/80">
+                                        ${getProductCategory(p)}
+                                    </span>
+                                    <span class="absolute bottom-3 right-3 bg-[#0F172A]/85 backdrop-blur-md text-[9px] font-extrabold text-[#FFC244] px-2.5 py-1 rounded-full uppercase tracking-wider">
+                                        Fast seat drop
+                                    </span>
+                                </div>
+                                <div class="p-4 flex-1 flex flex-col justify-between space-y-3">
+                                    <div>
+                                        <h5 class="text-sm font-black text-[#0F172A] tracking-tight group-hover:text-[#05A357] transition duration-200 ${out ? 'text-zinc-400 line-through' : ''}">${p.name}</h5>
+                                        <p class="text-[11px] text-zinc-500 line-clamp-2 leading-relaxed mt-1 font-medium">${p.description || 'Delivered fresh and hot to your exact stadium seat location coordinates.'}</p>
+                                    </div>
+                                    <div class="flex items-center justify-between pt-2 border-t border-slate-100">
+                                        <div>
+                                            <p class="text-[9px] uppercase tracking-wider text-zinc-400 font-bold">Price</p>
+                                            <p class="text-sm font-black text-[#05A357]">Ksh ${parseFloat(p.price).toLocaleString()}</p>
+                                        </div>
+                                        <div>
+                                            ${out
+                        ? `<span class="text-[9px] bg-zinc-100 border border-zinc-200 text-zinc-400 px-3 py-1.5 rounded-full font-bold">Out of stock</span>`
+                        : `<button onclick="addToBasket(${p.id}, '${p.name}', ${p.price}, ${vendor.id})" class="px-4 py-2 rounded-full bg-[#FFC244] hover:bg-[#FFB71B] text-[#0F172A] flex items-center gap-1.5 font-black text-xs transition-all shadow-md shadow-[#FFC244]/25 border border-[#E6A920] cursor-pointer hover:scale-105 active:scale-95">
+                                                            <i class="fas fa-plus text-[10px]"></i> Add
+                                                       </button>`
+                    }
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         `;
-                }
-
-                productsHtml += `
-                        <div class="product-card-hover group bg-white rounded-[26px] border border-[#E2E8F0] overflow-hidden flex flex-col h-full relative">
-                            <div class="h-44 relative overflow-hidden bg-slate-100 flex-shrink-0">
-                                ${imageTag}
-                                <span class="absolute top-3 left-3 bg-white/95 backdrop-blur-md text-[9.5px] font-black text-[#0F172A] px-3 py-1 rounded-full uppercase tracking-wider shadow-sm border border-slate-200/80">
-                                    ${getProductCategory(p)}
-                                </span>
-                                <span class="absolute bottom-3 right-3 bg-[#0F172A]/85 backdrop-blur-md text-[9px] font-extrabold text-[#FFC244] px-2.5 py-1 rounded-full uppercase tracking-wider">
-                                    Fast seat drop
-                                </span>
-                            </div>
-                            <div class="p-4 flex-1 flex flex-col justify-between space-y-3">
-                                <div>
-                                    <h5 class="text-sm font-black text-[#0F172A] tracking-tight group-hover:text-[#05A357] transition duration-200 ${out ? 'text-zinc-400 line-through' : ''}">${p.name}</h5>
-                                    <p class="text-[11px] text-zinc-500 line-clamp-2 leading-relaxed mt-1 font-medium">${p.description || 'Delivered fresh and hot to your exact stadium seat location coordinates.'}</p>
-                                </div>
-                                <div class="flex items-center justify-between pt-2 border-t border-slate-100">
-                                    <div>
-                                        <p class="text-[9px] uppercase tracking-wider text-zinc-400 font-bold">Price</p>
-                                        <p class="text-sm font-black text-[#05A357]">Ksh ${parseFloat(p.price).toLocaleString()}</p>
-                                    </div>
-                                    <div>
-                                        ${out
-                    ? `<span class="text-[9px] bg-zinc-100 border border-zinc-200 text-zinc-400 px-3 py-1.5 rounded-full font-bold">Out of stock</span>`
-                    : `<button onclick="addToBasket(${p.id}, '${p.name}', ${p.price}, ${vendor.id})" class="px-4 py-2 rounded-full bg-[#FFC244] hover:bg-[#FFB71B] text-[#0F172A] flex items-center gap-1.5 font-black text-xs transition-all shadow-md shadow-[#FFC244]/25 border border-[#E6A920] cursor-pointer hover:scale-105 active:scale-95">
-                                                        <i class="fas fa-plus text-[10px]"></i> Add
-                                                   </button>`
-                }
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-            });
-
-            productsHtml += '</div>';
+                });
+                productsHtml += '</div>';
+            } else {
+                productsHtml = `
+                    <div class="mt-4 p-5 rounded-2xl bg-[#FFF8E7] border border-dashed border-[#F7E5B2] text-center text-xs font-bold text-slate-600 flex items-center justify-center gap-2">
+                        <i class="fas fa-store text-[#FFC244] text-base"></i> Stall onboarded! Festival menu items coming soon.
+                    </div>
+                `;
+            }
 
             stallSection.innerHTML = headerCard + productsHtml;
             container.appendChild(stallSection);
         });
+
+        if (renderedCount === 0 && (searchVal !== '' || selectedCategory !== 'all')) {
+            container.innerHTML = `
+                <div class="text-center py-16 px-4 bg-white rounded-[32px] border border-slate-200/90 shadow-sm space-y-3">
+                    <div class="w-16 h-16 rounded-full bg-amber-50 text-[#A31D1D] mx-auto flex items-center justify-center text-2xl shadow-inner">
+                        🔍
+                    </div>
+                    <h3 class="text-base font-black text-[#0F172A]">No stalls matching your filter</h3>
+                    <p class="text-xs text-slate-500 max-w-sm mx-auto font-medium">Try selecting "All Vendors" or resetting your search query.</p>
+                </div>
+            `;
+        }
     }
 
     function searchMenu() {
