@@ -875,24 +875,24 @@
 
         <!-- Modal header -->
         <div class="bg-[#05A357] px-6 py-4 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <span class="inline-flex items-center justify-center bg-white px-2.5 py-1 rounded-full h-8 overflow-hidden shadow-xs border border-emerald-200">
-                    <img src="{{ asset('images/logo/mpesa.png') }}" alt="M-Pesa" class="h-6 w-auto object-contain"
+            <div class="flex items-center gap-2.5">
+                <span class="inline-flex items-center justify-center bg-white px-2.5 py-1 rounded-full h-7 overflow-hidden shadow-xs border border-emerald-200 shrink-0">
+                    <img src="{{ asset('images/logo/mpesa.png') }}" alt="M-Pesa" class="h-4 max-h-5 max-w-[60px] object-contain"
                          onerror="this.outerHTML='<span class=\'text-[#05A357] font-black text-[11px]\'>M-PESA</span>'">
                 </span>
-                <span class="text-white/40">·</span>
-                <span class="text-white font-black text-sm tracking-tight">M-Pesa Express Checkout</span>
+                <span class="text-white/50 text-xs font-bold">·</span>
+                <span class="text-white font-black text-sm tracking-tight leading-none">M-Pesa Express Checkout</span>
             </div>
-            <button onclick="closeMpesaOverlay()" class="text-white/80 hover:text-white text-xl font-bold leading-none cursor-pointer">&times;</button>
+            <button onclick="closeMpesaOverlay()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center text-lg font-bold leading-none cursor-pointer transition">&times;</button>
         </div>
 
         <!-- Order summary & states -->
         <div class="px-6 py-5 space-y-4">
-            <div class="text-center space-y-1.5">
-                <p class="text-[10px] uppercase tracking-widest text-zinc-400 font-black">Total Payment</p>
+            <div class="text-center space-y-2 py-1">
+                <p class="text-[10px] uppercase tracking-widest text-slate-400 font-black">Total Payment</p>
                 <p class="text-3xl font-black text-[#05A357]" id="mpesa-amount-display">Ksh 0</p>
-                <div class="inline-flex items-center gap-1.5 bg-[#05A357]/10 text-[#05A357] px-3 py-1 rounded-full text-xs font-black">
-                    <img src="{{ asset('images/logo/mpesa.png') }}" alt="M-Pesa" class="h-4 w-auto object-contain"
+                <div class="inline-flex items-center justify-center gap-2 bg-[#05A357]/10 text-[#05A357] px-3.5 py-1.5 rounded-full text-xs font-black">
+                    <img src="{{ asset('images/logo/mpesa.png') }}" alt="M-Pesa" class="h-4 max-h-4 max-w-[50px] object-contain shrink-0"
                          onerror="this.outerHTML='<span class=\'text-[#05A357] font-black text-[9px]\'>M-PESA</span>'">
                     <span>Lipa Na M-Pesa STK Push</span>
                 </div>
@@ -901,23 +901,23 @@
             <!-- Input state (Enter / Confirm phone number) -->
             <div id="mpesa-input-state" class="space-y-4 pt-2">
                 <div>
-                    <label class="block text-xs font-black text-zinc-700 mb-1.5">M-Pesa Phone Number</label>
+                    <label class="block text-xs font-black text-slate-700 mb-1.5">M-Pesa Phone Number</label>
                     <div class="relative">
-                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400 text-sm font-bold"><i class="fas fa-phone text-[#05A357]"></i></span>
+                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-[#05A357] text-sm"><i class="fas fa-phone"></i></span>
                         <input type="tel" id="mpesa-phone-input" placeholder="e.g. 0712345678"
-                               class="w-full pl-10 pr-4 py-3 bg-zinc-50 border border-zinc-200 rounded-2xl text-sm font-bold text-zinc-800 focus:outline-none focus:border-[#05A357] focus:bg-white transition">
+                               class="w-full pl-10 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-800 focus:outline-none focus:border-[#05A357] focus:bg-white transition shadow-inner">
                     </div>
-                    <p class="text-[10px] text-zinc-400 mt-1 font-medium">You will receive an M-Pesa PIN prompt on this phone.</p>
+                    <p class="text-[10px] text-slate-400 mt-1.5 font-medium">You will receive an M-Pesa PIN prompt on this phone.</p>
                 </div>
 
                 <button onclick="triggerMpesaStkPush()"
-                        class="w-full py-4 bg-[#05A357] hover:bg-[#047A43] text-white rounded-2xl text-sm font-black shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2.5 cursor-pointer">
-                    <span class="bg-white px-2 py-0.5 rounded-full inline-flex items-center justify-center shadow-xs">
-                        <img src="{{ asset('images/logo/mpesa.png') }}" alt="M-Pesa" class="h-4.5 w-auto object-contain"
+                        class="w-full py-3.5 px-4 bg-[#05A357] hover:bg-[#047A43] active:scale-[0.98] text-white rounded-2xl text-sm font-black shadow-lg shadow-[#05A357]/25 hover:shadow-xl transition-all flex items-center justify-center gap-3 cursor-pointer">
+                    <span class="bg-white px-2.5 py-1 rounded-full inline-flex items-center justify-center shadow-xs shrink-0">
+                        <img src="{{ asset('images/logo/mpesa.png') }}" alt="M-Pesa" class="h-4 max-h-5 max-w-[60px] object-contain"
                              onerror="this.outerHTML='<span class=\'text-[#05A357] font-black text-[9px]\'>M-PESA</span>'">
                     </span>
-                    <span>Pay with M-Pesa Express</span>
-                    <i class="fas fa-arrow-right text-xs"></i>
+                    <span class="font-black text-white tracking-tight">Pay with M-Pesa Express</span>
+                    <i class="fas fa-arrow-right text-xs text-[#FFC244]"></i>
                 </button>
             </div>
 
@@ -1148,6 +1148,7 @@
     let currentUser = null;
     let activeEvent = null;
     let vendors = [];
+    let selectedCategory = 'all';
     let basket = [];
     let activeOrder = null;
     let hasBeepedForArrival = false;
@@ -2775,10 +2776,18 @@
         `;
 
         vendors.forEach((vendor, index) => {
-            const products = (vendor.products || []).filter(p => selectedCategory === 'all' || getProductCategory(p) === selectedCategory);
-            if (selectedCategory !== 'all' && !products.length) return;
+            const currentCat = (typeof selectedCategory !== 'undefined') ? selectedCategory : 'all';
+            const products = (vendor.products || []).filter(p => currentCat === 'all' || getProductCategory(p) === currentCat);
+            if (currentCat !== 'all' && !products.length) return;
 
-            const vendorEmoji = vendor.logo_url || ['🍔', '🥤', '🍿', '🌮', '🍟'][index % 5];
+            let logoContent = '';
+            if (vendor.logo_url && (vendor.logo_url.startsWith('/') || vendor.logo_url.startsWith('http'))) {
+                logoContent = `<img src="${vendor.logo_url}" class="w-full h-full object-cover rounded-full" alt="${vendor.business_name}">`;
+            } else {
+                const emoji = vendor.logo_url || ['🍔', '🥤', '🍿', '🌮', '🍟'][index % 5];
+                logoContent = `<span class="text-4xl sm:text-5xl md:text-6xl drop-shadow-sm group-hover:scale-110 transition-transform duration-300">${emoji}</span>`;
+            }
+
             const rating = (4.9 - (index * 0.08)).toFixed(1);
             const etaMin = 7 + (index % 3) * 2;
             const etaMax = etaMin + 6;
@@ -2790,7 +2799,7 @@
                     <!-- Circular Glovo Bubble Avatar -->
                     <div class="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full bg-white border-2 border-slate-200 group-hover:border-[#05A357] shadow-md group-hover:shadow-2xl transition-all duration-300 flex items-center justify-center overflow-hidden relative group-hover:scale-105">
                         <div class="w-full h-full bg-[#FFF8E7] flex items-center justify-center p-2">
-                            <span class="text-4xl sm:text-5xl md:text-6xl drop-shadow-sm group-hover:scale-110 transition-transform duration-300">${vendorEmoji}</span>
+                            ${logoContent}
                         </div>
                         <span class="absolute bottom-1.5 sm:bottom-2 bg-white/90 backdrop-blur text-[#0F172A] text-[8.5px] sm:text-[9.5px] font-black px-2 py-0.5 rounded-full shadow-sm border border-slate-200">
                             <i class="fas fa-star text-[#FFC244] text-[8px] sm:text-[8.5px]"></i> ${rating}
