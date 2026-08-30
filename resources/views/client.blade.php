@@ -434,28 +434,28 @@
                                 </div>
                             </div>
 
-                            <!-- Floating interactive items -->
-                            <div class="floating-food absolute left-1 sm:left-2 top-4 sm:top-8 bg-white/95 text-[#0F172A] rounded-2xl sm:rounded-[26px] p-2.5 sm:p-3.5 shadow-2xl flex items-center gap-2 sm:gap-3 border border-white/60 z-20">
-                                <span class="text-xl sm:text-3xl">🍔</span>
+                            <!-- Floating interactive items (Dynamic Vendor Adverts) -->
+                            <div onclick="selectHeroVendorAd(0)" class="floating-food absolute left-1 sm:left-2 top-4 sm:top-8 bg-white/95 text-[#0F172A] rounded-2xl sm:rounded-[26px] p-2.5 sm:p-3.5 shadow-2xl flex items-center gap-2 sm:gap-3 border border-white/60 z-20 cursor-pointer hover:scale-105 transition-all" id="hero-ad-card-0">
+                                <span class="text-xl sm:text-3xl" id="hero-ad-logo-0">🍔</span>
                                 <div>
-                                    <p class="text-[11px] sm:text-xs font-black">Smash Burgers</p>
-                                    <p class="text-[9px] sm:text-[10px] text-[#05A357] font-extrabold">from Ksh 450</p>
+                                    <p class="text-[11px] sm:text-xs font-black truncate max-w-[110px] sm:max-w-[130px]" id="hero-ad-name-0">Smash Burgers</p>
+                                    <p class="text-[9px] sm:text-[10px] text-[#05A357] font-extrabold" id="hero-ad-sub-0">from Ksh 450</p>
                                 </div>
                             </div>
 
-                            <div class="floating-food absolute right-1 sm:right-2 top-16 sm:top-24 bg-white/95 text-[#0F172A] rounded-2xl sm:rounded-[26px] p-2.5 sm:p-3.5 shadow-2xl flex items-center gap-2 sm:gap-3 border border-white/60 z-20">
-                                <span class="text-xl sm:text-3xl">🥤</span>
+                            <div onclick="selectHeroVendorAd(1)" class="floating-food absolute right-1 sm:right-2 top-16 sm:top-24 bg-white/95 text-[#0F172A] rounded-2xl sm:rounded-[26px] p-2.5 sm:p-3.5 shadow-2xl flex items-center gap-2 sm:gap-3 border border-white/60 z-20 cursor-pointer hover:scale-105 transition-all" id="hero-ad-card-1">
+                                <span class="text-xl sm:text-3xl" id="hero-ad-logo-1">🥤</span>
                                 <div>
-                                    <p class="text-[11px] sm:text-xs font-black">Ice Cold Drinks</p>
-                                    <p class="text-[9px] sm:text-[10px] text-[#05A357] font-extrabold">Chilled & Fast</p>
+                                    <p class="text-[11px] sm:text-xs font-black truncate max-w-[110px] sm:max-w-[130px]" id="hero-ad-name-1">Ice Cold Drinks</p>
+                                    <p class="text-[9px] sm:text-[10px] text-[#05A357] font-extrabold" id="hero-ad-sub-1">Chilled & Fast</p>
                                 </div>
                             </div>
 
-                            <div class="floating-food absolute bottom-6 sm:bottom-8 left-4 sm:left-8 bg-white/95 text-[#0F172A] rounded-2xl sm:rounded-[26px] p-2.5 sm:p-3.5 shadow-2xl flex items-center gap-2 sm:gap-3 border border-white/60 z-20">
-                                <span class="text-xl sm:text-3xl">🍿</span>
+                            <div onclick="selectHeroVendorAd(2)" class="floating-food absolute bottom-6 sm:bottom-8 left-4 sm:left-8 bg-white/95 text-[#0F172A] rounded-2xl sm:rounded-[26px] p-2.5 sm:p-3.5 shadow-2xl flex items-center gap-2 sm:gap-3 border border-white/60 z-20 cursor-pointer hover:scale-105 transition-all" id="hero-ad-card-2">
+                                <span class="text-xl sm:text-3xl" id="hero-ad-logo-2">🍿</span>
                                 <div>
-                                    <p class="text-[11px] sm:text-xs font-black">Event Snacks</p>
-                                    <p class="text-[9px] sm:text-[10px] text-[#05A357] font-extrabold">Queue-free</p>
+                                    <p class="text-[11px] sm:text-xs font-black truncate max-w-[110px] sm:max-w-[130px]" id="hero-ad-name-2">Event Snacks</p>
+                                    <p class="text-[9px] sm:text-[10px] text-[#05A357] font-extrabold" id="hero-ad-sub-2">Queue-free</p>
                                 </div>
                             </div>
 
@@ -1373,6 +1373,51 @@
         }
     }
 
+    let heroVendorAdIds = [];
+
+    function renderHeroVendorAdverts() {
+        if (!vendors || !vendors.length) return;
+
+        heroVendorAdIds = [];
+        vendors.slice(0, 3).forEach((v, index) => {
+            heroVendorAdIds[index] = v.id;
+
+            const nameEl = document.getElementById(`hero-ad-name-${index}`);
+            const subEl = document.getElementById(`hero-ad-sub-${index}`);
+            const logoEl = document.getElementById(`hero-ad-logo-${index}`);
+
+            if (nameEl) nameEl.textContent = v.business_name;
+
+            let subText = 'Verified Stall';
+            if (v.products && v.products.length) {
+                const prices = v.products.map(p => parseFloat(p.price)).filter(pr => !isNaN(pr) && pr > 0);
+                if (prices.length) {
+                    const minPrice = Math.min(...prices);
+                    subText = `from Ksh ${Math.round(minPrice).toLocaleString()}`;
+                } else {
+                    subText = `${v.products.length} Items Menu`;
+                }
+            }
+            if (subEl) subEl.textContent = subText;
+
+            if (logoEl) {
+                if (v.logo_url && (v.logo_url.startsWith('/') || v.logo_url.startsWith('http'))) {
+                    logoEl.innerHTML = `<img src="${v.logo_url}" class="w-6 h-6 sm:w-8 sm:h-8 object-cover rounded-xl shrink-0" alt="${v.business_name}">`;
+                } else {
+                    const fallbackEmojis = ['🍔', '🥤', '🍿', '🌮', '🍖'];
+                    const emoji = (v.logo_url && v.logo_url.length <= 4) ? v.logo_url : fallbackEmojis[index % fallbackEmojis.length];
+                    logoEl.textContent = emoji;
+                }
+            }
+        });
+    }
+
+    function selectHeroVendorAd(index) {
+        if (heroVendorAdIds[index]) {
+            selectVendor(heroVendorAdIds[index]);
+        }
+    }
+
     async function loadVendors() {
         try {
             const res = await fetch(`${API_BASE}/vendors`);
@@ -1380,6 +1425,7 @@
                 const data = await res.json();
                 vendors = Array.isArray(data) ? data : (data.data || []);
                 renderVendors();
+                renderHeroVendorAdverts();
             }
         } catch (e) {
             console.error("Error loading marketplace vendors:", e);
