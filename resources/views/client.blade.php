@@ -1635,7 +1635,6 @@
                                 <div class="p-4 flex-1 flex flex-col justify-between space-y-3">
                                     <div>
                                         <h5 class="text-sm font-black text-[#0F172A] tracking-tight group-hover:text-[#05A357] transition duration-200 ${out ? 'text-zinc-400 line-through' : ''}">${p.name}</h5>
-                                        <p class="text-[11px] text-zinc-500 line-clamp-2 leading-relaxed mt-1 font-medium">${p.description || 'Delivered fresh and hot to your exact stadium seat location coordinates.'}</p>
                                     </div>
                                     <div class="flex items-center justify-between pt-2 border-t border-slate-100">
                                         <div>
@@ -2703,7 +2702,6 @@
                                 <div class="p-4 flex-1 flex flex-col justify-between gap-4">
                                     <div>
                                         <h4 class="text-sm font-black tracking-tight text-[#0F172A] group-hover:text-[#05A357] ${out ? 'line-through text-slate-400' : ''}">${p.name}</h4>
-                                        <p class="text-[11px] text-slate-500 leading-relaxed mt-1 line-clamp-2 font-medium">${p.description || 'Prepared fresh by approved event vendor.'}</p>
                                     </div>
                                     <div class="flex items-center justify-between gap-3">
                                         <div><p class="text-[9px] uppercase tracking-wider text-slate-400 font-black">Price</p><p class="text-lg font-black text-[#05A357]">Ksh ${parseFloat(p.price).toLocaleString()}</p></div>
@@ -2791,7 +2789,6 @@
                             <div class="p-4 flex-1 flex flex-col justify-between gap-4">
                                 <div>
                                     <h4 class="text-sm font-black tracking-tight text-[#0F172A] group-hover:text-[#05A357] ${out ? 'line-through text-slate-400' : ''}">${p.name}</h4>
-                                    <p class="text-[11px] text-slate-500 leading-relaxed mt-1 line-clamp-2 font-medium">${p.description || 'Prepared fresh by an approved event vendor.'}</p>
                                 </div>
                                 <div class="flex items-center justify-between gap-3">
                                     <div><p class="text-[9px] uppercase tracking-wider text-slate-400 font-black">Price</p><p class="text-lg font-black text-[#05A357]">Ksh ${parseFloat(p.price).toLocaleString()}</p></div>
@@ -2920,7 +2917,6 @@
                         <div class="p-3.5 flex-1 flex flex-col justify-between gap-3">
                             <div>
                                 <h4 class="text-xs font-black tracking-tight text-[#0F172A] group-hover:text-[#05A357] ${out ? 'line-through text-slate-400' : ''}">${p.name}</h4>
-                                <p class="text-[10.5px] text-slate-500 leading-relaxed mt-0.5 line-clamp-2 font-medium">${p.description || 'Prepared fresh by an approved event vendor.'}</p>
                             </div>
                             <div class="flex items-center justify-between gap-2">
                                 <div><p class="text-[8.5px] uppercase tracking-wider text-slate-400 font-black">Price</p><p class="text-base font-black text-[#05A357]">Ksh ${parseFloat(p.price).toLocaleString()}</p></div>
