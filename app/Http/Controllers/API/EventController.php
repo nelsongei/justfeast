@@ -22,6 +22,15 @@ class EventController extends Controller
         return response()->json($event);
     }
 
+    public function settings()
+    {
+        $deliveryFee = floatval(\App\Models\Setting::get('delivery_fee', 30));
+        return response()->json([
+            'status'       => 'success',
+            'delivery_fee' => $deliveryFee,
+        ]);
+    }
+
     public function vendors(Request $request)
     {
         $event = Event::where('status', 'active')->first();

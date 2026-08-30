@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\Vendor;
 use App\Models\User;
 use App\Models\Delivery;
+use App\Models\Setting;
 use App\Services\MpesaDarajaService;
 use App\Services\RunnerAllocationService;
 use Illuminate\Http\Request;
@@ -101,6 +102,10 @@ class OrderController extends Controller
                     'price'      => $price,
                 ];
             }
+
+            // Include system seat delivery fee (default: 30 shillings)
+            $deliveryFee = floatval(Setting::get('delivery_fee', 30));
+            $totalAmount += $deliveryFee;
 
             $loc = $request->seat_location;
 

@@ -679,7 +679,7 @@
                                 </div>
                                 <div class="flex justify-between text-xs text-slate-500 font-medium">
                                     <span>Seat Delivery Fee</span>
-                                    <span class="font-black text-[#A31D1D]">FREE</span>
+                                    <span class="font-black text-[#A31D1D]" id="desktop-cart-delivery-fee">Ksh 30</span>
                                 </div>
                                 <div class="flex justify-between items-end pt-2 border-t border-slate-200/60">
                                     <span class="text-xs text-slate-500 font-black">Total Payable</span>
@@ -1243,6 +1243,7 @@
     window.addEventListener('DOMContentLoaded', () => {
         loadActiveEvent();
         loadVendors();
+        fetchSystemSettings();
 
         // Always show the marketplace main wrapper
         document.getElementById('cust-main').classList.remove('hidden');
@@ -2836,12 +2837,28 @@
         container.innerHTML = chipsHtml + vendorGridHtml;
     }
 
+    let systemDeliveryFee = 30;
+
+    async function fetchSystemSettings() {
+        try {
+            const res = await fetch('/api/settings');
+            if (res.ok) {
+                const data = await res.json();
+                if (data.delivery_fee !== undefined) {
+                    systemDeliveryFee = Number(data.delivery_fee);
+                    renderBasket();
+                }
+            }
+        } catch (e) {}
+    }
+
     function renderBasket() {
         const mobileTray = document.getElementById('phone-cart-tray');
         const mobileContainer = document.getElementById('cart-tray-items');
         const desktopContainer = document.getElementById('desktop-cart-tray-items');
         const badgeEl = document.getElementById('basket-count-badge');
         const subtotalEl = document.getElementById('desktop-cart-subtotal');
+        const feeEl = document.getElementById('desktop-cart-delivery-fee');
 
         let totalQty = 0;
         basket.forEach(i => totalQty += i.quantity);
@@ -2863,6 +2880,7 @@
             if (document.getElementById('cart-tray-total')) document.getElementById('cart-tray-total').textContent = 'Ksh 0';
             if (document.getElementById('desktop-cart-tray-total')) document.getElementById('desktop-cart-tray-total').textContent = 'Ksh 0';
             if (subtotalEl) subtotalEl.textContent = 'Ksh 0';
+            if (feeEl) feeEl.textContent = systemDeliveryFee > 0 ? `Ksh ${systemDeliveryFee.toLocaleString()}` : 'FREE';
             return;
         }
 
@@ -2870,9 +2888,9 @@
         if (mobileContainer) mobileContainer.innerHTML = '';
         if (desktopContainer) desktopContainer.innerHTML = '';
 
-        let total = 0;
+        let subtotal = 0;
         basket.forEach(item => {
-            total += item.price * item.quantity;
+            subtotal += item.price * item.quantity;
             const row = `
                     <div class="flex justify-between items-center gap-3 text-xs py-2.5 border-b border-slate-100 last:border-b-0">
                         <div class="flex-1 min-w-0">
@@ -2889,10 +2907,15 @@
             if (desktopContainer) desktopContainer.insertAdjacentHTML('beforeend', row);
         });
 
-        const totalText = `Ksh ${total.toLocaleString()}`;
-        if (document.getElementById('cart-tray-total')) document.getElementById('cart-tray-total').textContent = totalText;
-        if (document.getElementById('desktop-cart-tray-total')) document.getElementById('desktop-cart-tray-total').textContent = totalText;
-        if (subtotalEl) subtotalEl.textContent = totalText;
+        const grandTotal = subtotal + systemDeliveryFee;
+        const subtotalText = `Ksh ${subtotal.toLocaleString()}`;
+        const feeText = systemDeliveryFee > 0 ? `Ksh ${systemDeliveryFee.toLocaleString()}` : 'FREE';
+        const grandTotalText = `Ksh ${grandTotal.toLocaleString()}`;
+
+        if (subtotalEl) subtotalEl.textContent = subtotalText;
+        if (feeEl) feeEl.textContent = feeText;
+        if (document.getElementById('cart-tray-total')) document.getElementById('cart-tray-total').textContent = grandTotalText;
+        if (document.getElementById('desktop-cart-tray-total')) document.getElementById('desktop-cart-tray-total').textContent = grandTotalText;
     }
 </script>
 </body>

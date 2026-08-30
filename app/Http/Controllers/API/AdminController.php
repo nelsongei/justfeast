@@ -10,6 +10,7 @@ use App\Models\Vendor;
 use App\Models\Product;
 use App\Models\Delivery;
 use App\Models\User;
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -464,6 +465,35 @@ class AdminController extends Controller
         return response()->json([
             'success' => true,
             'message' => "Menu item '{$name}' deleted successfully.",
+        ]);
+    }
+
+    public function getSettings()
+    {
+        $deliveryFee = floatval(Setting::get('delivery_fee', 30));
+
+        return response()->json([
+            'status'   => 'success',
+            'settings' => [
+                'delivery_fee' => $deliveryFee,
+            ],
+        ]);
+    }
+
+    public function updateSettings(Request $request)
+    {
+        $validated = $request->validate([
+            'delivery_fee' => 'required|numeric|min:0',
+        ]);
+
+        Setting::set('delivery_fee', $validated['delivery_fee']);
+
+        return response()->json([
+            'status'   => 'success',
+            'message'  => 'System seat delivery fee updated to Ksh ' . number_format($validated['delivery_fee'], 2) . ' successfully.',
+            'settings' => [
+                'delivery_fee' => floatval($validated['delivery_fee']),
+            ],
         ]);
     }
 }

@@ -230,7 +230,18 @@ tbody td{padding:1.1rem 1.5rem;vertical-align:middle;color:var(--text)}
       <h1 id="topbar-title">@yield('page-title', 'Operations Dashboard')</h1>
       <p class="meta" id="topbar-meta">@yield('page-meta', 'JustFeast — Global Admin Command Center')</p>
     </div>
-    <div class="live-badge"><div class="live-dot"></div> Live sync</div>
+    <div style="display:flex;align-items:center;gap:0.75rem;">
+      <!-- Delivery Fee Quick Settings Button -->
+      <button type="button" onclick="openDeliveryFeeModal()" 
+              style="display:flex;align-items:center;gap:0.4rem;font-size:0.75rem;font-weight:800;color:var(--brand);background:#FFF8E7;border:1px solid #F7E5B2;padding:0.4rem 0.9rem;border-radius:20px;cursor:pointer;transition:all 0.15s ease;"
+              title="Click to adjust seat delivery fee">
+        <i class="fas fa-motorcycle" style="color:var(--brand);"></i>
+        <span>Delivery Fee: <strong id="admin-delivery-fee-badge">Ksh 30</strong></span>
+        <i class="fas fa-edit text-xs" style="opacity:0.6;"></i>
+      </button>
+
+      <div class="live-badge"><div class="live-dot"></div> Live sync</div>
+    </div>
   </div>
 
   <div class="content">
@@ -238,7 +249,127 @@ tbody td{padding:1.1rem 1.5rem;vertical-align:middle;color:var(--text)}
   </div>
 </div>
 
+<!-- Delivery Fee Settings Modal -->
+<div class="modal-overlay" id="delivery-fee-modal-overlay" onclick="if(event.target===this) closeDeliveryFeeModal()">
+  <div class="modal-card" style="max-width:440px;">
+    <div class="modal-header">
+      <h3 style="font-size:1.1rem;font-weight:900;color:var(--text);display:flex;align-items:center;gap:0.5rem;">
+        <i class="fas fa-motorcycle" style="color:var(--brand)"></i>
+        Adjust Seat Delivery Fee
+      </h3>
+      <button type="button" class="modal-close-btn" onclick="closeDeliveryFeeModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <form id="delivery-fee-form" onsubmit="handleSaveDeliveryFee(event)">
+      <div style="padding:1.5rem;display:flex;flex-direction:column;gap:1.25rem;">
+        <div>
+          <label style="display:block;font-size:0.78rem;font-weight:800;color:var(--text);margin-bottom:0.4rem;">
+            Seat Delivery Fee (Ksh) *
+          </label>
+          <div style="position:relative;">
+            <span style="position:absolute;left:1rem;top:50%;transform:translateY(-50%);font-weight:800;color:var(--brand);">Ksh</span>
+            <input type="number" id="setting-delivery-fee-input" required min="0" step="1" 
+                   style="width:100%;padding:0.75rem 1rem 0.75rem 3.2rem;background:var(--surface2);border:1px solid var(--border);border-radius:14px;font-weight:900;font-size:1.1rem;color:var(--text);outline:none;">
+          </div>
+          <p style="font-size:0.72rem;color:var(--muted);margin-top:0.4rem;font-weight:600;">
+            This fee is automatically added to customer orders during seat delivery checkout. Default: 30 Ksh.
+          </p>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;gap:0.75rem;padding-top:1rem;border-top:1px solid var(--border);">
+          <button type="button" class="btn-page" onclick="closeDeliveryFeeModal()">Cancel</button>
+          <button type="submit" id="btn-save-fee" 
+                  style="padding:0.65rem 1.4rem;background:#05A357;color:#FFF;border:none;border-radius:12px;font-weight:800;font-size:0.82rem;cursor:pointer;display:flex;align-items:center;gap:0.4rem;">
+            <i class="fas fa-save"></i> Save Delivery Fee
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
 <script>
+window.addEventListener('DOMContentLoaded', () => {
+  loadAdminDeliveryFee();
+});
+
+async function loadAdminDeliveryFee() {
+  try {
+    const res = await fetch(`${API_BASE}/admin/settings`, {
+      headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data.settings && data.settings.delivery_fee !== undefined) {
+        const fee = Number(data.settings.delivery_fee);
+        const badge = document.getElementById('admin-delivery-fee-badge');
+        const input = document.getElementById('setting-delivery-fee-input');
+        if (badge) badge.textContent = `Ksh ${fee}`;
+        if (input) input.value = fee;
+      }
+    }
+  } catch (e) {
+    console.error('Error loading delivery fee setting:', e);
+  }
+}
+
+function openDeliveryFeeModal() {
+  const modal = document.getElementById('delivery-fee-modal-overlay');
+  if (modal) modal.classList.add('is-active');
+}
+
+function closeDeliveryFeeModal() {
+  const modal = document.getElementById('delivery-fee-modal-overlay');
+  if (modal) modal.classList.remove('is-active');
+}
+
+async function handleSaveDeliveryFee(event) {
+  event.preventDefault();
+  const input = document.getElementById('setting-delivery-fee-input');
+  const btn = document.getElementById('btn-save-fee');
+  if (!input || !btn) return;
+
+  const originalHtml = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Saving...`;
+
+  try {
+    const res = await fetch(`${API_BASE}/admin/settings`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+      },
+      body: JSON.stringify({ delivery_fee: Number(input.value) })
+    });
+
+    const data = await res.json();
+
+    if (res.ok && (data.status === 'success' || data.success)) {
+      const newFee = Number(data.settings.delivery_fee);
+      const badge = document.getElementById('admin-delivery-fee-badge');
+      if (badge) badge.textContent = `Ksh ${newFee}`;
+      closeDeliveryFeeModal();
+      if (typeof showNotification === 'function') {
+        showNotification(`System delivery fee updated to Ksh ${newFee}!`, 'success');
+      } else {
+        alert(`System delivery fee updated to Ksh ${newFee}!`);
+      }
+    } else {
+      alert(data.message || 'Failed to update delivery fee.');
+    }
+  } catch (e) {
+    alert('Network error while saving delivery fee');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = originalHtml;
+  }
+}
+
 function logoutAdmin() {
   localStorage.removeItem('justfeast_admin_user');
   localStorage.removeItem('justfeast_vendor_user');

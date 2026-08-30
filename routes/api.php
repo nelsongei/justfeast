@@ -14,9 +14,10 @@ use App\Http\Controllers\API\MpesaCallbackController;
 |--------------------------------------------------------------------------
 */
 
-// ── Public: Product browsing (required before login) ─────────────────────────
+// ── Public: Product browsing & Settings ─────────────────────────────────────
 Route::get('/events/active', [EventController::class, 'index']);
 Route::get('/vendors',       [EventController::class, 'vendors']);
+Route::get('/settings',      [EventController::class, 'settings']);
 
 // ── Authentication (OTP & Vendor Registration) ──────────────────────────────
 Route::prefix('auth')->group(function () {
@@ -73,6 +74,8 @@ Route::middleware('auth:sanctum,web')->group(function () {
         Route::delete('/products/{product}', [AdminController::class, 'deleteProduct']);
         Route::get('/events',  [AdminController::class, 'events']);
         Route::patch('/vendors/{vendor}/status', [AdminController::class, 'updateVendorStatus']);
+        Route::get('/settings', [AdminController::class, 'getSettings']);
+        Route::post('/settings', [AdminController::class, 'updateSettings']);
     });
 });
 
