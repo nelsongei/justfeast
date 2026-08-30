@@ -693,9 +693,14 @@
                     <div class="flex justify-between items-start">
                         <div>
                             <span class="text-[9px] text-zinc-500 font-bold uppercase">Order #${o.id}</span>
-                            <h4 class="text-xs font-bold text-white">${o.user.name}</h4>
+                            <h4 class="text-xs font-bold text-white">${o.user ? o.user.name : 'Customer'}</h4>
                         </div>
-                        <span class="text-[8px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full ${badgeClass}">${o.order_status}</span>
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#05A357]/20 text-[#05A357] border border-[#05A357]/30">
+                                <i class="fas fa-check-circle text-[8px] mr-0.5"></i> PAID
+                            </span>
+                            <span class="text-[8px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full ${badgeClass}">${o.order_status}</span>
+                        </div>
                     </div>
                     <div class="text-[10px] text-zinc-400 space-y-1 py-1.5 border-y border-zinc-900">
                         ${o.items.map(item => `<div>• ${item.quantity}x ${item.product.name}</div>`).join('')}

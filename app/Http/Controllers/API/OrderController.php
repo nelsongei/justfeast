@@ -130,6 +130,19 @@ class OrderController extends Controller
                 OrderItem::create($itemData);
             }
 
+            // Generate 4-digit system Delivery OTP / PIN for client verification
+            $otpPin  = (string) random_int(1000, 9999);
+            $otpHash = Hash::make($otpPin);
+
+            Delivery::create([
+                'order_id'              => $order->id,
+                'verification_pin'      => $otpPin,
+                'verification_pin_hash' => $otpHash,
+                'verification_attempts' => 0,
+                'pin_expires_at'        => now()->addHours(2),
+                'status'                => 'pending',
+            ]);
+
             DB::commit();
 
             return response()->json([
