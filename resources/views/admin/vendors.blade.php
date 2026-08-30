@@ -403,6 +403,153 @@
       cursor: not-allowed;
       transform: none !important;
     }
+
+    /* Register Vendor Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(8px);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .modal-overlay.is-active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      width: 100%;
+      max-width: 640px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      transform: scale(0.95) translateY(10px);
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .modal-overlay.is-active .modal-card {
+      transform: scale(1) translateY(0);
+    }
+
+    .modal-header {
+      padding: 1.5rem 1.75rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #FFFFFF;
+    }
+
+    .modal-header h3 {
+      font-size: 1.1rem;
+      font-weight: 900;
+      color: var(--text);
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin: 0;
+    }
+
+    .modal-close-btn {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.15s ease;
+    }
+
+    .modal-close-btn:hover {
+      background: #FEF2F2;
+      color: #991B1B;
+      border-color: #FCA5A5;
+    }
+
+    .modal-body {
+      padding: 1.75rem;
+    }
+
+    .form-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+    }
+
+    @media (max-width: 640px) {
+      .form-grid-2 { grid-template-columns: 1fr; }
+    }
+
+    .form-field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .form-field-group label {
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+    }
+
+    .form-input-ctrl {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border-radius: 12px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 0.85rem;
+      font-weight: 600;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .form-input-ctrl:focus {
+      border-color: var(--brand);
+      box-shadow: 0 0 0 3px rgba(163, 29, 29, 0.1);
+      background: #FFFFFF;
+    }
+
+    .btn-register-vendor {
+      background: linear-gradient(135deg, #A31D1D, #841313);
+      color: #FFFFFF;
+      padding: 0.75rem 1.4rem;
+      border-radius: 12px;
+      font-size: 0.82rem;
+      font-weight: 900;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: 0 4px 14px rgba(163, 29, 29, 0.25);
+      transition: all 0.2s ease;
+    }
+
+    .btn-register-vendor:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(163, 29, 29, 0.35);
+    }
   </style>
 
   <div id="toast-container" class="toast-container"></div>
@@ -473,10 +620,17 @@
         </select>
       </div>
 
-      <button type="button" class="btn-sync" onclick="loadVendorsTab(true)">
-        <i class="fas fa-sync-alt" id="sync-icon"></i>
-        <span>Refresh Vendors</span>
-      </button>
+      <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
+        <button type="button" class="btn-register-vendor" onclick="openRegisterVendorModal()">
+          <i class="fas fa-plus-circle"></i>
+          <span>Register New Vendor</span>
+        </button>
+
+        <button type="button" class="btn-sync" onclick="loadVendorsTab(true)">
+          <i class="fas fa-sync-alt" id="sync-icon"></i>
+          <span>Refresh Vendors</span>
+        </button>
+      </div>
     </div>
 
     {{-- ── 3. Vendor Cards Grid Container ── --}}
@@ -487,6 +641,101 @@
       </div>
     </div>
 
+  </div>
+
+  {{-- ── 4. Register Vendor Modal ── --}}
+  <div class="modal-overlay" id="vendor-modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>
+          <i class="fas fa-store" style="color:var(--brand)"></i>
+          Register New Vendor Account
+        </h3>
+        <button type="button" class="modal-close-btn" onclick="closeRegisterVendorModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <form id="register-vendor-form" onsubmit="handleRegisterVendor(event)" enctype="multipart/form-data">
+        <div class="modal-body" style="display:flex;flex-direction:column;gap:1.25rem;">
+          
+          <div style="font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--brand);border-bottom:1px solid var(--border);padding-bottom:0.4rem;">
+            <i class="fas fa-user-shield mr-1"></i> Account Owner & Credentials
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-field-group">
+              <label for="v-owner-name">Owner Full Name *</label>
+              <input type="text" id="v-owner-name" name="name" required class="form-input-ctrl" placeholder="e.g. Jane Doe">
+            </div>
+
+            <div class="form-field-group">
+              <label for="v-owner-email">Email Address *</label>
+              <input type="email" id="v-owner-email" name="email" required class="form-input-ctrl" placeholder="jane@stall.co.ke">
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-field-group">
+              <label for="v-owner-phone">Phone Number</label>
+              <input type="tel" id="v-owner-phone" name="phone" class="form-input-ctrl" placeholder="+254 700 000 000">
+            </div>
+
+            <div class="form-field-group">
+              <label for="v-password">Account Password *</label>
+              <input type="password" id="v-password" name="password" required class="form-input-ctrl" placeholder="••••••••" minlength="6">
+            </div>
+          </div>
+
+          <div style="font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--brand);border-bottom:1px solid var(--border);padding-bottom:0.4rem;margin-top:0.5rem;">
+            <i class="fas fa-store-alt mr-1"></i> Vendor Business & Outlet Profile
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-field-group">
+              <label for="v-biz-name">Stall / Business Name *</label>
+              <input type="text" id="v-biz-name" name="business_name" required class="form-input-ctrl" placeholder="e.g. Carnivore Smokehouse">
+            </div>
+
+            <div class="form-field-group">
+              <label for="v-event-id">Assigned Event *</label>
+              <select id="v-event-id" name="event_id" required class="form-input-ctrl">
+                <option value="">Loading events...</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-field-group">
+              <label for="v-status">Initial Account Status</label>
+              <select id="v-status" name="status" class="form-input-ctrl">
+                <option value="active">Active (Ready to trade)</option>
+                <option value="inactive">Inactive / Suspended</option>
+              </select>
+            </div>
+
+            <div class="form-field-group">
+              <label for="v-logo-file">Stall Logo File</label>
+              <input type="file" id="v-logo-file" name="logo" accept="image/*" class="form-input-ctrl" style="padding:0.5rem;">
+            </div>
+          </div>
+
+          <div class="form-field-group">
+            <label for="v-logo-url">Or Image / Emoji URL (Optional)</label>
+            <input type="text" id="v-logo-url" name="logo_url" class="form-input-ctrl" placeholder="https://example.com/logo.png or 🍔">
+          </div>
+
+          <div style="display:flex;justify-content:flex-end;gap:0.75rem;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);">
+            <button type="button" class="btn-sync" onclick="closeRegisterVendorModal()">Cancel</button>
+            <button type="submit" class="btn-register-vendor" id="btn-submit-vendor">
+              <i class="fas fa-check-circle"></i>
+              <span>Create Vendor Account</span>
+            </button>
+          </div>
+
+        </div>
+      </form>
+    </div>
   </div>
 @endsection
 
@@ -764,6 +1013,78 @@ function escapeHtml(str) {
 function escapeJs(str) {
   if (!str) return '';
   return String(str).replace(/'/g, "\\'").replace(/"/g, '\\"');
+}
+
+async function openRegisterVendorModal() {
+  const modal = document.getElementById('vendor-modal-overlay');
+  if (modal) modal.classList.add('is-active');
+  await loadEventsForVendorModal();
+}
+
+function closeRegisterVendorModal() {
+  const modal = document.getElementById('vendor-modal-overlay');
+  if (modal) modal.classList.remove('is-active');
+  const form = document.getElementById('register-vendor-form');
+  if (form) form.reset();
+}
+
+async function loadEventsForVendorModal() {
+  const select = document.getElementById('v-event-id');
+  if (!select) return;
+
+  try {
+    const res = await fetch(`${API_BASE}/admin/events`);
+    if (res.ok) {
+      const events = await res.json();
+      select.innerHTML = events.length
+        ? events.map(e => `<option value="${e.id}">${escapeHtml(e.name)} (${(e.status || 'active').toUpperCase()})</option>`).join('')
+        : '<option value="">Default Main Event</option>';
+    } else {
+      select.innerHTML = '<option value="">Default Main Event</option>';
+    }
+  } catch (e) {
+    select.innerHTML = '<option value="">Default Main Event</option>';
+  }
+}
+
+async function handleRegisterVendor(event) {
+  event.preventDefault();
+  const form = document.getElementById('register-vendor-form');
+  const submitBtn = document.getElementById('btn-submit-vendor');
+  if (!form || !submitBtn) return;
+
+  const originalHtml = submitBtn.innerHTML;
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Registering Vendor...`;
+
+  const formData = new FormData(form);
+
+  try {
+    const res = await fetch(`${API_BASE}/admin/vendors`, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+      },
+      body: formData
+    });
+
+    const data = await res.json();
+
+    if (res.ok && (data.success || data.status === 'success')) {
+      showNotification(data.message || 'Vendor account registered successfully!', 'success');
+      closeRegisterVendorModal();
+      loadVendorsTab();
+    } else {
+      const errMsg = data.message || (data.errors ? Object.values(data.errors).flat().join(', ') : 'Failed to register vendor account.');
+      showNotification(errMsg, 'error');
+    }
+  } catch (e) {
+    showNotification('Network error while registering vendor', 'error');
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = originalHtml;
+  }
 }
 </script>
 @endsection

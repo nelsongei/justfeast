@@ -69,12 +69,17 @@
 
         <div>
           <label style="display: block; font-size: .7rem; font-weight: 800; text-transform: uppercase; color: var(--muted); margin-bottom: .4rem; letter-spacing: .05em;">Assign Role</label>
-          <select id="new-user-role" required style="width: 100%; padding: .65rem .85rem; border-radius: 10px; background: var(--surface2); border: 1px solid var(--border); color: var(--text); outline: none; font-weight: 600;">
+          <select id="new-user-role" required onchange="toggleVendorBizField()" style="width: 100%; padding: .65rem .85rem; border-radius: 10px; background: var(--surface2); border: 1px solid var(--border); color: var(--text); outline: none; font-weight: 600;">
             <option value="client">Client (Customer)</option>
             <option value="runner">Runner (Courier)</option>
             <option value="vendor">Vendor (Stall Staff)</option>
             <option value="admin">Administrator</option>
           </select>
+        </div>
+
+        <div id="vendor-biz-name-wrap" style="display: none;">
+          <label style="display: block; font-size: .7rem; font-weight: 800; text-transform: uppercase; color: var(--brand); margin-bottom: .4rem; letter-spacing: .05em;">Stall / Business Name</label>
+          <input type="text" id="new-user-biz-name" placeholder="Carnivore Smokehouse" style="width: 100%; padding: .65rem .85rem; border-radius: 10px; background: var(--surface2); border: 1px solid var(--border); color: var(--text); outline: none; font-weight: 600;">
         </div>
 
         <button type="submit" style="background: linear-gradient(135deg, #A31D1D, #841313); color: #fff; padding: .75rem; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; transition: .15s; margin-top: .5rem; box-shadow: 0 4px 14px rgba(163,29,29,0.3);">
@@ -163,12 +168,21 @@ function promptManageUser(userId, name) {
   alert(`Managing permissions for user: ${name} (ID: ${userId}). Account status: Active.`);
 }
 
+function toggleVendorBizField() {
+  const role = document.getElementById('new-user-role')?.value;
+  const wrap = document.getElementById('vendor-biz-name-wrap');
+  if (wrap) {
+    wrap.style.display = role === 'vendor' ? 'block' : 'none';
+  }
+}
+
 async function handleCreateUser(event) {
   event.preventDefault();
   const name = document.getElementById('new-user-name').value;
   const email = document.getElementById('new-user-email').value;
   const password = document.getElementById('new-user-password').value;
   const role = document.getElementById('new-user-role').value;
+  const business_name = role === 'vendor' ? document.getElementById('new-user-biz-name')?.value : null;
 
   try {
     const res = await fetch(`${API_BASE}/admin/users`, {
@@ -177,13 +191,14 @@ async function handleCreateUser(event) {
         'Content-Type': 'application/json',
         'X-CSRF-TOKEN': '{{ csrf_token() }}'
       },
-      body: JSON.stringify({ name, email, password, role })
+      body: JSON.stringify({ name, email, password, role, business_name })
     });
     
     const data = await res.json();
     if (res.ok && data.success) {
       alert(data.message);
       document.getElementById('create-user-form').reset();
+      toggleVendorBizField();
       loadUsersTab();
     } else {
       alert(data.message || 'Error creating user account');

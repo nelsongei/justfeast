@@ -3,12 +3,15 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Event;
+use App\Models\Venue;
 use App\Models\Order;
 use App\Models\Vendor;
 use App\Models\Delivery;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class AdminController extends Controller
 {
@@ -212,24 +215,142 @@ class AdminController extends Controller
     public function createUser(Request $request)
     {
         $data = $request->validate([
-            'name'     => 'required|string|max:255',
-            'email'    => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6',
-            'role'     => 'required|in:admin,vendor,runner,client',
+            'name'          => 'required|string|max:255',
+            'email'         => 'required|email|unique:users,email',
+            'password'      => 'required|string|min:6',
+            'role'          => 'required|in:admin,vendor,runner,client',
+            'business_name' => 'nullable|string|max:255',
+            'phone'         => 'nullable|string|max:20|unique:users,phone',
         ]);
 
         $user = User::create([
             'name'     => $data['name'],
             'email'    => $data['email'],
-            'password' => bcrypt($data['password']),
+            'phone'    => $data['phone'] ?? null,
+            'password' => Hash::make($data['password']),
             'role'     => $data['role'],
         ]);
+
+        $vendor = null;
+        if ($data['role'] === 'vendor') {
+            $businessName = !empty($data['business_name']) ? $data['business_name'] : $data['name'] . "'s Stall";
+            $eventId = $this->getOrCreateActiveEventId();
+            $vendor = Vendor::create([
+                'user_id'       => $user->id,
+                'business_name' => $businessName,
+                'event_id'      => $eventId,
+                'status'        => 'active',
+            ]);
+        }
 
         return response()->json([
             'success' => true,
             'message' => 'User account created successfully!',
-            'user'    => $user
+            'user'    => $user,
+            'vendor'  => $vendor,
         ]);
+    }
+
+    public function events()
+    {
+        $events = Event::select(['id', 'name', 'status', 'start_time', 'end_time'])
+            ->orderByDesc('id')
+            ->get();
+
+        return response()->json($events);
+    }
+
+    public function storeVendor(Request $request)
+    {
+        $validated = $request->validate([
+            'name'          => 'required|string|max:255',
+            'business_name' => 'required|string|max:255',
+            'email'         => 'required|string|email|max:255|unique:users,email',
+            'phone'         => 'nullable|string|max:20|unique:users,phone',
+            'password'      => 'required|string|min:6',
+            'event_id'      => 'nullable|exists:events,id',
+            'status'        => 'nullable|in:active,inactive',
+            'logo'          => 'nullable|image|max:2048',
+            'logo_url'      => 'nullable|string|max:255',
+        ]);
+
+        $logoUrl = $validated['logo_url'] ?? null;
+        if ($request->hasFile('logo')) {
+            $file     = $request->file('logo');
+            $filename = time() . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '_', $file->getClientOriginalName());
+            $file->move(public_path('images/uploads'), $filename);
+            $logoUrl  = '/images/uploads/' . $filename;
+        }
+
+        $eventId = $this->getOrCreateActiveEventId($validated['event_id'] ?? null);
+
+        DB::beginTransaction();
+        try {
+            $user = User::create([
+                'name'     => $validated['name'],
+                'email'    => $validated['email'],
+                'phone'    => $validated['phone'] ?? null,
+                'role'     => 'vendor',
+                'password' => Hash::make($validated['password']),
+            ]);
+
+            $vendor = Vendor::create([
+                'user_id'       => $user->id,
+                'business_name' => $validated['business_name'],
+                'event_id'      => $eventId,
+                'status'        => $validated['status'] ?? 'active',
+                'logo_url'      => $logoUrl,
+            ]);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => "Vendor account '{$vendor->business_name}' registered successfully!",
+                'vendor'  => $vendor->load(['user:id,name,email,phone', 'event:id,name']),
+            ], 201);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to register vendor: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    private function getOrCreateActiveEventId(?int $eventId = null): int
+    {
+        if ($eventId && Event::where('id', $eventId)->exists()) {
+            return (int) $eventId;
+        }
+
+        $activeId = Event::where('status', 'active')->value('id');
+        if ($activeId) {
+            return (int) $activeId;
+        }
+
+        $firstId = Event::first()?->id;
+        if ($firstId) {
+            return (int) $firstId;
+        }
+
+        $venue = Venue::firstOrCreate(
+            ['name' => 'Main Venue'],
+            [
+                'map_data'       => ['coordinates' => '0,0'],
+                'seating_layout' => ['sections' => []],
+            ]
+        );
+
+        $event = Event::create([
+            'name'       => 'Main Concert Event',
+            'venue_id'   => $venue->id,
+            'start_time' => now(),
+            'end_time'   => now()->addDays(30),
+            'status'     => 'active',
+        ]);
+
+        return (int) $event->id;
     }
 
     public function vendors(Request $request)

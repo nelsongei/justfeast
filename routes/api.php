@@ -29,8 +29,8 @@ Route::prefix('auth')->group(function () {
     Route::post('/register-vendor', [AuthController::class, 'registerVendor']);
 });
 
-// ── Sanctum-protected routes ──────────────────────────────────────────────────
-Route::middleware('auth:sanctum')->group(function () {
+// ── Sanctum & Session-protected routes ────────────────────────────────────────
+Route::middleware('auth:sanctum,web')->group(function () {
 
     // Customer — order management
     Route::get('/orders/active',                [OrderController::class, 'active']);
@@ -68,6 +68,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/users',  [AdminController::class, 'createUser']);
         Route::get('/reports', [AdminController::class, 'reports']);
         Route::get('/vendors', [AdminController::class, 'vendors']);
+        Route::post('/vendors', [AdminController::class, 'storeVendor']);
+        Route::get('/events',  [AdminController::class, 'events']);
         Route::patch('/vendors/{vendor}/status', [AdminController::class, 'updateVendorStatus']);
     });
 });
