@@ -43,30 +43,36 @@ class MpesaDarajaService
      */
     public function getAccessToken(): ?string
     {
-        // Cache token for 55 minutes (tokens last 3600s = 60 mins)
-        return Cache::remember('mpesa_access_token_' . $this->env, 3300, function () {
-            try {
-                $url = $this->getBaseUrl() . '/oauth/v1/generate?grant_type=client_credentials';
+        $cacheKey = 'mpesa_access_token_' . $this->env;
+        $cachedToken = Cache::get($cacheKey);
 
-                $response = Http::withBasicAuth($this->consumerKey, $this->consumerSecret)
-                    ->acceptJson()
-                    ->get($url);
+        if ($cachedToken && is_string($cachedToken)) {
+            return $cachedToken;
+        }
 
-                if ($response->successful() && isset($response->json()['access_token'])) {
-                    return $response->json()['access_token'];
-                }
+        try {
+            $url = $this->getBaseUrl() . '/oauth/v1/generate?grant_type=client_credentials';
 
-                Log::error('M-Pesa Daraja OAuth Failed', [
-                    'status' => $response->status(),
-                    'body'   => $response->json(),
-                ]);
+            $response = Http::withBasicAuth($this->consumerKey, $this->consumerSecret)
+                ->acceptJson()
+                ->get($url);
 
-                return null;
-            } catch (\Exception $e) {
-                Log::error('M-Pesa Daraja OAuth Exception: ' . $e->getMessage());
-                return null;
+            if ($response->successful() && isset($response->json()['access_token'])) {
+                $token = $response->json()['access_token'];
+                Cache::put($cacheKey, $token, 3300);
+                return $token;
             }
-        });
+
+            Log::error('M-Pesa Daraja OAuth Failed', [
+                'status' => $response->status(),
+                'body'   => $response->json(),
+            ]);
+
+            return null;
+        } catch (\Exception $e) {
+            Log::error('M-Pesa Daraja OAuth Exception: ' . $e->getMessage());
+            return null;
+        }
     }
 
     /**
@@ -245,10 +251,12 @@ class MpesaDarajaService
     {
         $phone = preg_replace('/\D/', '', $phone);
 
-        if (str_starts_with($phone, '0')) {
-            $phone = '254' . substr($phone, 1);
-        } elseif (str_starts_with($phone, '+254')) {
-            $phone = substr($phone, 1);
+        if (str_starts_with($phone, '0') && strlen($phone) === 10) {
+            return '254' . substr($phone, 1);
+        }
+
+        if ((str_starts_with($phone, '7') || str_starts_with($phone, '1')) && strlen($phone) === 9) {
+            return '254' . $phone;
         }
 
         return $phone;

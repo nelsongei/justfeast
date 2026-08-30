@@ -18,13 +18,15 @@ use App\Http\Controllers\API\MpesaCallbackController;
 Route::get('/events/active', [EventController::class, 'index']);
 Route::get('/vendors',       [EventController::class, 'vendors']);
 
-// ── Authentication (OTP flow) ─────────────────────────────────────────────────
+// ── Authentication (OTP & Vendor Registration) ──────────────────────────────
 Route::prefix('auth')->group(function () {
-    Route::post('/login',  [AuthController::class, 'login'])
+    Route::post('/login',           [AuthController::class, 'login'])
         ->middleware('throttle:otp');
 
-    Route::post('/verify', [AuthController::class, 'verify'])
+    Route::post('/verify',          [AuthController::class, 'verify'])
         ->middleware('throttle:otp-verify');
+
+    Route::post('/register-vendor', [AuthController::class, 'registerVendor']);
 });
 
 // ── Sanctum-protected routes ──────────────────────────────────────────────────
@@ -65,6 +67,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/users',   [AdminController::class, 'users']);
         Route::post('/users',  [AdminController::class, 'createUser']);
         Route::get('/reports', [AdminController::class, 'reports']);
+        Route::get('/vendors', [AdminController::class, 'vendors']);
+        Route::patch('/vendors/{vendor}/status', [AdminController::class, 'updateVendorStatus']);
     });
 });
 

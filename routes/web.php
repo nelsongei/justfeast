@@ -4,9 +4,11 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 
 // ─── Auth ────────────────────────────────────────────────────────────────────
-Route::get('/login',  [AuthController::class, 'showLogin'])->name('login');
-Route::post('/login', [AuthController::class, 'login'])->name('login.post');
-Route::post('/logout',[AuthController::class, 'logout'])->name('logout');
+Route::get('/login',             [AuthController::class, 'showLogin'])->name('login');
+Route::post('/login',            [AuthController::class, 'login'])->name('login.post');
+Route::get('/register/vendor',   [AuthController::class, 'showVendorRegister'])->name('register.vendor');
+Route::post('/register/vendor',  [AuthController::class, 'registerVendor'])->name('register.vendor.post');
+Route::post('/logout',           [AuthController::class, 'logout'])->name('logout');
 // ─────────────────────────────────────────────────────────────────────────────
 
 /*

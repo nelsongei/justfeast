@@ -83,24 +83,25 @@
         .logo {
             display: flex;
             align-items: center;
-            gap: 0.8rem;
-            margin-bottom: 2rem;
+            justify-content: flex-start;
+            margin-bottom: 1.8rem;
         }
         .logo-icon {
-            width: 46px; height: 46px;
+            height: 48px;
+            padding: 6px 14px;
             background: #FFFFFF;
             border-radius: 16px;
-            display: flex; align-items: center; justify-content: center;
-            padding: 5px;
-            box-shadow: 0 8px 20px rgba(163, 29, 29, 0.12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
             border: 1px solid var(--border);
         }
         .logo-icon img {
-            width: 100%; height: 100%;
+            height: 100%;
+            width: auto;
             object-fit: contain;
         }
-        .logo-text { font-size: 1.55rem; font-weight: 900; letter-spacing: -0.5px; color: var(--text); }
-        .logo-text span { color: var(--gold); }
 
         h1 { font-size: 1.7rem; font-weight: 900; margin-bottom: 0.35rem; letter-spacing: -0.4px; color: var(--text); }
         .subtitle { color: var(--muted); font-size: 0.88rem; margin-bottom: 1.8rem; font-weight: 600; }
@@ -202,10 +203,7 @@
         {{-- ── Login Form ──────────────────────────────────────────────────── --}}
         <div class="form-card">
             <div class="logo">
-                <div class="logo-icon">
-                    <img src="{{ asset('images/logo/jm.png') }}" alt="justFeast Logo">
-                </div>
-                <div class="logo-text">just<span>Feast</span></div>
+                <img src="{{ asset('images/logo/jm.png') }}" alt="justFeast Logo" style="height: 52px; width: auto; border-radius: 16px; box-shadow: 0 6px 20px rgba(0,0,0,0.12); border: 1px solid rgba(0,0,0,0.08);">
             </div>
 
             <h1>Welcome back</h1>
@@ -262,6 +260,10 @@
                     <i class="fas fa-arrow-right text-xs"></i>
                 </button>
             </form>
+
+            <div style="text-align: center; margin-top: 1.6rem; font-size: 0.88rem; color: var(--muted); font-weight: 600;">
+                Are you a vendor? <a href="{{ route('register.vendor') }}" style="color: var(--brand); font-weight: 800; text-decoration: none;">Register Your Business</a>
+            </div>
         </div>
 
     </div>

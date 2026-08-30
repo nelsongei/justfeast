@@ -125,14 +125,12 @@
     <!-- Header Navigation -->
     <header class="border-b border-zinc-900 bg-zinc-950/80 backdrop-blur-md sticky top-0 z-40 px-4 md:px-6 py-3 md:py-4 flex flex-col md:flex-row items-center justify-between gap-3 md:gap-4">
         <div class="flex items-center gap-3">
-            <div class="bg-white w-9 h-9 md:w-10 md:h-10 rounded-xl flex items-center justify-center shadow-lg shadow-brand-rose/20 overflow-hidden shrink-0">
-                <img src="{{ asset('images/logo/jm.png') }}" alt="justFeast Logo" class="h-7 md:h-8 w-auto object-contain">
-            </div>
-            <div class="min-w-0">
-                <h1 class="text-base md:text-xl font-bold tracking-tight text-white flex items-center gap-2">
-                    JUSTFEAST <span class="text-[9px] md:text-xs bg-brand-rose/20 text-brand-rose px-2 py-0.5 rounded-full font-semibold border border-brand-rose/30 whitespace-nowrap">Concert Delivery PWA</span>
-                </h1>
-                <p class="text-[10px] md:text-xs text-zinc-500 truncate max-w-[200px] md:max-w-none" id="live-event-banner">Loading active event...</p>
+            <img src="{{ asset('images/logo/jm.png') }}" alt="justFeast Logo" class="h-9 md:h-11 w-auto rounded-xl shadow-md border border-black/10 shrink-0">
+            <div class="min-w-0 flex flex-col justify-center gap-0.5">
+                <div class="flex items-center gap-2">
+                    <span class="text-[9px] md:text-xs bg-brand-rose/20 text-brand-rose px-2 py-0.5 rounded-full font-bold border border-brand-rose/30 whitespace-nowrap">Concert Delivery PWA</span>
+                </div>
+                <p class="text-[10px] md:text-xs text-zinc-400 font-bold truncate max-w-[200px] md:max-w-none" id="live-event-banner">Loading active event...</p>
             </div>
         </div>
 
@@ -166,9 +164,7 @@
             <div id="col-customer" class="xl:col-span-1 glass-card p-5 rounded-3xl border border-zinc-800 flex flex-col h-[780px] relative overflow-hidden">
                 <div class="pb-3 border-b border-zinc-800 mb-4 flex items-center justify-between">
                     <div class="flex items-center gap-2">
-                        <div class="bg-white w-7 h-7 rounded-lg flex items-center justify-center border border-zinc-200 shadow-sm overflow-hidden">
-                            <img src="{{ asset('images/logo/jm.png') }}" alt="justFeast Logo" class="h-5 w-auto object-contain">
-                        </div>
+                        <img src="{{ asset('images/logo/jm.png') }}" alt="justFeast Logo" class="h-7 w-auto rounded-lg shadow-xs border border-black/10 shrink-0">
                         <div>
                             <h2 class="text-xs font-black text-white">justFeast</h2>
                             <p class="text-[8px] text-zinc-400">Seat Delivery</p>
@@ -193,9 +189,7 @@
                             <!-- Auth Screen -->
                             <div id="cust-auth" class="w-full bg-[#1C1C24] border border-zinc-800 rounded-3xl p-5 text-center space-y-5 relative shadow-2xl">
                                 <button onclick="closeAuthModal()" class="absolute top-3 right-3 text-zinc-500 hover:text-zinc-300 text-xs"><i class="fas fa-times"></i></button>
-                                <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center mx-auto shadow-lg shadow-zinc-150/15 border border-zinc-200 overflow-hidden">
-                                    <img src="{{ asset('images/logo/jm.png') }}" alt="justFeast Logo" class="h-9 w-auto object-contain">
-                                </div>
+                                <img src="{{ asset('images/logo/jm.png') }}" alt="justFeast Logo" class="h-9 w-auto mx-auto rounded-xl shadow-md border border-black/10 block">
                                 <div class="space-y-1">
                                     <h3 class="text-sm font-black text-white">Concert Location Delivery</h3>
                                     <p class="text-[10px] text-zinc-400 leading-relaxed font-medium">Get food, drinks, and snacks delivered directly to your location during the concert!</p>
@@ -1536,12 +1530,12 @@
         // Checkout Cart Trigger
         function checkoutOrder() {
             if (basket.length === 0) {
-                alert("Please add items to your basket first!");
+                showToast("Please add items to your basket first!", "warning");
                 return;
             }
  
             if (!selectedSeat) {
-                alert("Please configure your delivery location on the map first!");
+                showToast("Please configure your delivery location on the map first!", "warning");
                 openSeatModal();
                 return;
             }
@@ -1570,7 +1564,7 @@
         async function confirmMpesaSimulation() {
             const pin = document.getElementById('mpesa-pin-input').value;
             if (!pin || pin.length < 4) {
-                alert("Please input your 4-digit M-Pesa PIN!");
+                showToast("Please input your 4-digit M-Pesa PIN!", "warning");
                 return;
             }
  
@@ -1797,7 +1791,7 @@
                 });
             } else if (status === 'delivered') {
                 playSoundNotification('success');
-                alert("🎉 Order successfully delivered to your seat! Enjoy the concert!");
+                showToast("🎉 Order successfully delivered to your seat! Enjoy the concert!", "success");
                 resetTrackerDemo();
             }
         }

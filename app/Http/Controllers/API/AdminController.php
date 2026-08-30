@@ -231,4 +231,65 @@ class AdminController extends Controller
             'user'    => $user
         ]);
     }
+
+    public function vendors(Request $request)
+    {
+        $vendors = Vendor::query()
+            ->with(['user:id,name,email,phone', 'event:id,name', 'products:id,vendor_id,name,description,price,stock_status'])
+            ->leftJoin('orders', function ($join) {
+                $join->on('orders.vendor_id', '=', 'vendors.id')
+                    ->where('orders.payment_status', '=', 'paid');
+            })
+            ->select([
+                'vendors.id',
+                'vendors.user_id',
+                'vendors.event_id',
+                'vendors.business_name',
+                'vendors.logo_url',
+                'vendors.status',
+            ])
+            ->selectRaw('COALESCE(SUM(orders.total_amount), 0) AS total_revenue')
+            ->selectRaw('COUNT(orders.id) AS orders_count')
+            ->groupBy('vendors.id', 'vendors.user_id', 'vendors.event_id', 'vendors.business_name', 'vendors.logo_url', 'vendors.status')
+            ->get()
+            ->map(function ($vendor) {
+                $logoHtml = $vendor->logo_url 
+                    ? (str_starts_with($vendor->logo_url, 'http') || str_starts_with($vendor->logo_url, '/') 
+                        ? '<img src="' . e($vendor->logo_url) . '" alt="Logo" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">' 
+                        : e($vendor->logo_url)) 
+                    : '<i class="fas fa-store"></i>';
+
+                return [
+                    'id'            => $vendor->id,
+                    'user_id'       => $vendor->user_id,
+                    'event_id'      => $vendor->event_id,
+                    'business_name' => $vendor->business_name,
+                    'logo_url'      => $logoHtml,
+                    'raw_logo'      => $vendor->logo_url,
+                    'status'        => $vendor->status,
+                    'total_revenue' => floatval($vendor->total_revenue),
+                    'orders_count'  => (int) $vendor->orders_count,
+                    'user'          => $vendor->user,
+                    'event'         => $vendor->event,
+                    'products'      => $vendor->products,
+                ];
+            });
+
+        return response()->json($vendors);
+    }
+
+    public function updateVendorStatus(Request $request, Vendor $vendor)
+    {
+        $validated = $request->validate([
+            'status' => 'required|in:active,inactive',
+        ]);
+
+        $vendor->update(['status' => $validated['status']]);
+
+        return response()->json([
+            'success' => true,
+            'message' => "Vendor account '{$vendor->business_name}' is now {$vendor->status}.",
+            'vendor'  => $vendor->fresh(['user:id,name,email', 'event:id,name']),
+        ]);
+    }
 }

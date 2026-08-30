@@ -255,9 +255,7 @@
             <!-- Header -->
             <header class="flex flex-wrap items-center justify-between gap-3 bg-white p-3.5 sm:p-4 rounded-2xl border border-[#E2E8F0] shadow-sm">
                 <div class="flex items-center gap-2.5">
-                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white border border-[#E2E8F0] flex items-center justify-center overflow-hidden p-1 shadow-sm shrink-0">
-                        <img src="{{ asset('images/logo/jm.png') }}" alt="justFeast Logo" class="w-full h-full object-contain">
-                    </div>
+                    <img src="{{ asset('images/logo/jm.png') }}" alt="justFeast Logo" class="h-10 sm:h-12 w-auto rounded-xl shadow-sm border border-black/10 shrink-0">
                     <div>
                         <h1 class="text-base sm:text-lg font-black tracking-tight text-[#0F172A] flex items-center gap-1.5" id="vendor-title">
                             Vendor Portal
@@ -529,13 +527,36 @@
             } catch(e) {}
         }
 
+        function showToast(msg, type = 'success') {
+            let container = document.getElementById('toast-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'toast-container';
+                container.className = 'fixed top-4 right-4 z-[9999] flex flex-col gap-2 pointer-events-none max-w-sm w-full px-4';
+                document.body.appendChild(container);
+            }
+            const toast = document.createElement('div');
+            const bgColor = type === 'success' ? 'bg-[#05A357]' : type === 'danger' ? 'bg-[#A31D1D]' : 'bg-[#0F172A]';
+            const icon = type === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation';
+
+            toast.className = `${bgColor} text-white px-4 py-3 rounded-2xl shadow-xl flex items-center gap-3 text-xs font-bold pointer-events-auto transition-all transform translate-y-2 opacity-0`;
+            toast.innerHTML = `<i class="fas ${icon} text-base"></i> <span class="flex-1">${msg}</span>`;
+
+            container.appendChild(toast);
+            requestAnimationFrame(() => toast.classList.remove('translate-y-2', 'opacity-0'));
+            setTimeout(() => {
+                toast.classList.add('opacity-0', '-translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
         async function sendVendorOTP() {
             const phone = document.getElementById('vendor-phone-input').value.trim();
-            if (!phone) { alert('Please enter your phone number.'); return; }
+            if (!phone) { showToast('Please enter your phone number.', 'danger'); return; }
             try {
                 const res = await fetch(`${API_BASE}/auth/login`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                     body: JSON.stringify({ phone })
                 });
                 const data = await res.json();
@@ -544,21 +565,22 @@
                     document.getElementById('vendor-otp-status-text').textContent = data.message;
                     document.getElementById('vendor-auth-step-phone').classList.add('hidden');
                     document.getElementById('vendor-auth-step-otp').classList.remove('hidden');
+                    showToast('Verification OTP code sent to phone.', 'success');
                 } else {
-                    alert(data.message || 'Error sending OTP');
+                    showToast(data.message || 'Error sending OTP', 'danger');
                 }
-            } catch(e) { alert('Network error'); }
+            } catch(e) { showToast('Network error connecting to authentication server', 'danger'); }
         }
 
         async function verifyVendorOTP() {
             const phone = document.getElementById('vendor-phone-input').value.trim();
             const code = document.getElementById('vendor-otp-input').value.trim();
-            if (!code || code.length < 6) { alert('Please enter the 6-digit code.'); return; }
+            if (!code || code.length < 6) { showToast('Please enter the 6-digit verification code.', 'danger'); return; }
 
             try {
                 const res = await fetch(`${API_BASE}/auth/verify`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                     body: JSON.stringify({ phone, code })
                 });
                 const data = await res.json();
@@ -568,10 +590,11 @@
                     localStorage.setItem('justfeast_vendor_user', JSON.stringify({ ...currentUser, __token: data.token }));
                     showDashboard();
                     syncQueue();
+                    showToast(`Welcome back, ${currentUser.name}!`, 'success');
                 } else {
-                    alert(data.message || 'Verification failed');
+                    showToast(data.message || 'Verification failed', 'danger');
                 }
-            } catch(e) { alert('Network error'); }
+            } catch(e) { showToast('Network error verifying code', 'danger'); }
         }
 
         function resetVendorAuthForm() {

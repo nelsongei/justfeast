@@ -388,13 +388,36 @@
             pollingInterval = setInterval(syncDeliveries, 2000);
         });
 
+        function showToast(msg, type = 'success') {
+            let container = document.getElementById('toast-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'toast-container';
+                container.className = 'fixed top-4 right-4 z-[9999] flex flex-col gap-2 pointer-events-none max-w-sm w-full px-4';
+                document.body.appendChild(container);
+            }
+            const toast = document.createElement('div');
+            const bgColor = type === 'success' ? 'bg-[#05A357]' : type === 'danger' ? 'bg-[#A31D1D]' : 'bg-[#0F172A]';
+            const icon = type === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation';
+
+            toast.className = `${bgColor} text-white px-4 py-3 rounded-2xl shadow-xl flex items-center gap-3 text-xs font-bold pointer-events-auto transition-all transform translate-y-2 opacity-0`;
+            toast.innerHTML = `<i class="fas ${icon} text-base"></i> <span class="flex-1">${msg}</span>`;
+
+            container.appendChild(toast);
+            requestAnimationFrame(() => toast.classList.remove('translate-y-2', 'opacity-0'));
+            setTimeout(() => {
+                toast.classList.add('opacity-0', '-translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
         async function sendRunnerOTP() {
             const phone = document.getElementById('runner-phone-input').value.trim();
-            if (!phone) { alert('Please enter your phone number.'); return; }
+            if (!phone) { showToast('Please enter your phone number.', 'danger'); return; }
             try {
                 const res = await fetch(`${API_BASE}/auth/login`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                     body: JSON.stringify({ phone })
                 });
                 const data = await res.json();
@@ -403,21 +426,22 @@
                     document.getElementById('runner-otp-status-text').textContent = data.message;
                     document.getElementById('runner-auth-step-phone').classList.add('hidden');
                     document.getElementById('runner-auth-step-otp').classList.remove('hidden');
+                    showToast('Verification OTP code sent to phone.', 'success');
                 } else {
-                    alert(data.message || 'Error sending OTP');
+                    showToast(data.message || 'Error sending OTP', 'danger');
                 }
-            } catch(e) { alert('Network error'); }
+            } catch(e) { showToast('Network error connecting to authentication server', 'danger'); }
         }
 
         async function verifyRunnerOTP() {
             const phone = document.getElementById('runner-phone-input').value.trim();
             const code = document.getElementById('runner-otp-input').value.trim();
-            if (!code || code.length < 6) { alert('Please enter the 6-digit code.'); return; }
+            if (!code || code.length < 6) { showToast('Please enter the 6-digit verification code.', 'danger'); return; }
 
             try {
                 const res = await fetch(`${API_BASE}/auth/verify`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                     body: JSON.stringify({ phone, code })
                 });
                 const data = await res.json();
@@ -427,10 +451,11 @@
                     localStorage.setItem('justfeast_runner_user', JSON.stringify({ ...currentUser, __token: data.token }));
                     showDashboard();
                     syncDeliveries();
+                    showToast(`Welcome back, ${currentUser.name}!`, 'success');
                 } else {
-                    alert(data.message || 'Verification failed');
+                    showToast(data.message || 'Verification failed', 'danger');
                 }
-            } catch(e) { alert('Network error'); }
+            } catch(e) { showToast('Network error verifying code', 'danger'); }
         }
 
         function resetRunnerAuthForm() {
@@ -563,12 +588,12 @@
                         });
                         if (verifyRes.ok) {
                             playSound('success');
-                            alert("🎉 Delivery verified successfully! Order completed.");
+                            showToast("🎉 Delivery verified successfully! Order completed.", 'success');
                             document.getElementById('runner-pin-input').value = '';
                             syncDeliveries();
                         } else {
                             const err = await verifyRes.json();
-                            alert(err.message);
+                            showToast(err.message || "Invalid verification PIN.", 'danger');
                         }
                     }
                 }

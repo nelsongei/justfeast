@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>justFeast — Event Seat Delivery</title>
     <link rel="manifest" href="/manifest.json">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="theme-color" content="#A31D1D">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -317,19 +318,14 @@
 <div class="app-shell relative z-10">
     <!-- App Header -->
     <header class="jf-card rounded-[24px] sm:rounded-[32px] px-3 sm:px-5 md:px-7 py-3 md:py-4 mb-6 flex items-center justify-between sticky top-3 z-40 border border-white/40 shadow-2xl backdrop-blur-xl bg-white/80">
-        <div class="flex items-center gap-2 sm:gap-3.5 min-w-0">
-            <div class="w-9 h-9 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-[#A31D1D] p-0.5 shadow-lg shadow-[#A31D1D]/20 flex items-center justify-center overflow-hidden shrink-0 group hover:scale-105 transition duration-300">
-                <div class="w-full h-full bg-white rounded-[10px] sm:rounded-[14px] flex items-center justify-center p-1">
-                    <img src="{{ asset('images/logo/jm.png') }}" alt="justFeast Logo" class="h-5 sm:h-8 w-auto object-contain">
+        <div class="flex items-center gap-3 min-w-0">
+            <img src="{{ asset('images/logo/jm.png') }}" alt="justFeast Logo" class="h-9 sm:h-12 w-auto rounded-2xl shadow-sm border border-black/10 shrink-0">
+            <div class="min-w-0 flex flex-col justify-center gap-0.5">
+                <div class="flex items-center gap-2">
+                    <span class="bg-[#A31D1D]/10 text-[#A31D1D] text-[8px] sm:text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border border-[#A31D1D]/20 whitespace-nowrap">Live Event</span>
                 </div>
-            </div>
-            <div class="min-w-0">
-                <div class="flex items-center gap-1.5 sm:gap-2">
-                    <h1 class="text-base sm:text-2xl font-black tracking-tight leading-none text-[#0F172A] shrink-0">just<span class="text-[#FFC244]">Feast</span></h1>
-                    <span class="hidden sm:inline-flex bg-[#A31D1D]/10 text-[#A31D1D] text-[8px] sm:text-[9px] font-black uppercase tracking-wider px-1.5 sm:px-2 py-0.5 rounded-full border border-[#A31D1D]/20 whitespace-nowrap">Live Event</span>
-                </div>
-                <p class="text-[9.5px] sm:text-[11px] text-slate-500 font-extrabold mt-0.5 sm:mt-1 flex items-center gap-1 sm:gap-1.5 truncate max-w-[140px] xs:max-w-[180px] sm:max-w-xs md:max-w-none" id="live-event-banner">
-                    <span class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#A31D1D] animate-ping shrink-0"></span>
+                <p class="text-[10px] sm:text-xs text-slate-600 font-extrabold flex items-center gap-1.5 truncate max-w-[150px] xs:max-w-[200px] sm:max-w-xs md:max-w-none" id="live-event-banner">
+                    <span class="w-2 h-2 rounded-full bg-[#05A357] animate-pulse shrink-0"></span>
                     <span class="truncate">Loading active event...</span>
                 </p>
             </div>
@@ -829,9 +825,7 @@
     <div class="max-w-[1480px] mx-auto px-5 md:px-8 py-12 grid grid-cols-1 md:grid-cols-12 gap-8">
         <div class="md:col-span-5 space-y-4">
             <div class="flex items-center gap-3">
-                <div class="w-11 h-11 rounded-2xl bg-white flex items-center justify-center overflow-hidden">
-                    <img src="{{ asset('images/logo/jm.png') }}" alt="justFeast Logo" class="h-9 w-auto object-contain">
-                </div>
+                <img src="{{ asset('images/logo/jm.png') }}" alt="justFeast Logo" class="h-10 w-auto rounded-2xl shadow-sm border border-white/10 shrink-0">
                 <h2 class="text-2xl font-black">just<span class="text-[#FFC244]">Feast</span></h2></div>
             <p class="text-sm text-white/55 leading-relaxed max-w-md">Live event food ordering for concerts, stadiums
                 and festivals. Vendors sell more, attendees miss less, runners deliver to the exact location.</p>
@@ -967,45 +961,85 @@
 </div>
 
 
-<!-- Authentication Modal Overlay (OTP Login) -->
+<!-- Authentication Modal Overlay (OTP Login & Registration) -->
 <div id="auth-modal-overlay"
      class="hidden fixed inset-0 bg-[#2D3748]/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <!-- Auth / Registration Screen -->
     <div id="cust-auth"
-         class="w-full max-w-[380px] bg-white rounded-[32px] p-7 shadow-2xl border border-[#E2E8F0] relative">
-        <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-zinc-400 hover:text-zinc-600"><i class="fas fa-times"></i></button>
-        <div class="text-center space-y-5">
-            <div class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center mx-auto shadow-lg shadow-zinc-100 border border-zinc-200 overflow-hidden">
-                <img src="{{ asset('images/logo/jm.png') }}" alt="justFeast Logo" class="h-10 w-auto object-contain">
+         class="w-full max-w-[400px] bg-white rounded-[32px] p-6 sm:p-7 shadow-2xl border border-[#E2E8F0] relative">
+        <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-zinc-400 hover:text-zinc-600 cursor-pointer p-1"><i class="fas fa-times"></i></button>
+        <div class="text-center space-y-4">
+            <img src="{{ asset('images/logo/jm.png') }}" alt="justFeast Logo" class="h-12 w-auto mx-auto rounded-2xl shadow-md border border-black/10 shrink-0 block">
+
+            <!-- Tab Mode Switcher: Log In vs Register -->
+            <div class="flex bg-slate-100 p-1.5 rounded-2xl border border-slate-200/80 gap-1 text-xs font-black">
+                <button type="button" id="auth-tab-login" onclick="switchAuthTab('login')"
+                        class="flex-1 py-2.5 rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 bg-white text-[#0F172A] shadow-xs font-black">
+                    <i class="fas fa-right-to-bracket text-[#05A357]"></i>
+                    <span>Log In</span>
+                </button>
+                <button type="button" id="auth-tab-register" onclick="switchAuthTab('register')"
+                        class="flex-1 py-2.5 rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 font-bold">
+                    <i class="fas fa-user-plus text-[#A31D1D]"></i>
+                    <span>Register</span>
+                </button>
             </div>
+
             <div class="space-y-1">
-                <h2 class="text-xl font-black text-[#2D3748]">Customer Registration</h2>
-                <p class="text-xs text-zinc-500 font-medium">Enter your details to log in or create an account for stadium seat delivery.</p>
+                <h2 class="text-xl font-black text-[#2D3748]" id="auth-modal-title">Log In to your Account</h2>
+                <p class="text-xs text-zinc-500 font-medium" id="auth-modal-subtitle">Enter your phone number to receive your instant verification OTP code.</p>
             </div>
+
+            <!-- Inline Auth Alert / Error Banner -->
+            <div id="auth-error-banner" class="hidden rounded-2xl p-3.5 text-xs font-bold transition-all border">
+                <div class="flex items-start gap-2.5">
+                    <i id="auth-error-icon" class="fas fa-circle-exclamation text-base shrink-0 mt-0.5"></i>
+                    <div class="space-y-1 flex-1 text-left">
+                        <p id="auth-error-msg" class="leading-snug"></p>
+                        <button type="button" id="auth-error-action" class="hidden text-[11px] font-black underline underline-offset-2 cursor-pointer mt-1 block"></button>
+                    </div>
+                    <button type="button" onclick="hideAuthError()" class="text-xs opacity-60 hover:opacity-100 cursor-pointer p-0.5"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+
             <div class="space-y-3.5 text-left">
-                <div>
-                    <label class="block text-[9px] font-black text-zinc-500 mb-1 uppercase tracking-wider">Full Name</label>
+                <!-- Name field (shown only in Register mode) -->
+                <div id="field-wrap-name" class="hidden">
+                    <label class="block text-[9.5px] font-black text-zinc-600 mb-1 uppercase tracking-wider">Full Name *</label>
                     <input type="text" id="cust-name-input" placeholder="e.g. John Doe"
                            class="w-full px-4 py-3 rounded-xl bg-[#F7F9FA] border border-[#E2E8F0] text-[#2D3748] text-xs font-bold focus:outline-none focus:border-[#05A357] transition"
                            value="">
                 </div>
+
+                <!-- Phone number field (always required) -->
                 <div>
-                    <label class="block text-[9px] font-black text-zinc-500 mb-1 uppercase tracking-wider">Phone Number *</label>
-                    <input type="tel" id="cust-phone-input" placeholder="e.g. 0712345678"
-                           class="w-full px-4 py-3 rounded-xl bg-[#F7F9FA] border border-[#E2E8F0] text-[#2D3748] text-xs font-bold focus:outline-none focus:border-[#05A357] transition"
-                           value="">
+                    <label class="block text-[9.5px] font-black text-zinc-600 mb-1 uppercase tracking-wider">Phone Number *</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400 text-xs font-bold"><i class="fas fa-phone text-[#05A357]"></i></span>
+                        <input type="tel" id="cust-phone-input" placeholder="e.g. 0712345678" required
+                               class="w-full pl-9 pr-4 py-3 rounded-xl bg-[#F7F9FA] border border-[#E2E8F0] text-[#2D3748] text-xs font-bold focus:outline-none focus:border-[#05A357] transition"
+                               value="">
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-[9px] font-black text-zinc-500 mb-1 uppercase tracking-wider">Email Address (Optional)</label>
+
+                <!-- Email field (shown only in Register mode) -->
+                <div id="field-wrap-email" class="hidden">
+                    <label class="block text-[9.5px] font-black text-zinc-600 mb-1 uppercase tracking-wider">Email Address (Optional)</label>
                     <input type="email" id="cust-email-input" placeholder="e.g. john@example.com"
                            class="w-full px-4 py-3 rounded-xl bg-[#F7F9FA] border border-[#E2E8F0] text-[#2D3748] text-xs font-bold focus:outline-none focus:border-[#05A357] transition"
                            value="">
                 </div>
-                <button onclick="sendOTP()"
+
+                <button onclick="sendOTP()" type="button" id="auth-submit-btn"
                         class="w-full py-3.5 rounded-full bg-[#05A357] hover:bg-[#047A43] text-white font-black text-xs transition shadow-md shadow-[#05A357]/20 border-0 cursor-pointer flex items-center justify-center gap-2">
                     <i class="fas fa-key text-xs"></i>
-                    <span>Generate Verification OTP</span>
+                    <span id="auth-submit-btn-text">Generate Login OTP</span>
                 </button>
+            </div>
+
+            <!-- Bottom Links -->
+            <div class="pt-3 border-t border-slate-100 flex flex-col items-center gap-2 text-xs">
+                <span class="text-slate-400 font-medium" id="auth-footer-prompt">First time ordering? <a href="javascript:void(0)" onclick="switchAuthTab('register')" class="text-[#05A357] font-bold hover:underline">Create an Account</a></span>
             </div>
         </div>
     </div>
@@ -1013,7 +1047,7 @@
     <!-- OTP Screen -->
     <div id="cust-otp"
          class="hidden w-full max-w-[380px] bg-white rounded-[32px] p-7 shadow-2xl border border-[#E2E8F0] relative">
-        <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-zinc-400 hover:text-zinc-600"><i class="fas fa-times"></i></button>
+        <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-zinc-400 hover:text-zinc-600 cursor-pointer"><i class="fas fa-times"></i></button>
         <div class="text-center space-y-5">
             <h3 class="text-xl font-black text-[#2D3748]">Confirm OTP Code</h3>
             
@@ -1027,6 +1061,15 @@
             </div>
 
             <p class="text-xs text-zinc-500 font-medium" id="otp-phone-text">Verification code generated for your account.</p>
+
+            <!-- Inline OTP Error Banner -->
+            <div id="otp-error-banner" class="hidden rounded-2xl p-3 text-xs font-bold transition-all border bg-red-50 text-red-700 border-red-200">
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-circle-exclamation text-red-600 shrink-0"></i>
+                    <span id="otp-error-msg" class="flex-1 text-left"></span>
+                    <button type="button" onclick="hideOtpError()" class="opacity-60 hover:opacity-100 cursor-pointer p-0.5"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
             <div class="space-y-3.5 text-left">
                 <div>
                     <label class="block text-[9px] font-black text-zinc-500 mb-1 uppercase tracking-wider">Enter 6-Digit Code</label>
@@ -1034,14 +1077,14 @@
                            class="w-full px-4 py-3 rounded-xl bg-[#F7F9FA] border border-[#E2E8F0] text-[#2D3748] text-center text-xl tracking-widest font-black focus:outline-none focus:border-[#05A357] transition"
                            value="">
                 </div>
-                <button onclick="verifyOTP()"
+                <button onclick="verifyOTP()" id="cust-otp-verify-btn"
                         class="w-full py-3.5 rounded-full bg-[#05A357] hover:bg-[#047A43] text-white font-black text-xs transition shadow-md shadow-[#05A357]/20 border-0 cursor-pointer flex items-center justify-center gap-2">
                     <i class="fas fa-check-circle text-xs"></i>
                     <span>Verify Code & Login</span>
                 </button>
                 <button onclick="showAuthScreen()"
                         class="w-full py-2 rounded-full text-zinc-400 hover:text-zinc-700 text-xs font-bold text-center transition cursor-pointer">
-                    <i class="fas fa-arrow-left mr-1"></i> Edit Registration Details
+                    <i class="fas fa-arrow-left mr-1"></i> Edit Phone / Details
                 </button>
             </div>
         </div>
@@ -1292,16 +1335,26 @@
             }
             if (sidebarAction) {
                 sidebarAction.innerHTML = `
-                        <button onclick="openAuthModal()" class="px-3.5 py-1.5 bg-[#FFC244] hover:bg-[#E0A325] text-[#0F172A] rounded-full text-xs font-black transition border border-[#E0A325] shadow-xs cursor-pointer">
-                            Register / Log In
-                        </button>
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="openAuthModal('login')" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-[#0F172A] rounded-full text-xs font-bold transition border border-slate-200 shadow-xs cursor-pointer">
+                                Log In
+                            </button>
+                            <button onclick="openAuthModal('register')" class="px-3.5 py-1.5 bg-[#FFC244] hover:bg-[#E0A325] text-[#0F172A] rounded-full text-xs font-black transition border border-[#E0A325] shadow-xs cursor-pointer">
+                                Register
+                            </button>
+                        </div>
                     `;
             }
             if (authButtonsContainer) {
                 authButtonsContainer.innerHTML = `
-                        <button onclick="openAuthModal()" class="px-3.5 sm:px-5 py-1.5 sm:py-2.5 text-[10px] sm:text-xs font-black text-[#2D3748] bg-[#FFC244] hover:bg-[#E0A325] border border-[#E0A325] rounded-full transition shadow-sm cursor-pointer focus:outline-none whitespace-nowrap">
-                            Register / Log In
-                        </button>
+                        <div class="flex items-center gap-1.5 sm:gap-2">
+                            <button onclick="openAuthModal('login')" class="px-3 sm:px-4 py-1.5 sm:py-2 text-[10px] sm:text-xs font-black text-slate-700 hover:text-[#0F172A] bg-white hover:bg-slate-50 border border-slate-200 rounded-full transition shadow-xs cursor-pointer focus:outline-none whitespace-nowrap">
+                                Log In
+                            </button>
+                            <button onclick="openAuthModal('register')" class="px-3.5 sm:px-5 py-1.5 sm:py-2.5 text-[10px] sm:text-xs font-black text-[#2D3748] bg-[#FFC244] hover:bg-[#E0A325] border border-[#E0A325] rounded-full transition shadow-sm cursor-pointer focus:outline-none whitespace-nowrap">
+                                Register
+                            </button>
+                        </div>
                     `;
             }
         }
@@ -1702,25 +1755,176 @@
         renderVendors();
     }
 
+    let currentAuthMode = 'login';
     let lastGeneratedOTP = '';
 
+    function showAuthError(msg, type = 'danger', actionText = null, actionCallback = null) {
+        const banner    = document.getElementById('auth-error-banner');
+        const icon      = document.getElementById('auth-error-icon');
+        const msgEl     = document.getElementById('auth-error-msg');
+        const actionBtn = document.getElementById('auth-error-action');
+
+        if (!banner || !msgEl) return;
+
+        msgEl.textContent = msg;
+
+        if (type === 'danger') {
+            banner.className = "rounded-2xl p-3.5 text-xs font-bold transition-all border bg-red-50 text-red-700 border-red-200 mb-2";
+            icon.className = "fas fa-circle-exclamation text-base text-red-600 shrink-0 mt-0.5";
+        } else if (type === 'warning') {
+            banner.className = "rounded-2xl p-3.5 text-xs font-bold transition-all border bg-amber-50 text-amber-800 border-amber-200 mb-2";
+            icon.className = "fas fa-triangle-exclamation text-base text-amber-600 shrink-0 mt-0.5";
+        } else {
+            banner.className = "rounded-2xl p-3.5 text-xs font-bold transition-all border bg-emerald-50 text-emerald-800 border-emerald-200 mb-2";
+            icon.className = "fas fa-circle-check text-base text-emerald-600 shrink-0 mt-0.5";
+        }
+
+        if (actionText && actionCallback) {
+            actionBtn.textContent = actionText;
+            actionBtn.classList.remove('hidden');
+            actionBtn.onclick = () => {
+                actionCallback();
+                hideAuthError();
+            };
+        } else {
+            actionBtn.classList.add('hidden');
+            actionBtn.onclick = null;
+        }
+
+        banner.classList.remove('hidden');
+    }
+
+    function hideAuthError() {
+        const banner = document.getElementById('auth-error-banner');
+        if (banner) banner.classList.add('hidden');
+    }
+
+    function showOtpError(msg) {
+        const banner = document.getElementById('otp-error-banner');
+        const msgEl  = document.getElementById('otp-error-msg');
+        if (!banner || !msgEl) return;
+        msgEl.textContent = msg;
+        banner.classList.remove('hidden');
+    }
+
+    function hideOtpError() {
+        const banner = document.getElementById('otp-error-banner');
+        if (banner) banner.classList.add('hidden');
+    }
+
+    function showToast(msg, type = 'success') {
+        let container = document.getElementById('toast-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'toast-container';
+            container.className = 'fixed top-4 right-4 z-50 flex flex-col gap-2 pointer-events-none max-w-sm w-full px-4';
+            document.body.appendChild(container);
+        }
+
+        const toast = document.createElement('div');
+        const bgColor = type === 'success' ? 'bg-[#05A357]' : type === 'danger' ? 'bg-[#A31D1D]' : 'bg-[#0F172A]';
+        const icon = type === 'success' ? 'fa-circle-check' : type === 'danger' ? 'fa-circle-exclamation' : 'fa-info-circle';
+
+        toast.className = `${bgColor} text-white px-4 py-3 rounded-2xl shadow-xl flex items-center gap-3 text-xs font-bold pointer-events-auto transition-all transform translate-y-2 opacity-0`;
+        toast.innerHTML = `<i class="fas ${icon} text-base"></i> <span class="flex-1">${msg}</span>`;
+
+        container.appendChild(toast);
+
+        requestAnimationFrame(() => {
+            toast.classList.remove('translate-y-2', 'opacity-0');
+        });
+
+        setTimeout(() => {
+            toast.classList.add('opacity-0', '-translate-y-2');
+            setTimeout(() => toast.remove(), 300);
+        }, 4000);
+    }
+
+    function switchAuthTab(mode) {
+        hideAuthError();
+        hideOtpError();
+        currentAuthMode = mode;
+        const tabLogin = document.getElementById('auth-tab-login');
+        const tabRegister = document.getElementById('auth-tab-register');
+        const fieldName = document.getElementById('field-wrap-name');
+        const fieldEmail = document.getElementById('field-wrap-email');
+        const modalTitle = document.getElementById('auth-modal-title');
+        const modalSubtitle = document.getElementById('auth-modal-subtitle');
+        const btnText = document.getElementById('auth-submit-btn-text');
+        const footerPrompt = document.getElementById('auth-footer-prompt');
+
+        if (!tabLogin || !tabRegister) return;
+
+        if (mode === 'login') {
+            tabLogin.className = "flex-1 py-2.5 rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 bg-white text-[#0F172A] shadow-xs font-black";
+            tabRegister.className = "flex-1 py-2.5 rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 font-bold";
+            if (fieldName) fieldName.classList.add('hidden');
+            if (fieldEmail) fieldEmail.classList.add('hidden');
+            if (modalTitle) modalTitle.textContent = "Customer Log In";
+            if (modalSubtitle) modalSubtitle.textContent = "Enter your phone number to receive your instant verification OTP.";
+            if (btnText) btnText.textContent = "Generate Login OTP";
+            if (footerPrompt) footerPrompt.innerHTML = `First time ordering? <a href="javascript:void(0)" onclick="switchAuthTab('register')" class="text-[#05A357] font-bold hover:underline">Create an Account</a>`;
+        } else {
+            tabRegister.className = "flex-1 py-2.5 rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 bg-white text-[#0F172A] shadow-xs font-black";
+            tabLogin.className = "flex-1 py-2.5 rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 font-bold";
+            if (fieldName) fieldName.classList.remove('hidden');
+            if (fieldEmail) fieldEmail.classList.remove('hidden');
+            if (modalTitle) modalTitle.textContent = "Customer Registration";
+            if (modalSubtitle) modalSubtitle.textContent = "Set up your details for stadium seat delivery & order tracking.";
+            if (btnText) btnText.textContent = "Generate Registration OTP";
+            if (footerPrompt) footerPrompt.innerHTML = `Already registered? <a href="javascript:void(0)" onclick="switchAuthTab('login')" class="text-[#05A357] font-bold hover:underline">Log In</a>`;
+        }
+    }
+
     async function sendOTP() {
+        hideAuthError();
+
         const name  = document.getElementById('cust-name-input').value.trim();
         const phone = document.getElementById('cust-phone-input').value.trim();
         const email = document.getElementById('cust-email-input').value.trim();
 
         if (!phone) {
-            alert("Please enter a valid phone number!");
+            showAuthError("Please enter your phone number to proceed.", "warning");
+            document.getElementById('cust-phone-input').focus();
             return;
         }
 
+        if (currentAuthMode === 'register' && !name) {
+            showAuthError("Please enter your full name to create an account.", "warning");
+            document.getElementById('cust-name-input').focus();
+            return;
+        }
+
+        const btn = document.getElementById('auth-submit-btn');
+        const btnText = document.getElementById('auth-submit-btn-text');
+        if (btn) {
+            btn.disabled = true;
+            if (btnText) btnText.textContent = "Generating OTP...";
+        }
+
         try {
+            const payload = { phone, mode: currentAuthMode };
+            if (name) payload.name = name;
+            if (email) payload.email = email;
+
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+
             const res = await fetch(`${API_BASE}/auth/login`, {
                 method:  'POST',
-                headers: {'Content-Type': 'application/json'},
-                body:    JSON.stringify({ phone, name, email })
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept':       'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body:    JSON.stringify(payload)
             });
-            const data = await res.json();
+
+            let data;
+            try {
+                data = await res.json();
+            } catch (jsonErr) {
+                data = { status: 'error', message: `Server error (${res.status}). Please try again.` };
+            }
 
             if (res.ok && data.status === 'success') {
                 playSound('beep');
@@ -1735,83 +1939,120 @@
 
                 document.getElementById('cust-auth').classList.add('hidden');
                 document.getElementById('cust-otp').classList.remove('hidden');
+                hideOtpError();
+            } else if (res.status === 404 || data.code === 'ACCOUNT_NOT_FOUND') {
+                showAuthError(
+                    data.message || `No registered account found for ${phone}. Please click Register below.`,
+                    'danger',
+                    'Switch to Registration →',
+                    () => {
+                        switchAuthTab('register');
+                        const phoneInput = document.getElementById('cust-phone-input');
+                        if (phoneInput) phoneInput.value = phone;
+                        const nameInput = document.getElementById('cust-name-input');
+                        if (nameInput) nameInput.focus();
+                    }
+                );
+            } else if (res.status === 422 && data.errors) {
+                const firstKey = Object.keys(data.errors)[0];
+                const firstMsg = data.errors[firstKey][0];
+                showAuthError(firstMsg || data.message || 'Validation failed. Please check input values.', 'danger');
             } else {
-                alert(data.message || 'Failed to generate verification OTP.');
+                showAuthError(data.message || 'Failed to generate verification code. Please check your details.', 'danger');
             }
         } catch (e) {
-            alert('Network error connecting to authentication server.');
-        }
-    }
-
-    function autoFillOTP() {
-        if (lastGeneratedOTP) {
-            document.getElementById('cust-otp-input').value = lastGeneratedOTP;
-            playSound('beep');
+            console.error('Auth sendOTP exception:', e);
+            showAuthError('Unable to connect to authentication server. Please check your network connection.', 'danger');
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                if (btnText) {
+                    btnText.textContent = currentAuthMode === 'login' ? 'Generate Login OTP' : 'Generate Registration OTP';
+                }
+            }
         }
     }
 
     async function verifyOTP() {
-        const name  = document.getElementById('cust-name-input').value.trim();
-        const phone = document.getElementById('cust-phone-input').value.trim();
-        const email = document.getElementById('cust-email-input').value.trim();
-        const code  = document.getElementById('cust-otp-input').value.trim();
+        hideOtpError();
 
-        if (!code) {
-            alert("Please enter the 6-digit OTP code!");
+        const phone = document.getElementById('cust-phone-input').value.trim();
+        const code  = document.getElementById('cust-otp-input').value.trim();
+        const name  = document.getElementById('cust-name-input').value.trim();
+        const email = document.getElementById('cust-email-input').value.trim();
+
+        if (!code || code.length < 6) {
+            showOtpError("Please enter the complete 6-digit verification code.");
             return;
         }
 
+        const btn = document.getElementById('cust-otp-verify-btn');
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin text-xs"></i> <span>Verifying...</span>`;
+        }
+
         try {
+            const payload = { phone, code };
+            if (name) payload.name = name;
+            if (email) payload.email = email;
+
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+
             const res = await fetch(`${API_BASE}/auth/verify`, {
-                method:  'POST',
-                headers: {'Content-Type': 'application/json'},
-                body:    JSON.stringify({ phone, code, name, email })
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept':       'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify(payload)
             });
-            const data = await res.json();
+
+            let data;
+            try {
+                data = await res.json();
+            } catch (jsonErr) {
+                data = { status: 'error', message: `Server error (${res.status}). Please try again.` };
+            }
 
             if (res.ok && data.status === 'success') {
                 playSound('success');
                 currentUser = data.user;
-                // Store user + token together
                 localStorage.setItem('justfeast_client_user', JSON.stringify({ ...currentUser, __token: data.token }));
+
                 updateAuthHeader();
                 closeAuthModal();
-                checkActiveOrderOnLogin();
 
-                // Auto checkout if basket & seat are set
-                if (basket.length > 0 && selectedSeat) {
-                    checkoutOrder();
-                }
+                showToast(`Welcome back, ${currentUser.name}! You are signed in.`, 'success');
+            } else if (res.status === 422 && data.errors) {
+                const firstKey = Object.keys(data.errors)[0];
+                const firstMsg = data.errors[firstKey][0];
+                showOtpError(firstMsg || data.message || 'Verification failed.');
             } else {
-                alert(data.message || 'OTP verification failed.');
+                showOtpError(data.message || 'Verification failed. Please check the code.');
             }
         } catch (e) {
-            alert('Network error verifying code.');
+            console.error('Auth verifyOTP exception:', e);
+            showOtpError('Network error connecting to authentication server.');
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fas fa-check-circle text-xs"></i> <span>Verify Code & Login</span>`;
+            }
         }
     }
 
-
-
-    function logoutCustomer() {
-        currentUser = null;
-        localStorage.removeItem('justfeast_admin_user');
-        localStorage.removeItem('justfeast_vendor_user');
-        localStorage.removeItem('justfeast_runner_user');
-        localStorage.removeItem('justfeast_client_user');
-
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = '{{ route("logout") }}';
-        const csrf = document.createElement('input');
-        csrf.type = 'hidden';
-        csrf.name = '_token';
-        csrf.value = '{{ csrf_token() }}';
-        form.appendChild(csrf);
-        document.body.appendChild(form);
-        form.submit();
+    function autoFillOTP() {
+        const input = document.getElementById('cust-otp-input');
+        if (input && lastGeneratedOTP) {
+            input.value = lastGeneratedOTP;
+            playSound('beep');
+        }
     }
 
-    function openAuthModal() {
+    function openAuthModal(defaultMode = 'login') {
+        switchAuthTab(defaultMode);
         document.getElementById('auth-modal-overlay').classList.remove('hidden');
         document.getElementById('cust-auth').classList.remove('hidden');
         document.getElementById('cust-otp').classList.add('hidden');
@@ -1907,11 +2148,11 @@
                     playSound('success');
                 },
                 (err) => {
-                    alert("Error getting location: " + err.message + ". Center map marker used instead.");
+                    showToast("Error getting location: " + err.message + ". Center map marker used instead.", "warning");
                 }
             );
         } else {
-            alert("Geolocation is not supported by this browser.");
+            showToast("Geolocation is not supported by this browser.", "warning");
         }
     }
 
@@ -1998,11 +2239,11 @@
 
     function checkoutOrder() {
         if (basket.length === 0) {
-            alert("Please add items to your basket first!");
+            showToast("Please add items to your basket first!", "warning");
             return;
         }
         if (!selectedSeat) {
-            alert("Please configure your delivery location on the map first!");
+            showToast("Please configure your delivery location on the map first!", "warning");
             openSeatModal();
             return;
         }
@@ -2044,7 +2285,7 @@
     async function triggerMpesaStkPush() {
         const phone = document.getElementById('mpesa-phone-input').value.trim();
         if (!phone) {
-            alert("Please enter a valid M-Pesa phone number!");
+            showToast("Please enter a valid M-Pesa phone number!", "warning");
             return;
         }
 
@@ -2250,7 +2491,7 @@
             });
         } else if (status === 'delivered') {
             playSound('success');
-            alert("🎉 Order successfully delivered to your seat! Enjoy the concert!");
+            showToast("🎉 Order successfully delivered to your seat! Enjoy the concert!", "success");
             resetTrackerDemo();
         }
     }

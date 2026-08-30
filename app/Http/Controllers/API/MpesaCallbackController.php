@@ -92,9 +92,10 @@ class MpesaCallbackController extends Controller
                         return;
                     }
 
-                    // Precise amount validation if amount is returned in callback metadata
-                    if ($amount !== null && bccomp((string) $amount, (string) $order->total_amount, 2) !== 0) {
-                        throw new \RuntimeException("Payment amount mismatch: received {$amount} vs order total {$order->total_amount}");
+                    // Precise amount validation matching STK push ceil amount or total amount
+                    $expectedInt = (int) ceil($order->total_amount);
+                    if ($amount !== null && (int) $amount !== $expectedInt && bccomp((string) $amount, (string) $order->total_amount, 2) !== 0) {
+                        throw new \RuntimeException("Payment amount mismatch: received {$amount} vs expected {$expectedInt} / {$order->total_amount}");
                     }
 
                     $order->update([

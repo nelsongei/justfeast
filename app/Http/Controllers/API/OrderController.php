@@ -243,7 +243,14 @@ class OrderController extends Controller
             ]);
             $freshOrder = $freshOrder->fresh();
             event(new \App\Events\PaymentStatusUpdated($freshOrder, 'paid', $freshOrder->order_status));
+        } elseif ($result['success'] && isset($result['result_code']) && (string) $result['result_code'] !== '0' && $freshOrder->payment_status === 'pending') {
+            $freshOrder->update([
+                'payment_status' => 'failed',
+            ]);
+            $freshOrder = $freshOrder->fresh();
         }
+
+        $isTerminal = in_array($freshOrder->payment_status, ['paid', 'failed'], true);
 
         return response()->json([
             'status'                     => $result['success'] ? 'success' : 'error',
@@ -251,7 +258,7 @@ class OrderController extends Controller
             'mpesa_result_code'          => $result['result_code'],
             'mpesa_result_desc'          => $result['result_desc'],
             'order_status'               => $freshOrder->order_status,
-            'next_poll_interval_seconds' => $freshOrder->payment_status === 'paid' ? 0 : $nextPollInterval,
+            'next_poll_interval_seconds' => $isTerminal ? 0 : $nextPollInterval,
         ]);
     }
 

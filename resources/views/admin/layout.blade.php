@@ -198,10 +198,7 @@ tbody td{padding:1.1rem 1.5rem;vertical-align:middle;color:var(--text)}
 {{-- ── Sidebar Navigation ── --}}
 <aside class="sidebar">
   <div class="sidebar-logo">
-    <div class="icon" style="overflow: hidden; background: white; box-shadow: none;">
-      <img src="{{ asset('images/logo/jm.png') }}" alt="justFeast Logo" style="width: 100%; height: 100%; object-fit: contain; padding: 4px; border-radius: 12px;">
-    </div>
-    <span>just<em style="color:#FFC244;">Feast</em></span>
+    <img src="{{ asset('images/logo/jm.png') }}" alt="justFeast Logo" style="height: 44px; width: auto; border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.12); border: 1px solid rgba(0,0,0,0.08);">
   </div>
 
   <span class="nav-section">Global Monitor</span>
