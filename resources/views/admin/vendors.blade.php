@@ -737,10 +737,10 @@
       </form>
     </div>
   <!-- Add Vendor Menu Product Modal -->
-  <div id="product-modal-overlay" class="vendor-modal-overlay" style="display:none;" onclick="if(event.target===this) closeAddProductModal()">
-    <div class="vendor-modal-card" style="max-width:520px;">
-      <div class="modal-head">
-        <h3>
+  <div class="modal-overlay" id="product-modal-overlay" onclick="if(event.target===this) closeAddProductModal()">
+    <div class="modal-card" style="max-width:540px;">
+      <div class="modal-header">
+        <h3 style="font-size:1.1rem;font-weight:900;color:var(--text);display:flex;align-items:center;gap:0.5rem;">
           <i class="fas fa-utensils" style="color:var(--brand)"></i>
           Add Stall Menu Item
         </h3>
@@ -1215,12 +1215,12 @@ function openAddProductModal(vendorId, businessName) {
   if (form) form.reset();
   if (vendorIdInput) vendorIdInput.value = vendorId;
   if (vendorNameInput) vendorNameInput.value = businessName;
-  if (modal) modal.style.display = 'flex';
+  if (modal) modal.classList.add('is-active');
 }
 
 function closeAddProductModal() {
   const modal = document.getElementById('product-modal-overlay');
-  if (modal) modal.style.display = 'none';
+  if (modal) modal.classList.remove('is-active');
 }
 
 async function handleRegisterProduct(event) {
