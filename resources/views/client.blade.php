@@ -466,7 +466,7 @@
                                 </p>
                                 <div class="flex items-center gap-1.5 sm:gap-2 mt-1 sm:mt-1.5">
                                     <span class="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-[#FFC244] rounded-full animate-pulse"></span>
-                                    <p class="text-xs sm:text-sm font-black">Active near Gate B</p>
+                                    <p class="text-xs sm:text-sm font-black">Active at Gate B</p>
                                 </div>
                             </div>
                         </div>
@@ -599,26 +599,26 @@
                 <!-- Right Sticky Cart Sidebar -->
                 <aside class="lg:col-span-4 xl:col-span-3 space-y-5 lg:sticky lg:top-28">
                     <!-- User Profile Card -->
-                    <div class="jf-card rounded-[32px] p-4 flex items-center justify-between border border-slate-200/90 shadow-sm bg-white hover:shadow-md transition">
-                        <div class="flex items-center gap-3.5">
-                            <div class="w-12 h-12 rounded-2xl bg-[#A31D1D] p-0.5 shadow-md shadow-[#A31D1D]/15 flex items-center justify-center overflow-hidden shrink-0">
+                    <div class="jf-card rounded-[32px] p-4 flex items-center justify-between gap-2 border border-slate-200/90 shadow-sm bg-white hover:shadow-md transition">
+                        <div class="flex items-center gap-3 min-w-0 pr-1">
+                            <div class="w-11 h-11 rounded-2xl bg-[#A31D1D] p-0.5 shadow-md shadow-[#A31D1D]/15 flex items-center justify-center overflow-hidden shrink-0">
                                 <div class="w-full h-full bg-white rounded-[14px] flex items-center justify-center text-[#0F172A] font-black text-sm">
                                     <i class="fas fa-user-tag text-[#A31D1D]"></i>
                                 </div>
                             </div>
-                            <div>
+                            <div class="min-w-0">
                                 <div class="flex items-center gap-1.5">
-                                    <h4 class="text-sm font-black text-[#0F172A] truncate max-w-[120px] sm:max-w-[160px]" id="cust-user-name">Guest</h4>
+                                    <h4 class="text-sm font-black text-[#0F172A] truncate" id="cust-user-name">Guest</h4>
                                     <span class="bg-slate-100 text-slate-500 text-[8.5px] font-black uppercase px-2 py-0.5 rounded-full border border-slate-200 shrink-0" id="cust-user-pass-badge">Guest</span>
                                 </div>
-                                <p class="text-[10px] text-slate-400 font-extrabold flex items-center gap-1 mt-0.5" id="cust-user-status-text">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-slate-300"></span> Tap Log In to order
+                                <p class="text-[10px] text-slate-400 font-bold truncate mt-0.5" id="cust-user-status-text">
+                                    Tap Register / Log In
                                 </p>
                             </div>
                         </div>
-                            <button onclick="openAuthModal()" class="px-3.5 py-1.5 bg-[#FFC244] hover:bg-[#E0A325] text-[#0F172A] rounded-full text-xs font-black transition border border-[#E0A325] shadow-xs cursor-pointer">
-                                Register / Log In
-                            </button>
+                        <button onclick="openAuthModal()" class="px-4 py-2 bg-[#FFC244] hover:bg-[#E0A325] active:scale-95 text-[#0F172A] rounded-full text-xs font-black transition-all border border-[#E0A325] shadow-xs cursor-pointer whitespace-nowrap shrink-0">
+                            Register / Log In
+                        </button>
                     </div>
 
                     <!-- Desktop Cart Basket Tray -->
@@ -2712,7 +2712,7 @@
                 const rating = (4.9 - (idx * 0.08)).toFixed(1);
                 const etaMin = 7 + (idx % 3) * 2;
                 const etaMax = etaMin + 6;
-                const zone = idx % 2 === 0 ? 'Near Gate B' : 'Near VIP concourse';
+                const zone = idx % 2 === 0 ? 'Gate B' : 'VIP concourse';
                 const products = (targetVendor.products || []).filter(p => selectedCategory === 'all' || getProductCategory(p) === selectedCategory);
 
                 let headerHtml = `

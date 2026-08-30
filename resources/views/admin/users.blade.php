@@ -121,6 +121,72 @@
       </form>
     </div>
   </div>
+
+  <!-- Manage User Account Modal -->
+  <div class="modal-overlay" id="manage-user-modal-overlay" onclick="if(event.target===this) closeManageUserModal()">
+    <div class="modal-card" style="max-width:520px;">
+      <div class="modal-header">
+        <h3 style="font-size:1.1rem;font-weight:900;color:var(--text);display:flex;align-items:center;gap:0.5rem;">
+          <i class="fas fa-user-gear" style="color:var(--brand)"></i>
+          Manage User Account
+        </h3>
+        <button type="button" class="modal-close-btn" onclick="closeManageUserModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <form id="manage-user-form" onsubmit="handleUpdateUser(event)">
+        <input type="hidden" id="edit-user-id">
+        <div style="padding:1.5rem;display:flex;flex-direction:column;gap:1.1rem;">
+          
+          <div>
+            <label style="display:block;font-size:.7rem;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;">Full Name *</label>
+            <input type="text" id="edit-user-name" required style="width:100%;padding:.65rem .85rem;border-radius:10px;background:var(--surface2);border:1px solid var(--border);color:var(--text);outline:none;font-weight:700;">
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+            <div>
+              <label style="display:block;font-size:.7rem;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;">Email Address *</label>
+              <input type="email" id="edit-user-email" required style="width:100%;padding:.65rem .85rem;border-radius:10px;background:var(--surface2);border:1px solid var(--border);color:var(--text);outline:none;font-weight:700;">
+            </div>
+            <div>
+              <label style="display:block;font-size:.7rem;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;">Phone Number</label>
+              <input type="tel" id="edit-user-phone" placeholder="e.g. 0712345678" style="width:100%;padding:.65rem .85rem;border-radius:10px;background:var(--surface2);border:1px solid var(--border);color:var(--text);outline:none;font-weight:700;">
+            </div>
+          </div>
+
+          <div>
+            <label style="display:block;font-size:.7rem;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;">Assign Account Role *</label>
+            <select id="edit-user-role" required style="width:100%;padding:.65rem .85rem;border-radius:10px;background:var(--surface2);border:1px solid var(--border);color:var(--text);outline:none;font-weight:700;">
+              <option value="customer">Customer (Client)</option>
+              <option value="runner">Runner (Courier)</option>
+              <option value="vendor">Vendor (Stall Staff)</option>
+              <option value="admin">Administrator</option>
+            </select>
+          </div>
+
+          <div>
+            <label style="display:block;font-size:.7rem;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;">Reset Password (Optional)</label>
+            <input type="password" id="edit-user-password" placeholder="Leave blank to keep current password" style="width:100%;padding:.65rem .85rem;border-radius:10px;background:var(--surface2);border:1px solid var(--border);color:var(--text);outline:none;font-weight:600;">
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;padding-top:1rem;border-top:1px solid var(--border);margin-top:0.5rem;">
+            <button type="button" onclick="handleDeleteUser()" style="padding:.6rem 1rem;background:#FEF2F2;color:#991B1B;border:1px solid #FCA5A5;border-radius:10px;font-weight:800;font-size:.75rem;cursor:pointer;">
+              <i class="fas fa-trash-alt mr-1"></i> Delete User Account
+            </button>
+
+            <div style="display:flex;gap:0.5rem;">
+              <button type="button" class="btn-page" onclick="closeManageUserModal()">Cancel</button>
+              <button type="submit" id="btn-update-user" style="padding:.6rem 1.2rem;background:#05A357;color:#FFF;border:none;border-radius:10px;font-weight:800;font-size:.78rem;cursor:pointer;">
+                <i class="fas fa-save mr-1"></i> Save Changes
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </form>
+    </div>
+  </div>
 @endsection
 
 @section('scripts')
@@ -204,7 +270,9 @@ function renderUsersUI(users) {
       <td style="font-size:.78rem;color:var(--muted);">${regDate}</td>
       <td><span class="status-pill s-ready"><div class="live-dot" style="display:inline-block;margin-right:4px;"></div>Active</span></td>
       <td>
-        <button class="btn-page" style="padding:.25rem .6rem;font-size:.7rem;" onclick="promptManageUser(${user.id}, '${user.name}')">Manage</button>
+        <button class="btn-page" style="padding:.3rem .75rem;font-size:.72rem;font-weight:800;background:var(--surface2);border-color:var(--border);" onclick="promptManageUser(${user.id})">
+          <i class="fas fa-sliders mr-1"></i> Manage
+        </button>
       </td>
     `;
     tbody.appendChild(tr);
@@ -235,8 +303,113 @@ function filterUsers() {
   renderUsersUI(filtered);
 }
 
-function promptManageUser(userId, name) {
-  alert(`Managing permissions for user: ${name} (ID: ${userId}). Account status: Active.`);
+function promptManageUser(userId) {
+  const user = cachedUsers.find(u => u.id === userId);
+  if (!user) return;
+
+  const modal = document.getElementById('manage-user-modal-overlay');
+  const idInput = document.getElementById('edit-user-id');
+  const nameInput = document.getElementById('edit-user-name');
+  const emailInput = document.getElementById('edit-user-email');
+  const phoneInput = document.getElementById('edit-user-phone');
+  const roleInput = document.getElementById('edit-user-role');
+  const passwordInput = document.getElementById('edit-user-password');
+
+  if (idInput) idInput.value = user.id;
+  if (nameInput) nameInput.value = user.name || '';
+  if (emailInput) emailInput.value = user.email || '';
+  if (phoneInput) phoneInput.value = user.phone || '';
+  if (roleInput) {
+    let r = (user.role || 'customer').toLowerCase();
+    if (r === 'client') r = 'customer';
+    roleInput.value = r;
+  }
+  if (passwordInput) passwordInput.value = '';
+
+  if (modal) modal.classList.add('is-active');
+}
+
+function closeManageUserModal() {
+  const modal = document.getElementById('manage-user-modal-overlay');
+  if (modal) modal.classList.remove('is-active');
+}
+
+async function handleUpdateUser(event) {
+  event.preventDefault();
+  const userId = document.getElementById('edit-user-id').value;
+  const name = document.getElementById('edit-user-name').value;
+  const email = document.getElementById('edit-user-email').value;
+  const phone = document.getElementById('edit-user-phone').value;
+  const role = document.getElementById('edit-user-role').value;
+  const password = document.getElementById('edit-user-password').value;
+  const btn = document.getElementById('btn-update-user');
+
+  if (!userId || !btn) return;
+
+  const originalHtml = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-1"></i> Saving...`;
+
+  try {
+    const res = await fetch(`${API_BASE}/admin/users/${userId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+      },
+      body: JSON.stringify({ name, email, phone, role, password })
+    });
+
+    const data = await res.json();
+
+    if (res.ok && (data.success || data.status === 'success')) {
+      alert(data.message || 'User account updated successfully!');
+      closeManageUserModal();
+      loadUsersTab();
+    } else {
+      alert(data.message || (data.errors ? Object.values(data.errors).flat().join(', ') : 'Failed to update user account.'));
+    }
+  } catch (e) {
+    alert('Network error while updating user account');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = originalHtml;
+  }
+}
+
+async function handleDeleteUser() {
+  const userId = document.getElementById('edit-user-id').value;
+  const name = document.getElementById('edit-user-name').value;
+  if (!userId) return;
+
+  if (!confirm(`Are you sure you want to permanently delete the account for '${name}'? This action cannot be undone.`)) {
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_BASE}/admin/users/${userId}`, {
+      method: 'DELETE',
+      headers: {
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+      }
+    });
+
+    const data = await res.json();
+
+    if (res.ok && (data.success || data.status === 'success')) {
+      alert(data.message || 'User account deleted successfully.');
+      closeManageUserModal();
+      loadUsersTab();
+    } else {
+      alert(data.message || 'Failed to delete user account.');
+    }
+  } catch (e) {
+    alert('Network error while deleting user account');
+  }
 }
 
 function toggleVendorBizField() {

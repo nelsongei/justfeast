@@ -253,6 +253,66 @@ class AdminController extends Controller
         ]);
     }
 
+    public function updateUser(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+
+        $validated = $request->validate([
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|email|unique:users,email,' . $user->id,
+            'phone'    => 'nullable|string|max:20|unique:users,phone,' . $user->id,
+            'role'     => 'required|string|in:admin,vendor,runner,client,customer',
+            'password' => 'nullable|string|min:6',
+        ]);
+
+        $user->name  = $validated['name'];
+        $user->email = $validated['email'];
+        $user->phone = $validated['phone'] ?? null;
+        $user->role  = $validated['role'];
+
+        if (!empty($validated['password'])) {
+            $user->password = Hash::make($validated['password']);
+        }
+
+        $user->save();
+
+        if (($validated['role'] === 'vendor') && !$user->vendor) {
+            $eventId = $this->getOrCreateActiveEventId();
+            Vendor::create([
+                'user_id'       => $user->id,
+                'business_name' => $user->name . "'s Stall",
+                'event_id'      => $eventId,
+                'status'        => 'active',
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => "User account '{$user->name}' updated successfully!",
+            'user'    => $user,
+        ]);
+    }
+
+    public function destroyUser(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+
+        if ($request->user() && $request->user()->id === $user->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You cannot delete your own active administrator account.',
+            ], 400);
+        }
+
+        $userName = $user->name;
+        $user->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => "User account '{$userName}' deleted successfully.",
+        ]);
+    }
+
     public function events()
     {
         $events = Event::select(['id', 'name', 'status', 'start_time', 'end_time'])

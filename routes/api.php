@@ -67,6 +67,8 @@ Route::middleware('auth:sanctum,web')->group(function () {
         Route::get('/orders',  [AdminController::class, 'orders']);
         Route::get('/users',   [AdminController::class, 'users']);
         Route::post('/users',  [AdminController::class, 'createUser']);
+        Route::put('/users/{user}', [AdminController::class, 'updateUser']);
+        Route::delete('/users/{user}', [AdminController::class, 'destroyUser']);
         Route::get('/reports', [AdminController::class, 'reports']);
         Route::get('/vendors', [AdminController::class, 'vendors']);
         Route::post('/vendors', [AdminController::class, 'storeVendor']);
