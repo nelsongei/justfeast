@@ -1375,10 +1375,12 @@
         try {
             const res = await fetch(`${API_BASE}/vendors`);
             if (res.ok) {
-                vendors = await res.json();
+                const data = await res.json();
+                vendors = Array.isArray(data) ? data : (data.data || []);
                 renderVendors();
             }
         } catch (e) {
+            console.error("Error loading marketplace vendors:", e);
         }
     }
     // ── Auth helpers ───────────────────────────────────────────────────

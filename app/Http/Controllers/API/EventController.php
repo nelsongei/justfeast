@@ -32,17 +32,19 @@ class EventController extends Controller
             ], 404);
         }
 
-        $perPage = min($request->integer('per_page', 25), 100);
-
-        $vendors = Vendor::query()
+        $query = Vendor::query()
             ->with(['products' => function($q) {
                 $q->select(['id', 'vendor_id', 'name', 'description', 'price', 'image_url', 'stock_status'])->orderBy('name');
             }])
             ->where('event_id', $event->id)
-            ->where('status', 'active')
-            ->paginate($perPage);
+            ->where('status', 'active');
 
-        return response()->json($vendors);
+        if ($request->has('page') || $request->has('per_page')) {
+            $perPage = min($request->integer('per_page', 25), 100);
+            return response()->json($query->paginate($perPage));
+        }
+
+        return response()->json($query->get());
     }
 
     public function toggleProductStock(Request $request, $productId)
