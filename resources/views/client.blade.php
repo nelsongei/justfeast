@@ -565,6 +565,9 @@
                                 <span class="text-[11px] sm:text-xs font-black uppercase tracking-wide">Snacks</span>
                             </button>
                         </div>
+
+                        <!-- Featured Food & Drinks Container (Positioned inside Event Marketplace card) -->
+                        <div id="featured-food-container" class="mt-3 pt-3 border-t border-slate-100/90"></div>
                     </div>
 
                     <!-- Live Event Promo Banner -->
@@ -2875,22 +2878,32 @@
             `;
         });
 
-        // Build Featured Food Items directly from vendors
+        vendorGridHtml += `</div></div>`;
+        container.innerHTML = chipsHtml + vendorGridHtml;
+
+        // Render Featured Food & Drinks grid inside top Event Marketplace card
+        renderFeaturedFoodGrid();
+    }
+
+    function renderFeaturedFoodGrid() {
+        const featContainer = document.getElementById('featured-food-container');
+        if (!featContainer) return;
+
         let foodItemsHtml = `
-            <div class="mt-8 space-y-4">
-                <div class="flex items-center justify-between border-t border-slate-200/80 pt-6">
+            <div class="space-y-4">
+                <div class="flex items-center justify-between">
                     <div>
-                        <h3 class="text-lg sm:text-xl font-black text-[#0F172A] tracking-tight flex items-center gap-2">
+                        <h3 class="text-base sm:text-lg font-black text-[#0F172A] tracking-tight flex items-center gap-2">
                             <span>🍱</span> Featured Food & Drinks from Vendors
                         </h3>
-                        <p class="text-[11px] sm:text-xs text-slate-500 font-bold">Popular concert meals & drinks served direct to your seat</p>
+                        <p class="text-[11px] text-slate-500 font-bold">Popular concert meals & drinks served direct to your seat</p>
                     </div>
-                    <span class="bg-[#FFF8E7] text-[#0F172A] border border-[#F7E5B2] text-[10px] font-black uppercase px-3 py-1 rounded-full hidden sm:inline-block">
-                        ⚡ Seat Delivery
+                    <span class="bg-[#FFF8E7] text-[#0F172A] border border-[#F7E5B2] text-[9.5px] font-black uppercase px-3 py-1 rounded-full hidden sm:inline-block">
+                        ⚡ Express Seat Delivery
                     </span>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         `;
 
         let featuredCount = 0;
@@ -2905,23 +2918,23 @@
                 const safeName = String(p.name || '').replace(/'/g, "\\'");
                 let visual = p.image_url && p.image_url.startsWith('/')
                     ? `<img src="${API_BASE.replace('/api', '') + p.image_url}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="${p.name}">`
-                    : `<div class="w-full h-full bg-gradient-to-br from-[#FFF8E7] via-white to-[#E9F7EE] flex items-center justify-center"><span class="text-6xl drop-shadow-sm">${pCat === 'drinks' ? '🥤' : pCat === 'snacks' ? '🍿' : '🍔'}</span></div>`;
+                    : `<div class="w-full h-full bg-gradient-to-br from-[#FFF8E7] via-white to-[#E9F7EE] flex items-center justify-center"><span class="text-5xl drop-shadow-sm">${pCat === 'drinks' ? '🥤' : pCat === 'snacks' ? '🍿' : '🍔'}</span></div>`;
 
                 foodItemsHtml += `
-                    <article class="group bg-white rounded-[30px] border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition duration-300 flex flex-col">
-                        <div class="relative h-44 overflow-hidden bg-slate-50">
+                    <article class="group bg-white rounded-[26px] border border-slate-200 overflow-hidden shadow-xs hover:shadow-md transition duration-300 flex flex-col">
+                        <div class="relative h-40 overflow-hidden bg-slate-50">
                             ${visual}
-                            <span class="absolute top-3 left-3 bg-white/95 backdrop-blur text-[9px] font-black text-[#0F172A] px-3 py-1 rounded-full uppercase tracking-wider border border-slate-200">${pCat}</span>
-                            <span class="absolute bottom-3 left-3 bg-[#05A357] text-white text-[9px] font-black px-2.5 py-1 rounded-full shadow-sm"><i class="fas fa-shop mr-1"></i> ${v.business_name}</span>
+                            <span class="absolute top-2.5 left-2.5 bg-white/95 backdrop-blur text-[8.5px] font-black text-[#0F172A] px-2.5 py-0.5 rounded-full uppercase tracking-wider border border-slate-200">${pCat}</span>
+                            <span class="absolute bottom-2.5 left-2.5 bg-[#05A357] text-white text-[8.5px] font-black px-2 py-0.5 rounded-full shadow-xs"><i class="fas fa-shop mr-1"></i> ${v.business_name}</span>
                         </div>
-                        <div class="p-4 flex-1 flex flex-col justify-between gap-4">
+                        <div class="p-3.5 flex-1 flex flex-col justify-between gap-3">
                             <div>
-                                <h4 class="text-sm font-black tracking-tight text-[#0F172A] group-hover:text-[#05A357] ${out ? 'line-through text-slate-400' : ''}">${p.name}</h4>
-                                <p class="text-[11px] text-slate-500 leading-relaxed mt-1 line-clamp-2 font-medium">${p.description || 'Prepared fresh by an approved event vendor.'}</p>
+                                <h4 class="text-xs font-black tracking-tight text-[#0F172A] group-hover:text-[#05A357] ${out ? 'line-through text-slate-400' : ''}">${p.name}</h4>
+                                <p class="text-[10.5px] text-slate-500 leading-relaxed mt-0.5 line-clamp-2 font-medium">${p.description || 'Prepared fresh by an approved event vendor.'}</p>
                             </div>
-                            <div class="flex items-center justify-between gap-3">
-                                <div><p class="text-[9px] uppercase tracking-wider text-slate-400 font-black">Price</p><p class="text-lg font-black text-[#05A357]">Ksh ${parseFloat(p.price).toLocaleString()}</p></div>
-                                ${out ? `<span class="text-[9px] bg-slate-100 border border-slate-200 text-slate-400 px-3 py-2 rounded-full font-black">Out of stock</span>` : `<button onclick="addToBasket(${p.id}, '${safeName}', ${p.price}, ${v.id})" class="h-10 px-4 rounded-full bg-[#FFC244] hover:bg-[#05A357] text-[#0F172A] hover:text-white flex items-center justify-center font-black transition-all shadow-sm border border-[#efb52e] text-xs gap-1.5 cursor-pointer"><i class="fas fa-plus text-[10px]"></i> Add</button>`}
+                            <div class="flex items-center justify-between gap-2">
+                                <div><p class="text-[8.5px] uppercase tracking-wider text-slate-400 font-black">Price</p><p class="text-base font-black text-[#05A357]">Ksh ${parseFloat(p.price).toLocaleString()}</p></div>
+                                ${out ? `<span class="text-[8.5px] bg-slate-100 border border-slate-200 text-slate-400 px-2.5 py-1.5 rounded-full font-black">Out of stock</span>` : `<button onclick="addToBasket(${p.id}, '${safeName}', ${p.price}, ${v.id})" class="h-9 px-3.5 rounded-full bg-[#FFC244] hover:bg-[#05A357] text-[#0F172A] hover:text-white flex items-center justify-center font-black transition-all shadow-xs border border-[#efb52e] text-[11px] gap-1 cursor-pointer"><i class="fas fa-plus text-[9px]"></i> Add</button>`}
                             </div>
                         </div>
                     </article>
@@ -2932,11 +2945,12 @@
         foodItemsHtml += `</div></div>`;
 
         if (featuredCount > 0) {
-            vendorGridHtml += foodItemsHtml;
+            featContainer.style.display = 'block';
+            featContainer.innerHTML = foodItemsHtml;
+        } else {
+            featContainer.style.display = 'none';
         }
-
-        vendorGridHtml += `</div>`;
-        container.innerHTML = chipsHtml + vendorGridHtml;
+    }
     }
 
     let systemDeliveryFee = 30;
