@@ -133,11 +133,17 @@ async function loadReportsTab() {
         etimsBody.innerHTML = '';
         data.sales_by_vendor.forEach(item => {
           const vat = (item.revenue * 0.16).toFixed(2);
+          let logoTag = '🍔';
+          if (item.logo_url && (item.logo_url.startsWith('/') || item.logo_url.startsWith('http'))) {
+            logoTag = `<img src="${item.logo_url}" style="width:24px;height:24px;object-fit:cover;border-radius:6px;" alt="">`;
+          } else if (item.logo_url) {
+            logoTag = item.logo_url;
+          }
           const tr = document.createElement('tr');
           tr.innerHTML = `
             <td>
               <div style="display:flex;align-items:center;gap:.5rem;">
-                <span style="font-size:1.1rem;">${item.logo_url}</span>
+                <span style="font-size:1.1rem;display:inline-flex;align-items:center;justify-content:center;">${logoTag}</span>
                 <strong style="color:var(--text);">${item.business_name}</strong>
               </div>
             </td>

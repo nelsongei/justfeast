@@ -182,8 +182,14 @@ function updateOverviewUI(stats) {
   const vlist = document.getElementById('vendor-list');
   vlist.innerHTML = stats.vendor_revenue.length ? stats.vendor_revenue.map(v => {
     const pct = Math.round((v.revenue / maxRev) * 100);
+    let logoTag = '🍔';
+    if (v.logo_url && (v.logo_url.startsWith('/') || v.logo_url.startsWith('http'))) {
+      logoTag = `<img src="${v.logo_url}" style="width:100%;height:100%;object-fit:cover;border-radius:8px;" alt="${v.business_name}">`;
+    } else if (v.logo_url) {
+      logoTag = v.logo_url;
+    }
     return `<div class="vendor-item">
-      <div class="vendor-logo">${v.logo_url}</div>
+      <div class="vendor-logo" style="overflow:hidden;display:flex;align-items:center;justify-content:center;">${logoTag}</div>
       <div class="vendor-bar-wrap">
         <div class="top"><strong>${v.business_name}</strong><span>Ksh ${Number(v.revenue).toLocaleString()}</span></div>
         <div style="display:flex;align-items:center;gap:.5rem">

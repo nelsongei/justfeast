@@ -736,6 +736,76 @@
         </div>
       </form>
     </div>
+  <!-- Add Vendor Menu Product Modal -->
+  <div id="product-modal-overlay" class="vendor-modal-overlay" style="display:none;" onclick="if(event.target===this) closeAddProductModal()">
+    <div class="vendor-modal-card" style="max-width:520px;">
+      <div class="modal-head">
+        <h3>
+          <i class="fas fa-utensils" style="color:var(--brand)"></i>
+          Add Stall Menu Item
+        </h3>
+        <button type="button" class="modal-close-btn" onclick="closeAddProductModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <form id="add-product-form" onsubmit="handleRegisterProduct(event)" enctype="multipart/form-data">
+        <input type="hidden" id="p-vendor-id" name="vendor_id">
+        <div class="modal-body" style="display:flex;flex-direction:column;gap:1.25rem;">
+          
+          <div class="form-field-group">
+            <label for="p-vendor-name">Stall / Business Name</label>
+            <input type="text" id="p-vendor-name" readonly class="form-input-ctrl" style="background:var(--surface2);cursor:not-allowed;font-weight:800;">
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-field-group">
+              <label for="p-name">Item Name *</label>
+              <input type="text" id="p-name" name="name" required class="form-input-ctrl" placeholder="e.g. Samosa Special, Latte Coffee">
+            </div>
+
+            <div class="form-field-group">
+              <label for="p-price">Price (Ksh) *</label>
+              <input type="number" id="p-price" name="price" required min="0" step="0.01" class="form-input-ctrl" placeholder="e.g. 150">
+            </div>
+          </div>
+
+          <div class="form-field-group">
+            <label for="p-desc">Description</label>
+            <textarea id="p-desc" name="description" rows="2" class="form-input-ctrl" placeholder="e.g. Fresh spicy beef samosa with dipping sauce"></textarea>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-field-group">
+              <label for="p-stock">Stock Availability</label>
+              <select id="p-stock" name="stock_status" class="form-input-ctrl">
+                <option value="in_stock">✅ In Stock</option>
+                <option value="out_of_stock">❌ Sold Out / Out of Stock</option>
+              </select>
+            </div>
+
+            <div class="form-field-group">
+              <label for="p-image-file">Item Photo File</label>
+              <input type="file" id="p-image-file" name="image" accept="image/*" class="form-input-ctrl" style="padding:0.5rem;">
+            </div>
+          </div>
+
+          <div class="form-field-group">
+            <label for="p-image-url">Or Image URL / Gradient Class (Optional)</label>
+            <input type="text" id="p-image-url" name="image_url" class="form-input-ctrl" placeholder="https://example.com/item.png or bg-gradient-to-br...">
+          </div>
+
+          <div style="display:flex;justify-content:flex-end;gap:0.75rem;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);">
+            <button type="button" class="btn-sync" onclick="closeAddProductModal()">Cancel</button>
+            <button type="submit" class="btn-register-vendor" id="btn-submit-product" style="background:#05A357;">
+              <i class="fas fa-check-circle"></i>
+              <span>Add Menu Item</span>
+            </button>
+          </div>
+
+        </div>
+      </form>
+    </div>
   </div>
 @endsection
 
@@ -829,11 +899,18 @@ function renderVendorsUI(vendors) {
     const productsCount = v.products?.length || 0;
     const eventName = v.event?.name || 'Default Event';
 
+    let logoTag = '🍔';
+    if (v.logo_url && (v.logo_url.startsWith('/') || v.logo_url.startsWith('http'))) {
+      logoTag = `<img src="${v.logo_url}" style="width:100%;height:100%;object-fit:cover;border-radius:12px;" alt="${escapeHtml(v.business_name)}">`;
+    } else if (v.logo_url) {
+      logoTag = v.logo_url;
+    }
+
     card.innerHTML = `
       {{-- Card Header --}}
       <div class="vcard-head">
         <div class="vcard-logo-meta">
-          <div class="vcard-logo">${v.logo_url}</div>
+          <div class="vcard-logo" style="overflow:hidden;display:flex;align-items:center;justify-content:center;">${logoTag}</div>
           <div class="vcard-title">
             <h4>${escapeHtml(v.business_name)}</h4>
             <div class="v-sub">
@@ -877,44 +954,72 @@ function renderVendorsUI(vendors) {
 
       <div class="vcard-menu-drawer" id="v-menu-${v.id}">
         ${productsCount > 0 
-          ? v.products.map(p => `
-            <div class="menu-drawer-item">
-              <div>
-                <strong style="color:var(--text);">${escapeHtml(p.name)}</strong>
-                <div style="font-size:0.7rem;color:var(--muted);">${escapeHtml(p.description || 'No description')}</div>
-              </div>
-              <div style="text-align:right;">
-                <strong style="color:var(--brand);">Ksh ${Number(p.price).toLocaleString()}</strong>
-                <div style="font-size:0.65rem;">
-                  <span class="status-pill ${p.stock_status === 'out_of_stock' ? 'pill-inactive' : 'pill-active'}" style="padding:1px 6px;font-size:0.6rem;">
-                    ${p.stock_status === 'out_of_stock' ? 'Out of Stock' : 'In Stock'}
-                  </span>
+          ? v.products.map(p => {
+              let itemImg = '';
+              if (p.image_url && (p.image_url.startsWith('/') || p.image_url.startsWith('http'))) {
+                itemImg = `<img src="${p.image_url}" style="width:36px;height:36px;object-fit:cover;border-radius:8px;" alt="${escapeHtml(p.name)}">`;
+              } else {
+                itemImg = `<div style="width:36px;height:36px;border-radius:8px;background:var(--brand2);color:#FFF;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.75rem;">🍽️</div>`;
+              }
+              return `
+              <div class="menu-drawer-item" style="display:flex;align-items:center;justify-content:space-between;gap:0.75rem;">
+                <div style="display:flex;align-items:center;gap:0.6rem;min-width:0;">
+                  ${itemImg}
+                  <div style="min-width:0;">
+                    <strong style="color:var(--text);font-size:0.8rem;display:block;" class="truncate">${escapeHtml(p.name)}</strong>
+                    <div style="font-size:0.68rem;color:var(--muted);" class="truncate">${escapeHtml(p.description || 'No description')}</div>
+                  </div>
+                </div>
+                <div style="text-align:right;flex-shrink:0;">
+                  <strong style="color:var(--brand);font-size:0.8rem;">Ksh ${Number(p.price).toLocaleString()}</strong>
+                  <div style="display:flex;align-items:center;gap:0.3rem;justify-content:flex-end;margin-top:2px;">
+                    <span class="status-pill ${p.stock_status === 'out_of_stock' ? 'pill-inactive' : 'pill-active'}" style="padding:1px 6px;font-size:0.58rem;">
+                      ${p.stock_status === 'out_of_stock' ? 'Sold Out' : 'In Stock'}
+                    </span>
+                    <button type="button" onclick="deleteVendorProduct(${p.id})" title="Delete Menu Item" style="padding:2px 6px;font-size:0.65rem;background:#FEF2F2;color:#991B1B;border:1px solid #FCA5A5;border-radius:6px;cursor:pointer;font-weight:700;">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          `).join('')
-          : `<div style="padding:1rem;text-align:center;color:var(--muted);font-weight:600;">No items in menu catalog</div>`
+            `}).join('')
+          : `<div style="padding:1.25rem 1rem;text-align:center;color:var(--muted);font-weight:600;display:flex;flex-direction:column;align-items:center;gap:0.5rem;">
+              <span>No menu items in catalog yet.</span>
+              <button type="button" style="padding:5px 14px;background:#05A357;color:#FFF;border:none;border-radius:20px;font-size:0.72rem;font-weight:800;cursor:pointer;" onclick="openAddProductModal(${v.id}, '${escapeJs(v.business_name)}')">
+                <i class="fas fa-plus mr-1"></i> Add First Menu Item
+              </button>
+             </div>`
         }
       </div>
 
-      {{-- Action Button: Activate / Deactivate --}}
-      <div class="vcard-actions">
+      {{-- Action Buttons --}}
+      <div class="vcard-actions" style="display:flex;gap:0.5rem;">
+        <button 
+          type="button" 
+          class="btn-toggle-status" 
+          style="background:#05A357;color:#FFF;border:none;flex:1;"
+          onclick="openAddProductModal(${v.id}, '${escapeJs(v.business_name)}')"
+        >
+          <i class="fas fa-plus"></i> Add Menu Item
+        </button>
         ${isInactive 
           ? `<button 
               type="button" 
               class="btn-toggle-status activate" 
+              style="flex:1;"
               id="btn-status-${v.id}" 
               onclick="toggleVendorStatus(${v.id}, 'active', '${escapeJs(v.business_name)}')"
              >
-              <i class="fas fa-check-circle"></i> Activate Vendor Account
+              <i class="fas fa-check-circle"></i> Activate Account
              </button>`
           : `<button 
               type="button" 
               class="btn-toggle-status deactivate" 
+              style="flex:1;"
               id="btn-status-${v.id}" 
               onclick="toggleVendorStatus(${v.id}, 'inactive', '${escapeJs(v.business_name)}')"
              >
-              <i class="fas fa-power-off"></i> Deactivate Vendor Account
+              <i class="fas fa-power-off"></i> Deactivate Account
              </button>`
         }
       </div>
@@ -1098,6 +1203,96 @@ async function handleRegisterVendor(event) {
   } finally {
     submitBtn.disabled = false;
     submitBtn.innerHTML = originalHtml;
+  }
+}
+
+function openAddProductModal(vendorId, businessName) {
+  const modal = document.getElementById('product-modal-overlay');
+  const vendorIdInput = document.getElementById('p-vendor-id');
+  const vendorNameInput = document.getElementById('p-vendor-name');
+  const form = document.getElementById('add-product-form');
+  
+  if (form) form.reset();
+  if (vendorIdInput) vendorIdInput.value = vendorId;
+  if (vendorNameInput) vendorNameInput.value = businessName;
+  if (modal) modal.style.display = 'flex';
+}
+
+function closeAddProductModal() {
+  const modal = document.getElementById('product-modal-overlay');
+  if (modal) modal.style.display = 'none';
+}
+
+async function handleRegisterProduct(event) {
+  event.preventDefault();
+  const form = document.getElementById('add-product-form');
+  const submitBtn = document.getElementById('btn-submit-product');
+  const vendorId = document.getElementById('p-vendor-id').value;
+  if (!form || !submitBtn || !vendorId) return;
+
+  const originalHtml = submitBtn.innerHTML;
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Adding Menu Item...`;
+
+  const formData = new FormData(form);
+
+  try {
+    const res = await fetch(`${API_BASE}/admin/vendors/${vendorId}/products`, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+      },
+      body: formData
+    });
+
+    const data = await res.json();
+
+    if (res.ok && (data.success || data.status === 'success')) {
+      showNotification(data.message || 'Menu item added successfully!', 'success');
+      closeAddProductModal();
+      await loadVendorsTab();
+      // Expand vendor's drawer automatically
+      const menu = document.getElementById(`v-menu-${vendorId}`);
+      const arrow = document.getElementById(`v-arrow-${vendorId}`);
+      if (menu) menu.style.display = 'block';
+      if (arrow) arrow.className = 'fas fa-chevron-up';
+    } else {
+      const errMsg = data.message || (data.errors ? Object.values(data.errors).flat().join(', ') : 'Failed to add menu item.');
+      showNotification(errMsg, 'error');
+    }
+  } catch (e) {
+    showNotification('Network error while adding menu item', 'error');
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = originalHtml;
+  }
+}
+
+async function deleteVendorProduct(productId) {
+  if (!confirm('Are you sure you want to delete this menu item from the vendor catalog?')) return;
+
+  try {
+    const res = await fetch(`${API_BASE}/admin/products/${productId}`, {
+      method: 'DELETE',
+      headers: {
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+      }
+    });
+
+    const data = await res.json();
+
+    if (res.ok && (data.success || data.status === 'success')) {
+      showNotification(data.message || 'Menu item deleted successfully!', 'success');
+      loadVendorsTab();
+    } else {
+      showNotification(data.message || 'Failed to delete menu item', 'error');
+    }
+  } catch (e) {
+    showNotification('Network error while deleting menu item', 'error');
   }
 }
 </script>

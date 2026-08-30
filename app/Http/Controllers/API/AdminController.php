@@ -7,6 +7,7 @@ use App\Models\Event;
 use App\Models\Venue;
 use App\Models\Order;
 use App\Models\Vendor;
+use App\Models\Product;
 use App\Models\Delivery;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -411,6 +412,58 @@ class AdminController extends Controller
             'success' => true,
             'message' => "Vendor account '{$vendor->business_name}' is now {$vendor->status}.",
             'vendor'  => $vendor->fresh(['user:id,name,email', 'event:id,name']),
+        ]);
+    }
+
+    public function storeProduct(Request $request, $vendorId)
+    {
+        $vendor = Vendor::findOrFail($vendorId);
+
+        $validated = $request->validate([
+            'name'         => 'required|string|max:255',
+            'price'        => 'required|numeric|min:0',
+            'description'  => 'nullable|string',
+            'stock_status' => 'nullable|string|in:in_stock,out_of_stock',
+            'image'        => 'nullable|image|max:4096',
+            'image_url'    => 'nullable|string',
+        ]);
+
+        $imageUrl = 'bg-gradient-to-br from-amber-400 to-red-500';
+
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $filename = time() . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '_', $file->getClientOriginalName());
+            $file->move(public_path('images/uploads'), $filename);
+            $imageUrl = '/images/uploads/' . $filename;
+        } elseif ($request->filled('image_url')) {
+            $imageUrl = $validated['image_url'];
+        }
+
+        $product = Product::create([
+            'vendor_id'    => $vendor->id,
+            'name'         => $validated['name'],
+            'price'        => $validated['price'],
+            'description'  => $validated['description'] ?? null,
+            'stock_status' => $validated['stock_status'] ?? 'in_stock',
+            'image_url'    => $imageUrl,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => "Menu item '{$product->name}' added successfully to {$vendor->business_name}.",
+            'product' => $product,
+        ], 201);
+    }
+
+    public function deleteProduct($productId)
+    {
+        $product = Product::findOrFail($productId);
+        $name = $product->name;
+        $product->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => "Menu item '{$name}' deleted successfully.",
         ]);
     }
 }

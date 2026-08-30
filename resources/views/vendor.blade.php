@@ -610,7 +610,11 @@
             const vendorDetails = getVendorDetails();
             if (vendorDetails) {
                 document.getElementById('vendor-title').textContent = vendorDetails.business_name + ' Stall';
-                document.getElementById('vendor-avatar').textContent = vendorDetails.logo_url;
+                if (vendorDetails.logo_url && (vendorDetails.logo_url.startsWith('/') || vendorDetails.logo_url.startsWith('http'))) {
+                    document.getElementById('vendor-avatar').innerHTML = `<img src="${vendorDetails.logo_url}" class="w-5 h-5 rounded-full object-cover" alt="">`;
+                } else {
+                    document.getElementById('vendor-avatar').textContent = vendorDetails.logo_url || '🏪';
+                }
             }
             renderStockControls();
             renderMenuManagement();
