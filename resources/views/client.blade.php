@@ -1737,16 +1737,6 @@
 
     async function addToBasket(id, name, price, vendorId) {
         playSound('beep');
-        if (basket.length > 0 && basket[0].vendorId !== vendorId) {
-            const confirm = await showConfirmModal(
-                "Switch Vendor?",
-                "To keep delivery fast, you can only order from one vendor stall at a time. Adding this item will clear your current basket.",
-                "Clear & Add",
-                "Cancel"
-            );
-            if (!confirm) return;
-            basket = [];
-        }
         const existing = basket.find(item => item.id === id);
         if (existing) {
             existing.quantity++;
@@ -3031,9 +3021,18 @@
             if (desktopContainer) desktopContainer.insertAdjacentHTML('beforeend', row);
         });
 
-        const grandTotal = subtotal + systemDeliveryFee;
-        const subtotalText = `Ksh ${subtotal.toLocaleString()}`;
-        const feeText = systemDeliveryFee > 0 ? `Ksh ${systemDeliveryFee.toLocaleString()}` : 'FREE';
+        // Multi-Vendor Delivery Fee: Base fee + 50% extra for each additional unique vendor stall
+        const uniqueVendors = new Set(basket.map(i => i.vendorId).filter(Boolean));
+        const vendorCount   = Math.max(1, uniqueVendors.size);
+        const baseFee       = systemDeliveryFee;
+        const extraFee      = baseFee * 0.5; // +50% of base fee per extra vendor
+        const effectiveDeliveryFee = baseFee + (vendorCount - 1) * extraFee;
+
+        const grandTotal     = subtotal + effectiveDeliveryFee;
+        const subtotalText   = `Ksh ${subtotal.toLocaleString()}`;
+        const feeText        = vendorCount > 1
+            ? `Ksh ${effectiveDeliveryFee.toLocaleString()} (${vendorCount} Vendors)`
+            : (effectiveDeliveryFee > 0 ? `Ksh ${effectiveDeliveryFee.toLocaleString()}` : 'FREE');
         const grandTotalText = `Ksh ${grandTotal.toLocaleString()}`;
 
         if (subtotalEl) subtotalEl.textContent = subtotalText;

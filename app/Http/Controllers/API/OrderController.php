@@ -28,7 +28,7 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'vendor_id'                => 'required|exists:vendors,id',
+            'vendor_id'                => 'nullable|exists:vendors,id',
             'seat_location'            => 'required|array',
             'seat_location.type'       => 'nullable|string|in:seat,gps',
             'seat_location.section'    => 'required_without:seat_location.latitude|string',
@@ -63,19 +63,17 @@ class OrderController extends Controller
         try {
             DB::beginTransaction();
 
-            $totalAmount   = 0;
-            $itemsToCreate = [];
+            $itemsByVendor = [];
 
             foreach ($request->items as $item) {
                 $product = Product::query()
                     ->whereKey($item['product_id'])
-                    ->where('vendor_id', $request->vendor_id)
                     ->lockForUpdate()
                     ->first();
 
                 if (!$product) {
                     throw ValidationException::withMessages([
-                        'items' => "Selected product #{$item['product_id']} does not belong to vendor #{$request->vendor_id}.",
+                        'items' => "Selected product #{$item['product_id']} not found.",
                     ]);
                 }
 
@@ -92,63 +90,101 @@ class OrderController extends Controller
                     $product->update(['stock_status' => 'out_of_stock']);
                 }
 
-                $price       = $product->price;
-                $subtotal    = $price * $item['quantity'];
-                $totalAmount += $subtotal;
+                $vId = $product->vendor_id;
+                if (!isset($itemsByVendor[$vId])) {
+                    $itemsByVendor[$vId] = [];
+                }
 
-                $itemsToCreate[] = [
-                    'product_id' => $product->id,
-                    'quantity'   => $item['quantity'],
-                    'price'      => $price,
+                $itemsByVendor[$vId][] = [
+                    'product'  => $product,
+                    'quantity' => $item['quantity'],
+                    'price'    => $product->price,
+                    'subtotal' => $product->price * $item['quantity'],
                 ];
             }
 
-            // Include system seat delivery fee (default: 30 shillings)
-            $deliveryFee = floatval(Setting::get('delivery_fee', 30));
-            $totalAmount += $deliveryFee;
+            // Calculate Multi-Vendor Delivery Fee:
+            // Base delivery fee (e.g. Ksh 30) + 50% extra for each additional unique vendor stall
+            $baseDeliveryFee   = floatval(Setting::get('delivery_fee', 30));
+            $uniqueVendorCount = count($itemsByVendor);
+            $extraFeePerVendor = $baseDeliveryFee * 0.5; // +50% of base fee
+            $totalDeliveryFee  = $baseDeliveryFee + max(0, $uniqueVendorCount - 1) * $extraFeePerVendor;
 
             $loc = $request->seat_location;
+            $createdOrders = [];
+            $primaryOrder  = null;
+            $vIndex        = 0;
 
-            $order = Order::create([
-                'user_id'         => $userId,
-                'vendor_id'       => $request->vendor_id,
-                'seat_location'   => $loc,
-                'seat_type'       => $loc['type'] ?? 'seat',
-                'seat_section'    => $loc['section'] ?? null,
-                'seat_row'        => $loc['row'] ?? null,
-                'seat_number'     => $loc['seat'] ?? null,
-                'latitude'        => isset($loc['latitude']) ? floatval($loc['latitude']) : null,
-                'longitude'       => isset($loc['longitude']) ? floatval($loc['longitude']) : null,
-                'total_amount'    => $totalAmount,
-                'payment_status'  => 'pending',
-                'order_status'    => 'created',
-                'idempotency_key' => $idempotencyKey,
-            ]);
+            foreach ($itemsByVendor as $vId => $vItems) {
+                $vSubtotal = 0;
+                foreach ($vItems as $vi) {
+                    $vSubtotal += $vi['subtotal'];
+                }
 
-            foreach ($itemsToCreate as $itemData) {
-                $itemData['order_id'] = $order->id;
-                OrderItem::create($itemData);
+                // Primary vendor gets base fee, secondary vendors get their 50% extra fee share
+                $vFee = ($vIndex === 0) ? $baseDeliveryFee : $extraFeePerVendor;
+                $vTotal = $vSubtotal + $vFee;
+                $vIndex++;
+
+                $vendorIdempotencyKey = ($uniqueVendorCount > 1) 
+                    ? "{$idempotencyKey}-v{$vId}"
+                    : $idempotencyKey;
+
+                $order = Order::create([
+                    'user_id'         => $userId,
+                    'vendor_id'       => $vId,
+                    'seat_location'   => $loc,
+                    'seat_type'       => $loc['type'] ?? 'seat',
+                    'seat_section'    => $loc['section'] ?? null,
+                    'seat_row'        => $loc['row'] ?? null,
+                    'seat_number'     => $loc['seat'] ?? null,
+                    'latitude'        => isset($loc['latitude']) ? floatval($loc['latitude']) : null,
+                    'longitude'       => isset($loc['longitude']) ? floatval($loc['longitude']) : null,
+                    'total_amount'    => $vTotal,
+                    'payment_status'  => 'pending',
+                    'order_status'    => 'created',
+                    'idempotency_key' => $vendorIdempotencyKey,
+                ]);
+
+                foreach ($vItems as $vi) {
+                    OrderItem::create([
+                        'order_id'   => $order->id,
+                        'product_id' => $vi['product']->id,
+                        'quantity'   => $vi['quantity'],
+                        'price'      => $vi['price'],
+                    ]);
+                }
+
+                if (!$primaryOrder) {
+                    $primaryOrder = $order;
+                }
+                $createdOrders[] = $order;
             }
 
             // Generate 4-digit system Delivery OTP / PIN for client verification
             $otpPin  = (string) random_int(1000, 9999);
             $otpHash = Hash::make($otpPin);
 
-            Delivery::create([
-                'order_id'              => $order->id,
-                'verification_pin'      => $otpPin,
-                'verification_pin_hash' => $otpHash,
-                'verification_attempts' => 0,
-                'pin_expires_at'        => now()->addHours(2),
-                'status'                => 'pending',
-            ]);
+            foreach ($createdOrders as $ord) {
+                Delivery::create([
+                    'order_id'              => $ord->id,
+                    'verification_pin'      => $otpPin,
+                    'verification_pin_hash' => $otpHash,
+                    'verification_attempts' => 0,
+                    'pin_expires_at'        => now()->addHours(2),
+                    'status'                => 'pending',
+                ]);
+            }
 
             DB::commit();
 
             return response()->json([
-                'status'  => 'success',
-                'message' => 'Order created successfully. Please complete payment.',
-                'order'   => Order::with('items.product')->find($order->id),
+                'status'        => 'success',
+                'message'       => 'Order created successfully. Please complete payment.',
+                'order'         => $primaryOrder->load('items.product'),
+                'orders_count'  => count($createdOrders),
+                'delivery_fee'  => $totalDeliveryFee,
+                'vendor_count'  => $uniqueVendorCount,
             ]);
 
         } catch (ValidationException $ve) {
