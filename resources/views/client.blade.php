@@ -2624,12 +2624,19 @@
         `;
 
         vendors.forEach((v, idx) => {
-            const emoji = v.logo_url || ['🍔', '🥤', '🍿', '🌮', '🍟'][idx % 5];
+            let chipIcon = '';
+            if (v.logo_url && (v.logo_url.startsWith('/') || v.logo_url.startsWith('http'))) {
+                chipIcon = `<img src="${v.logo_url}" class="w-4 h-4 rounded-full object-cover inline-block shrink-0" alt="${v.business_name}">`;
+            } else {
+                const emoji = v.logo_url || ['🍔', '🥤', '🍿', '🌮', '🍟'][idx % 5];
+                chipIcon = `<span class="text-sm">${emoji}</span>`;
+            }
+
             const isSelected = activeVendorId === v.id;
             chipsHtml += `
                 <button onclick="selectVendor(${v.id})"
-                        class="px-4 py-2 rounded-full text-xs font-black transition-all cursor-pointer whitespace-nowrap border ${isSelected ? 'bg-[#05A357] text-white border-[#05A357] shadow-md' : 'bg-white text-slate-700 border-slate-200 hover:border-[#05A357]'}">
-                    <span>${emoji}</span> ${v.business_name}
+                        class="px-4 py-2 rounded-full text-xs font-black transition-all cursor-pointer whitespace-nowrap border inline-flex items-center gap-1.5 ${isSelected ? 'bg-[#05A357] text-white border-[#05A357] shadow-md' : 'bg-white text-slate-700 border-slate-200 hover:border-[#05A357]'}">
+                    ${chipIcon} <span>${v.business_name}</span>
                 </button>
             `;
         });
@@ -2693,7 +2700,14 @@
             const targetVendor = vendors.find(v => v.id === activeVendorId);
             if (targetVendor) {
                 const idx = vendors.findIndex(v => v.id === activeVendorId);
-                const emoji = targetVendor.logo_url || ['🍔', '🥤', '🍿', '🌮', '🍟'][idx % 5];
+                let headerLogo = '';
+                if (targetVendor.logo_url && (targetVendor.logo_url.startsWith('/') || targetVendor.logo_url.startsWith('http'))) {
+                    headerLogo = `<img src="${targetVendor.logo_url}" class="w-full h-full object-cover rounded-[20px]" alt="${targetVendor.business_name}">`;
+                } else {
+                    const emoji = targetVendor.logo_url || ['🍔', '🥤', '🍿', '🌮', '🍟'][idx % 5];
+                    headerLogo = `<span class="text-4xl">${emoji}</span>`;
+                }
+
                 const rating = (4.9 - (idx * 0.08)).toFixed(1);
                 const etaMin = 7 + (idx % 3) * 2;
                 const etaMax = etaMin + 6;
@@ -2707,7 +2721,7 @@
                         </button>
                         <div class="rounded-[32px] bg-white border border-slate-200 p-5 md:p-6 shadow-md flex flex-col md:flex-row md:items-center justify-between gap-5">
                             <div class="flex items-center gap-4">
-                                <div class="w-16 h-16 rounded-[22px] bg-emerald-50 border border-emerald-200 shadow-inner flex items-center justify-center text-4xl shrink-0">${emoji}</div>
+                                <div class="w-16 h-16 rounded-[22px] bg-emerald-50 border border-emerald-200 shadow-inner flex items-center justify-center text-4xl shrink-0 overflow-hidden">${headerLogo}</div>
                                 <div>
                                     <div class="flex items-center gap-2 mb-1">
                                         <span class="bg-[#FFC244] text-[#0F172A] text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full">Open Now</span>
