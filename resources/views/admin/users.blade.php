@@ -2,10 +2,10 @@
 
 @section('title', 'User Directory — JustFeast Admin')
 @section('page-title', 'User Directory')
-@section('page-meta', 'Manage platform accounts: Customers, Vendors, Runners, and Administrators')
+@section('page-meta', 'Enterprise Directory: Search, manage & control 100,000+ platform accounts')
 
 @section('content')
-  {{-- KPI Summary Row (Scales instantly over 100,000+ accounts via single SQL query) --}}
+  {{-- KPI Summary Row (Scales over 100,000+ accounts via indexed SQL query) --}}
   <div class="kpi-grid" style="grid-template-columns: repeat(4, 1fr); gap: 1.25rem; margin-bottom: 1.5rem;">
     <div class="kpi green">
       <div class="kpi-icon"><i class="fas fa-users"></i></div>
@@ -33,108 +33,154 @@
     </div>
   </div>
 
-  <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; align-items: start;">
-    <!-- Left: Users table -->
-    <div class="card">
-      <div class="card-header">
-        <h3><i class="fas fa-users" style="color:var(--brand)"></i> Platform User Directory</h3>
-        <div class="filters-bar" style="border-bottom: none; padding: 0; margin: 0; gap: 0.5rem; box-shadow: none;">
-          <div class="search-input-wrap" style="width: 220px;">
-            <i class="fas fa-search"></i>
-            <input type="text" id="user-search" class="search-input" placeholder="Search name, phone, email..." oninput="handleSearchInput()">
-          </div>
-          <select id="filter-user-role" class="select-filter" style="width: 150px;" onchange="handleRoleFilterChange()">
-            <option value="">All Roles</option>
-            <option value="customer">Customers (Clients)</option>
-            <option value="vendor">Vendors</option>
-            <option value="runner">Runners</option>
-            <option value="admin">Admins</option>
-          </select>
-        </div>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>User Name</th>
-              <th>Email & Contact Phone</th>
-              <th>Account Role</th>
-              <th>Registered</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="users-table-body">
-            <tr>
-              <td colspan="6" style="text-align:center;padding:4rem;color:var(--muted)"><i class="fas fa-spinner fa-spin fa-2x"></i></td>
-            </tr>
-          </tbody>
-        </table>
+  {{-- Main Full-Width Enterprise Data Directory --}}
+  <div class="card" style="width: 100%;">
+    {{-- Header with Quick Action --}}
+    <div class="card-header" style="padding: 1.25rem 1.5rem; flex-wrap: wrap; gap: 1rem; border-bottom: 1px solid var(--border);">
+      <div>
+        <h3 style="font-size: 1.15rem; font-weight: 900; color: var(--text); display: flex; align-items: center; gap: 0.5rem; margin: 0;">
+          <i class="fas fa-users-gear" style="color: var(--brand);"></i> Platform User Directory
+        </h3>
+        <p style="font-size: 0.75rem; color: var(--muted); margin: 0.2rem 0 0 0; font-weight: 600;">
+          Manage accounts, search records, reassign roles & adjust permissions across 100,000+ platform accounts.
+        </p>
       </div>
 
-      {{-- Server-Side Pagination Bar --}}
-      <div id="users-pagination-wrap" style="display:flex;align-items:center;justify-content:space-between;padding:0.9rem 1.25rem;border-top:1px solid var(--border);background:var(--surface);">
-        <span style="font-size:0.75rem;font-weight:700;color:var(--muted);" id="pagination-info-text">
-          Showing 0 to 0 of 0 accounts
-        </span>
-        <div style="display:flex;align-items:center;gap:0.4rem;" id="pagination-btn-container">
-          <!-- Rendered dynamically -->
+      <button type="button" onclick="openCreateUserModal()" 
+              style="padding: 0.65rem 1.25rem; background: linear-gradient(135deg, #A31D1D, #841313); color: #FFF; border: none; border-radius: 12px; font-weight: 800; font-size: 0.8rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; box-shadow: 0 4px 14px rgba(163,29,29,0.25); transition: all 0.15s ease;">
+        <i class="fas fa-user-plus"></i> Create New Account
+      </button>
+    </div>
+
+    {{-- Filter Toolbar: Role Tabs + Search + Rows Per Page --}}
+    <div style="padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); background: var(--surface2); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem;">
+      
+      {{-- Role Filter Tabs --}}
+      <div style="display: flex; align-items: center; gap: 0.4rem; background: var(--surface); padding: 0.25rem; border-radius: 14px; border: 1px solid var(--border);">
+        <button type="button" class="user-role-tab active" data-role="" onclick="selectRoleTab('')">All Accounts</button>
+        <button type="button" class="user-role-tab" data-role="customer" onclick="selectRoleTab('customer')">Customers</button>
+        <button type="button" class="user-role-tab" data-role="vendor" onclick="selectRoleTab('vendor')">Vendors</button>
+        <button type="button" class="user-role-tab" data-role="runner" onclick="selectRoleTab('runner')">Runners</button>
+        <button type="button" class="user-role-tab" data-role="admin" onclick="selectRoleTab('admin')">Admins</button>
+      </div>
+
+      {{-- Search Input & Rows Per Page Selector --}}
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <div class="search-input-wrap" style="width: 260px;">
+          <i class="fas fa-search"></i>
+          <input type="text" id="user-search" class="search-input" placeholder="Search name, phone, email..." oninput="handleSearchInput()">
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.75rem; font-weight: 700; color: var(--muted);">
+          <span>Rows:</span>
+          <select id="user-per-page" class="select-filter" style="width: 70px; padding: 0.4rem 0.5rem;" onchange="handlePerPageChange()">
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
         </div>
       </div>
     </div>
 
-    <!-- Right: Create User Form -->
-    <div class="card" style="padding: 1.5rem;">
-      <h3 style="font-size: .875rem; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 1.25rem;">
-        <i class="fas fa-user-plus" style="color: var(--brand);"></i> Create New Account
-      </h3>
-      
-      <form id="create-user-form" onsubmit="handleCreateUser(event)" style="display: flex; flex-direction: column; gap: 1rem;">
-        <div>
-          <label style="display: block; font-size: .7rem; font-weight: 800; text-transform: uppercase; color: var(--muted); margin-bottom: .4rem; letter-spacing: .05em;">Full Name *</label>
-          <input type="text" id="new-user-name" required placeholder="Jane Doe" style="width: 100%; padding: .65rem .85rem; border-radius: 10px; background: var(--surface2); border: 1px solid var(--border); color: var(--text); outline: none; font-weight: 600;">
-        </div>
+    {{-- Full-Width Table --}}
+    <div class="table-wrap">
+      <table style="width: 100%;">
+        <thead>
+          <tr>
+            <th>User Account</th>
+            <th>Email & Contact Phone</th>
+            <th>Account Role</th>
+            <th>Date Registered</th>
+            <th>Status</th>
+            <th style="text-align: right;">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="users-table-body">
+          <tr>
+            <td colspan="6" style="text-align:center;padding:4rem;color:var(--muted)"><i class="fas fa-spinner fa-spin fa-2x"></i></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-        <div>
-          <label style="display: block; font-size: .7rem; font-weight: 800; text-transform: uppercase; color: var(--muted); margin-bottom: .4rem; letter-spacing: .05em;">Email Address *</label>
-          <input type="email" id="new-user-email" required placeholder="jane@justfeast.co.ke" style="width: 100%; padding: .65rem .85rem; border-radius: 10px; background: var(--surface2); border: 1px solid var(--border); color: var(--text); outline: none; font-weight: 600;">
-        </div>
+    {{-- Enterprise Server-Side Pagination Bar --}}
+    <div id="users-pagination-wrap" style="display:flex;align-items:center;justify-content:space-between;padding:1rem 1.5rem;border-top:1px solid var(--border);background:var(--surface);">
+      <span style="font-size:0.78rem;font-weight:700;color:var(--muted);" id="pagination-info-text">
+        Showing 0 to 0 of 0 accounts
+      </span>
+      <div style="display:flex;align-items:center;gap:0.4rem;" id="pagination-btn-container">
+        <!-- Pagination controls generated dynamically -->
+      </div>
+    </div>
+  </div>
 
-        <div>
-          <label style="display: block; font-size: .7rem; font-weight: 800; text-transform: uppercase; color: var(--muted); margin-bottom: .4rem; letter-spacing: .05em;">Phone Number</label>
-          <input type="tel" id="new-user-phone" placeholder="0712345678" style="width: 100%; padding: .65rem .85rem; border-radius: 10px; background: var(--surface2); border: 1px solid var(--border); color: var(--text); outline: none; font-weight: 600;">
-        </div>
-
-        <div>
-          <label style="display: block; font-size: .7rem; font-weight: 800; text-transform: uppercase; color: var(--muted); margin-bottom: .4rem; letter-spacing: .05em;">Password *</label>
-          <input type="password" id="new-user-password" required placeholder="••••••••" style="width: 100%; padding: .65rem .85rem; border-radius: 10px; background: var(--surface2); border: 1px solid var(--border); color: var(--text); outline: none; font-weight: 600;">
-        </div>
-
-        <div>
-          <label style="display: block; font-size: .7rem; font-weight: 800; text-transform: uppercase; color: var(--muted); margin-bottom: .4rem; letter-spacing: .05em;">Assign Role *</label>
-          <select id="new-user-role" required onchange="toggleVendorBizField()" style="width: 100%; padding: .65rem .85rem; border-radius: 10px; background: var(--surface2); border: 1px solid var(--border); color: var(--text); outline: none; font-weight: 600;">
-            <option value="customer">Customer (Client)</option>
-            <option value="runner">Runner (Courier)</option>
-            <option value="vendor">Vendor (Stall Staff)</option>
-            <option value="admin">Administrator</option>
-          </select>
-        </div>
-
-        <div id="vendor-biz-name-wrap" style="display: none;">
-          <label style="display: block; font-size: .7rem; font-weight: 800; text-transform: uppercase; color: var(--brand); margin-bottom: .4rem; letter-spacing: .05em;">Stall / Business Name</label>
-          <input type="text" id="new-user-biz-name" placeholder="Carnivore Smokehouse" style="width: 100%; padding: .65rem .85rem; border-radius: 10px; background: var(--surface2); border: 1px solid var(--border); color: var(--text); outline: none; font-weight: 600;">
-        </div>
-
-        <button type="submit" style="background: linear-gradient(135deg, #A31D1D, #841313); color: #fff; padding: .75rem; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; transition: .15s; margin-top: .5rem; box-shadow: 0 4px 14px rgba(163,29,29,0.3);">
-          Create User Account
+  {{-- Create User Account Modal --}}
+  <div class="modal-overlay" id="create-user-modal-overlay" onclick="if(event.target===this) closeCreateUserModal()">
+    <div class="modal-card" style="max-width:540px;">
+      <div class="modal-header">
+        <h3 style="font-size:1.1rem;font-weight:900;color:var(--text);display:flex;align-items:center;gap:0.5rem;">
+          <i class="fas fa-user-plus" style="color:var(--brand)"></i>
+          Create New User Account
+        </h3>
+        <button type="button" class="modal-close-btn" onclick="closeCreateUserModal()">
+          <i class="fas fa-times"></i>
         </button>
+      </div>
+
+      <form id="create-user-form" onsubmit="handleCreateUser(event)">
+        <div style="padding:1.5rem;display:flex;flex-direction:column;gap:1.1rem;">
+          
+          <div>
+            <label style="display:block;font-size:.72rem;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;">Full Name *</label>
+            <input type="text" id="new-user-name" required placeholder="Jane Doe" style="width:100%;padding:.7rem .9rem;border-radius:12px;background:var(--surface2);border:1px solid var(--border);color:var(--text);outline:none;font-weight:600;">
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+            <div>
+              <label style="display:block;font-size:.72rem;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;">Email Address *</label>
+              <input type="email" id="new-user-email" required placeholder="jane@justfeast.co.ke" style="width:100%;padding:.7rem .9rem;border-radius:12px;background:var(--surface2);border:1px solid var(--border);color:var(--text);outline:none;font-weight:600;">
+            </div>
+            <div>
+              <label style="display:block;font-size:.72rem;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;">Phone Number</label>
+              <input type="tel" id="new-user-phone" placeholder="0712345678" style="width:100%;padding:.7rem .9rem;border-radius:12px;background:var(--surface2);border:1px solid var(--border);color:var(--text);outline:none;font-weight:600;">
+            </div>
+          </div>
+
+          <div>
+            <label style="display:block;font-size:.72rem;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;">Password *</label>
+            <input type="password" id="new-user-password" required placeholder="••••••••" style="width:100%;padding:.7rem .9rem;border-radius:12px;background:var(--surface2);border:1px solid var(--border);color:var(--text);outline:none;font-weight:600;">
+          </div>
+
+          <div>
+            <label style="display:block;font-size:.72rem;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;">Assign Role *</label>
+            <select id="new-user-role" required onchange="toggleVendorBizField()" style="width:100%;padding:.7rem .9rem;border-radius:12px;background:var(--surface2);border:1px solid var(--border);color:var(--text);outline:none;font-weight:700;">
+              <option value="customer">Customer (Client)</option>
+              <option value="runner">Runner (Courier)</option>
+              <option value="vendor">Vendor (Stall Staff)</option>
+              <option value="admin">Administrator</option>
+            </select>
+          </div>
+
+          <div id="vendor-biz-name-wrap" style="display: none;">
+            <label style="display:block;font-size:.72rem;font-weight:800;text-transform:uppercase;color:var(--brand);margin-bottom:.35rem;">Stall / Business Name</label>
+            <input type="text" id="new-user-biz-name" placeholder="Carnivore Smokehouse" style="width:100%;padding:.7rem .9rem;border-radius:12px;background:var(--surface2);border:1px solid var(--border);color:var(--text);outline:none;font-weight:600;">
+          </div>
+
+          <div style="display:flex;justify-content:flex-end;gap:0.75rem;padding-top:1rem;border-top:1px solid var(--border);">
+            <button type="button" class="btn-page" onclick="closeCreateUserModal()">Cancel</button>
+            <button type="submit" id="btn-create-user" style="padding:.7rem 1.4rem;background:#05A357;color:#FFF;border:none;border-radius:12px;font-weight:800;font-size:.82rem;cursor:pointer;display:flex;align-items:center;gap:0.4rem;">
+              <i class="fas fa-check"></i> Create Account
+            </button>
+          </div>
+
+        </div>
       </form>
     </div>
   </div>
 
-  <!-- Manage User Account Modal -->
+  {{-- Manage User Account Modal --}}
   <div class="modal-overlay" id="manage-user-modal-overlay" onclick="if(event.target===this) closeManageUserModal()">
-    <div class="modal-card" style="max-width:520px;">
+    <div class="modal-card" style="max-width:540px;">
       <div class="modal-header">
         <h3 style="font-size:1.1rem;font-weight:900;color:var(--text);display:flex;align-items:center;gap:0.5rem;">
           <i class="fas fa-user-gear" style="color:var(--brand)"></i>
@@ -150,24 +196,24 @@
         <div style="padding:1.5rem;display:flex;flex-direction:column;gap:1.1rem;">
           
           <div>
-            <label style="display:block;font-size:.7rem;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;">Full Name *</label>
-            <input type="text" id="edit-user-name" required style="width:100%;padding:.65rem .85rem;border-radius:10px;background:var(--surface2);border:1px solid var(--border);color:var(--text);outline:none;font-weight:700;">
+            <label style="display:block;font-size:.72rem;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;">Full Name *</label>
+            <input type="text" id="edit-user-name" required style="width:100%;padding:.7rem .9rem;border-radius:12px;background:var(--surface2);border:1px solid var(--border);color:var(--text);outline:none;font-weight:700;">
           </div>
 
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
             <div>
-              <label style="display:block;font-size:.7rem;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;">Email Address *</label>
-              <input type="email" id="edit-user-email" required style="width:100%;padding:.65rem .85rem;border-radius:10px;background:var(--surface2);border:1px solid var(--border);color:var(--text);outline:none;font-weight:700;">
+              <label style="display:block;font-size:.72rem;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;">Email Address *</label>
+              <input type="email" id="edit-user-email" required style="width:100%;padding:.7rem .9rem;border-radius:12px;background:var(--surface2);border:1px solid var(--border);color:var(--text);outline:none;font-weight:700;">
             </div>
             <div>
-              <label style="display:block;font-size:.7rem;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;">Phone Number</label>
-              <input type="tel" id="edit-user-phone" placeholder="e.g. 0712345678" style="width:100%;padding:.65rem .85rem;border-radius:10px;background:var(--surface2);border:1px solid var(--border);color:var(--text);outline:none;font-weight:700;">
+              <label style="display:block;font-size:.72rem;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;">Phone Number</label>
+              <input type="tel" id="edit-user-phone" placeholder="e.g. 0712345678" style="width:100%;padding:.7rem .9rem;border-radius:12px;background:var(--surface2);border:1px solid var(--border);color:var(--text);outline:none;font-weight:700;">
             </div>
           </div>
 
           <div>
-            <label style="display:block;font-size:.7rem;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;">Assign Account Role *</label>
-            <select id="edit-user-role" required style="width:100%;padding:.65rem .85rem;border-radius:10px;background:var(--surface2);border:1px solid var(--border);color:var(--text);outline:none;font-weight:700;">
+            <label style="display:block;font-size:.72rem;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;">Assign Account Role *</label>
+            <select id="edit-user-role" required style="width:100%;padding:.7rem .9rem;border-radius:12px;background:var(--surface2);border:1px solid var(--border);color:var(--text);outline:none;font-weight:700;">
               <option value="customer">Customer (Client)</option>
               <option value="runner">Runner (Courier)</option>
               <option value="vendor">Vendor (Stall Staff)</option>
@@ -176,18 +222,18 @@
           </div>
 
           <div>
-            <label style="display:block;font-size:.7rem;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;">Reset Password (Optional)</label>
-            <input type="password" id="edit-user-password" placeholder="Leave blank to keep current password" style="width:100%;padding:.65rem .85rem;border-radius:10px;background:var(--surface2);border:1px solid var(--border);color:var(--text);outline:none;font-weight:600;">
+            <label style="display:block;font-size:.72rem;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;">Reset Password (Optional)</label>
+            <input type="password" id="edit-user-password" placeholder="Leave blank to keep current password" style="width:100%;padding:.7rem .9rem;border-radius:12px;background:var(--surface2);border:1px solid var(--border);color:var(--text);outline:none;font-weight:600;">
           </div>
 
           <div style="display:flex;justify-content:space-between;align-items:center;padding-top:1rem;border-top:1px solid var(--border);margin-top:0.5rem;">
-            <button type="button" onclick="handleDeleteUser()" style="padding:.6rem 1rem;background:#FEF2F2;color:#991B1B;border:1px solid #FCA5A5;border-radius:10px;font-weight:800;font-size:.75rem;cursor:pointer;">
+            <button type="button" onclick="handleDeleteUser()" style="padding:.65rem 1.1rem;background:#FEF2F2;color:#991B1B;border:1px solid #FCA5A5;border-radius:12px;font-weight:800;font-size:.78rem;cursor:pointer;">
               <i class="fas fa-trash-alt mr-1"></i> Delete User Account
             </button>
 
             <div style="display:flex;gap:0.5rem;">
               <button type="button" class="btn-page" onclick="closeManageUserModal()">Cancel</button>
-              <button type="submit" id="btn-update-user" style="padding:.6rem 1.2rem;background:#05A357;color:#FFF;border:none;border-radius:10px;font-weight:800;font-size:.78rem;cursor:pointer;">
+              <button type="submit" id="btn-update-user" style="padding:.65rem 1.4rem;background:#05A357;color:#FFF;border:none;border-radius:12px;font-weight:800;font-size:.8rem;cursor:pointer;">
                 <i class="fas fa-save mr-1"></i> Save Changes
               </button>
             </div>
@@ -200,16 +246,52 @@
 @endsection
 
 @section('scripts')
+<style>
+.user-role-tab {
+  padding: 0.4rem 0.9rem;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--muted);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.user-role-tab:hover {
+  color: var(--text);
+  background: var(--surface2);
+}
+.user-role-tab.active {
+  color: var(--brand);
+  background: #FFF8E7;
+  box-shadow: inset 0 0 0 1px #F7E5B2;
+}
+</style>
+
 <script>
 let currentPage = 1;
 let currentSearch = '';
 let currentRole = '';
+let currentPerPage = 25;
 let searchDebounceTimer = null;
 let loadedUsers = [];
 
 window.addEventListener('DOMContentLoaded', () => {
   loadUsersTab(1);
 });
+
+function selectRoleTab(role) {
+  currentRole = role;
+  document.querySelectorAll('.user-role-tab').forEach(tab => {
+    if (tab.dataset.role === role) {
+      tab.classList.add('active');
+    } else {
+      tab.classList.remove('active');
+    }
+  });
+  loadUsersTab(1);
+}
 
 function handleSearchInput() {
   clearTimeout(searchDebounceTimer);
@@ -219,8 +301,8 @@ function handleSearchInput() {
   }, 300);
 }
 
-function handleRoleFilterChange() {
-  currentRole = document.getElementById('filter-user-role').value;
+function handlePerPageChange() {
+  currentPerPage = parseInt(document.getElementById('user-per-page').value, 10) || 25;
   loadUsersTab(1);
 }
 
@@ -234,6 +316,7 @@ async function loadUsersTab(page = 1) {
   try {
     const params = new URLSearchParams({
       page: page,
+      per_page: currentPerPage,
       search: currentSearch,
       role: currentRole
     });
@@ -276,7 +359,7 @@ function renderUsersUI(users) {
   tbody.innerHTML = '';
   
   if (!users.length) {
-    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:3rem;color:var(--muted)">No user accounts found matching query</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:3.5rem;color:var(--muted)">No user accounts found matching query</td></tr>`;
     return;
   }
 
@@ -296,11 +379,14 @@ function renderUsersUI(users) {
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>
-        <div style="display:flex;align-items:center;gap:.6rem;">
-          <div style="width:32px;height:32px;border-radius:10px;background:#FFF8E7;color:var(--brand);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.8rem;border:1px solid var(--border);">
+        <div style="display:flex;align-items:center;gap:.75rem;">
+          <div style="width:36px;height:36px;border-radius:12px;background:#FFF8E7;color:var(--brand);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.85rem;border:1px solid #F7E5B2;shrink:0;">
             ${user.name.charAt(0).toUpperCase()}
           </div>
-          <strong style="color:var(--text);">${user.name}</strong>
+          <div>
+            <strong style="color:var(--text);font-size:.85rem;display:block;">${user.name}</strong>
+            <span style="font-size:.68rem;color:var(--muted);font-weight:600;">ID #${user.id}</span>
+          </div>
         </div>
       </td>
       <td style="color:var(--muted);font-weight:600;">
@@ -310,8 +396,8 @@ function renderUsersUI(users) {
       <td><span class="status-pill ${roleInfo.class}">${roleInfo.name}</span></td>
       <td style="font-size:.78rem;color:var(--muted);">${regDate}</td>
       <td><span class="status-pill s-ready"><div class="live-dot" style="display:inline-block;margin-right:4px;"></div>Active</span></td>
-      <td>
-        <button class="btn-page" style="padding:.3rem .75rem;font-size:.72rem;font-weight:800;background:var(--surface2);border-color:var(--border);" onclick="promptManageUser(${user.id})">
+      <td style="text-align: right;">
+        <button class="btn-page" style="padding:.35rem .85rem;font-size:.74rem;font-weight:800;background:var(--surface2);border-color:var(--border);" onclick="promptManageUser(${user.id})">
           <i class="fas fa-sliders mr-1"></i> Manage
         </button>
       </td>
@@ -371,6 +457,16 @@ function renderPagination(meta) {
   nextBtn.innerHTML = `Next <i class="fas fa-chevron-right"></i>`;
   nextBtn.onclick = () => loadUsersTab(meta.current_page + 1);
   btnWrap.appendChild(nextBtn);
+}
+
+function openCreateUserModal() {
+  const modal = document.getElementById('create-user-modal-overlay');
+  if (modal) modal.classList.add('is-active');
+}
+
+function closeCreateUserModal() {
+  const modal = document.getElementById('create-user-modal-overlay');
+  if (modal) modal.classList.remove('is-active');
 }
 
 function promptManageUser(userId) {
@@ -499,6 +595,13 @@ async function handleCreateUser(event) {
   const role = document.getElementById('new-user-role').value;
   const business_name = role === 'vendor' ? document.getElementById('new-user-biz-name')?.value : null;
 
+  const btn = document.getElementById('btn-create-user');
+  if (!btn) return;
+
+  const originalHtml = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-1"></i> Creating...`;
+
   try {
     const res = await fetch(`${API_BASE}/admin/users`, {
       method: 'POST',
@@ -511,15 +614,19 @@ async function handleCreateUser(event) {
     
     const data = await res.json();
     if (res.ok && data.success) {
-      alert(data.message);
+      alert(data.message || 'User account created successfully!');
       document.getElementById('create-user-form').reset();
       toggleVendorBizField();
+      closeCreateUserModal();
       loadUsersTab(1);
     } else {
       alert(data.message || 'Error creating user account');
     }
   } catch(e) {
     alert('Network error while creating account');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = originalHtml;
   }
 }
 </script>
