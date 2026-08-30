@@ -459,16 +459,7 @@
                                 </div>
                             </div>
 
-                            <!-- Runner status pill -->
-                            <div class="absolute bottom-1 sm:bottom-2 right-2 sm:right-4 bg-[#05A357] text-white rounded-2xl sm:rounded-[32px] p-3 sm:p-4 shadow-2xl border border-white/20 z-20 w-44 sm:w-56">
-                                <p class="text-[8.5px] sm:text-[9.5px] uppercase tracking-widest font-black text-white/80 flex items-center gap-1 sm:gap-1.5">
-                                    <i class="fas fa-bolt text-[#FFC244]"></i> Runner Dispatch
-                                </p>
-                                <div class="flex items-center gap-1.5 sm:gap-2 mt-1 sm:mt-1.5">
-                                    <span class="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-[#FFC244] rounded-full animate-pulse"></span>
-                                    <p class="text-xs sm:text-sm font-black">Active at Gate B</p>
-                                </div>
-                            </div>
+
                         </div>
                     </div>
                 </div>
