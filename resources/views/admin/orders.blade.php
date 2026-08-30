@@ -71,9 +71,15 @@ window.addEventListener('DOMContentLoaded', () => {
 
 async function loadOrdersTab() {
   try {
-    const res = await fetch(`${API_BASE}/admin/orders`);
+    const res = await fetch(`${API_BASE}/admin/orders`, {
+      headers: {
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    });
     if (res.ok) {
-      allOrders = await res.json();
+      const data = await res.json();
+      allOrders = Array.isArray(data) ? data : (data.data || []);
       filterOrders();
     }
   } catch(e) {}

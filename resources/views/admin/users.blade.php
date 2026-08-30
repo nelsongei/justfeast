@@ -100,9 +100,15 @@ window.addEventListener('DOMContentLoaded', () => {
 
 async function loadUsersTab() {
   try {
-    const res = await fetch(`${API_BASE}/admin/users`);
+    const res = await fetch(`${API_BASE}/admin/users`, {
+      headers: {
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    });
     if (res.ok) {
-      cachedUsers = await res.json();
+      const data = await res.json();
+      cachedUsers = Array.isArray(data) ? data : (data.data || []);
       renderUsersUI(cachedUsers);
     }
   } catch(e) {}

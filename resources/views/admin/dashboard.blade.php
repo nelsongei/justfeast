@@ -132,7 +132,12 @@ window.addEventListener('DOMContentLoaded', () => {
 
 async function syncStats() {
   try {
-    const res = await fetch(`${API_BASE}/admin/stats`);
+    const res = await fetch(`${API_BASE}/admin/stats`, {
+      headers: {
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    });
     if (res.ok) {
       cachedStats = await res.json();
       updateOverviewUI(cachedStats);

@@ -752,17 +752,26 @@ async function loadVendorsTab(showToast = false) {
   if (syncIcon) syncIcon.classList.add('fa-spin');
 
   try {
-    const res = await fetch(`${API_BASE}/admin/vendors`);
-    if (res.ok) {
-      allVendorsCache = await res.json();
+    const res = await fetch(`${API_BASE}/admin/vendors`, {
+      headers: {
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    });
+
+    const data = await res.json();
+
+    if (res.ok && Array.isArray(data)) {
+      allVendorsCache = data;
       updateKPISummary(allVendorsCache);
       applyVendorFilters();
       if (showToast) showNotification('Vendor directory synchronized', 'success');
     } else {
-      showNotification('Failed to fetch vendors data', 'error');
+      const msg = (data && data.message) ? data.message : 'Failed to fetch vendors data';
+      showNotification(msg, 'error');
     }
   } catch (e) {
-    showNotification('Network error while loading vendors', 'error');
+    showNotification('Network error while loading vendors: ' + (e.message || 'Server connection failed'), 'error');
   } finally {
     if (syncIcon) syncIcon.classList.remove('fa-spin');
   }
@@ -1033,10 +1042,15 @@ async function loadEventsForVendorModal() {
   if (!select) return;
 
   try {
-    const res = await fetch(`${API_BASE}/admin/events`);
+    const res = await fetch(`${API_BASE}/admin/events`, {
+      headers: {
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    });
     if (res.ok) {
       const events = await res.json();
-      select.innerHTML = events.length
+      select.innerHTML = Array.isArray(events) && events.length
         ? events.map(e => `<option value="${e.id}">${escapeHtml(e.name)} (${(e.status || 'active').toUpperCase()})</option>`).join('')
         : '<option value="">Default Main Event</option>';
     } else {

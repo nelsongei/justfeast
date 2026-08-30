@@ -114,7 +114,12 @@ window.addEventListener('DOMContentLoaded', () => {
 
 async function loadReportsTab() {
   try {
-    const res = await fetch(`${API_BASE}/admin/reports`);
+    const res = await fetch(`${API_BASE}/admin/reports`, {
+      headers: {
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    });
     if (res.ok) {
       const data = await res.json();
       
