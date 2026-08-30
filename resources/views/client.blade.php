@@ -2726,7 +2726,6 @@
                                 <div>
                                     <div class="flex items-center gap-2 mb-1">
                                         <span class="bg-[#FFC244] text-[#0F172A] text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full">Open Now</span>
-                                        <span class="bg-[#05A357]/10 text-[#05A357] border border-[#05A357]/20 text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full">${zone}</span>
                                     </div>
                                     <h3 class="text-2xl font-black tracking-tight text-[#0F172A]">${targetVendor.business_name}</h3>
                                     <div class="flex items-center gap-3 mt-1.5 text-xs font-bold text-slate-500">

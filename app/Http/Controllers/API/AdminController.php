@@ -125,14 +125,47 @@ class AdminController extends Controller
     public function users(Request $request)
     {
         $perPage = min($request->integer('per_page', 25), 100);
+        $search  = trim($request->input('search', ''));
+        $role    = strtolower(trim($request->input('role', '')));
 
+        // 1. Fast single SQL aggregate query for system-wide KPIs (Scales to 100k+ users)
+        $kpis = User::query()
+            ->selectRaw("COUNT(*) AS total_count")
+            ->selectRaw("COUNT(CASE WHEN role IN ('customer', 'client') THEN 1 END) AS customer_count")
+            ->selectRaw("COUNT(CASE WHEN role = 'vendor' THEN 1 END) AS vendor_count")
+            ->selectRaw("COUNT(CASE WHEN role = 'runner' THEN 1 END) AS runner_count")
+            ->first();
+
+        // 2. Server-side SQL filtered paginated user list
         $users = User::query()
             ->select(['id', 'name', 'email', 'phone', 'role', 'created_at'])
-            ->orderBy('role')
-            ->orderBy('name')
+            ->when(!empty($role), function ($q) use ($role) {
+                if ($role === 'customer' || $role === 'client') {
+                    $q->whereIn('role', ['customer', 'client']);
+                } else {
+                    $q->where('role', $role);
+                }
+            })
+            ->when(!empty($search), function ($q) use ($search) {
+                $q->where(function ($sub) use ($search) {
+                    $sub->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%")
+                        ->orWhere('phone', 'like', "%{$search}%");
+                });
+            })
+            ->orderByDesc('id')
             ->paginate($perPage);
 
-        return response()->json($users);
+        return response()->json([
+            'status' => 'success',
+            'kpis'   => [
+                'total'     => (int) ($kpis->total_count ?? 0),
+                'customers' => (int) ($kpis->customer_count ?? 0),
+                'vendors'   => (int) ($kpis->vendor_count ?? 0),
+                'runners'   => (int) ($kpis->runner_count ?? 0),
+            ],
+            'users'  => $users,
+        ]);
     }
 
     public function reports(Request $request)
