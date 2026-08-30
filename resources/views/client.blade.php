@@ -2951,7 +2951,6 @@
             featContainer.style.display = 'none';
         }
     }
-    }
 
     let systemDeliveryFee = 30;
     let systemStageConfig = {
