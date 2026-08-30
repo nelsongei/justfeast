@@ -2816,14 +2816,20 @@
         }
 
         // 4. OVERVIEW MODE: Render Glovo-Style Circular Bubble Cards Grid!
+        const eventName = (typeof activeEvent !== 'undefined' && activeEvent && activeEvent.name) ? activeEvent.name : 'RheamFeast';
         let vendorGridHtml = `
-            <div class="space-y-5 pt-2">
-                <div class="text-center space-y-1">
-                    <h3 class="text-lg sm:text-xl md:text-2xl font-black text-[#0F172A] tracking-tight">Top restaurants and stalls in justFeast</h3>
-                    <p class="text-[11px] sm:text-xs text-slate-500 font-bold">Tap any stall bubble to explore their full menu</p>
+            <div class="space-y-6 pt-4 border-t border-slate-200/80 mt-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                        <h3 class="text-lg sm:text-xl md:text-2xl font-black text-[#0F172A] tracking-tight">Top restaurants and stalls in ${eventName}</h3>
+                        <p class="text-[11px] sm:text-xs text-slate-500 font-bold mt-0.5">Tap any stall bubble to explore their full menu</p>
+                    </div>
+                    <span class="bg-[#FFF8E7] text-[#0F172A] border border-[#F7E5B2] text-[10px] font-black uppercase px-3 py-1 rounded-full self-start sm:self-auto">
+                        🏪 ${vendors.length} Verified Stalls
+                    </span>
                 </div>
 
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6 justify-items-center py-3">
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6 justify-items-start py-1">
         `;
 
         vendors.forEach((vendor, index) => {
@@ -2869,7 +2875,67 @@
             `;
         });
 
-        vendorGridHtml += `</div></div>`;
+        // Build Featured Food Items directly from vendors
+        let foodItemsHtml = `
+            <div class="mt-8 space-y-4">
+                <div class="flex items-center justify-between border-t border-slate-200/80 pt-6">
+                    <div>
+                        <h3 class="text-lg sm:text-xl font-black text-[#0F172A] tracking-tight flex items-center gap-2">
+                            <span>🍱</span> Featured Food & Drinks from Vendors
+                        </h3>
+                        <p class="text-[11px] sm:text-xs text-slate-500 font-bold">Popular concert meals & drinks served direct to your seat</p>
+                    </div>
+                    <span class="bg-[#FFF8E7] text-[#0F172A] border border-[#F7E5B2] text-[10px] font-black uppercase px-3 py-1 rounded-full hidden sm:inline-block">
+                        ⚡ Seat Delivery
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+        `;
+
+        let featuredCount = 0;
+        vendors.forEach(v => {
+            (v.products || []).forEach(p => {
+                const currentCat = (typeof selectedCategory !== 'undefined') ? selectedCategory : 'all';
+                const pCat = getProductCategory(p);
+                if (currentCat !== 'all' && pCat !== currentCat) return;
+
+                featuredCount++;
+                const out = p.stock_status !== 'in_stock';
+                const safeName = String(p.name || '').replace(/'/g, "\\'");
+                let visual = p.image_url && p.image_url.startsWith('/')
+                    ? `<img src="${API_BASE.replace('/api', '') + p.image_url}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="${p.name}">`
+                    : `<div class="w-full h-full bg-gradient-to-br from-[#FFF8E7] via-white to-[#E9F7EE] flex items-center justify-center"><span class="text-6xl drop-shadow-sm">${pCat === 'drinks' ? '🥤' : pCat === 'snacks' ? '🍿' : '🍔'}</span></div>`;
+
+                foodItemsHtml += `
+                    <article class="group bg-white rounded-[30px] border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition duration-300 flex flex-col">
+                        <div class="relative h-44 overflow-hidden bg-slate-50">
+                            ${visual}
+                            <span class="absolute top-3 left-3 bg-white/95 backdrop-blur text-[9px] font-black text-[#0F172A] px-3 py-1 rounded-full uppercase tracking-wider border border-slate-200">${pCat}</span>
+                            <span class="absolute bottom-3 left-3 bg-[#05A357] text-white text-[9px] font-black px-2.5 py-1 rounded-full shadow-sm"><i class="fas fa-shop mr-1"></i> ${v.business_name}</span>
+                        </div>
+                        <div class="p-4 flex-1 flex flex-col justify-between gap-4">
+                            <div>
+                                <h4 class="text-sm font-black tracking-tight text-[#0F172A] group-hover:text-[#05A357] ${out ? 'line-through text-slate-400' : ''}">${p.name}</h4>
+                                <p class="text-[11px] text-slate-500 leading-relaxed mt-1 line-clamp-2 font-medium">${p.description || 'Prepared fresh by an approved event vendor.'}</p>
+                            </div>
+                            <div class="flex items-center justify-between gap-3">
+                                <div><p class="text-[9px] uppercase tracking-wider text-slate-400 font-black">Price</p><p class="text-lg font-black text-[#05A357]">Ksh ${parseFloat(p.price).toLocaleString()}</p></div>
+                                ${out ? `<span class="text-[9px] bg-slate-100 border border-slate-200 text-slate-400 px-3 py-2 rounded-full font-black">Out of stock</span>` : `<button onclick="addToBasket(${p.id}, '${safeName}', ${p.price}, ${v.id})" class="h-10 px-4 rounded-full bg-[#FFC244] hover:bg-[#05A357] text-[#0F172A] hover:text-white flex items-center justify-center font-black transition-all shadow-sm border border-[#efb52e] text-xs gap-1.5 cursor-pointer"><i class="fas fa-plus text-[10px]"></i> Add</button>`}
+                            </div>
+                        </div>
+                    </article>
+                `;
+            });
+        });
+
+        foodItemsHtml += `</div></div>`;
+
+        if (featuredCount > 0) {
+            vendorGridHtml += foodItemsHtml;
+        }
+
+        vendorGridHtml += `</div>`;
         container.innerHTML = chipsHtml + vendorGridHtml;
     }
 
