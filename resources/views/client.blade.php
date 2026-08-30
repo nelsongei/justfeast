@@ -840,11 +840,11 @@
             <h4 class="text-[11px] font-black uppercase tracking-widest text-white/40">Payments</h4>
             <div class="bg-white/5 border border-white/10 rounded-3xl p-4 space-y-3">
                 <div class="flex items-center gap-2.5">
-                    <div class="h-9 px-3 bg-white rounded-xl flex items-center justify-center border border-white/20 shadow-xs shrink-0">
-                        <img src="{{ asset('images/logo/mpesa.png') }}" alt="M-Pesa" class="h-5 w-auto object-contain" onerror="this.style.display='none'">
+                    <div class="h-9 px-3 bg-white rounded-xl flex items-center justify-center border border-white/20 shadow-xs shrink-0 overflow-hidden">
+                        <img src="{{ asset('images/logo/mpesa.png') }}" alt="M-Pesa" class="h-5 max-h-5 w-auto object-contain" onerror="this.parentElement.style.display='none'">
                     </div>
-                    <div class="h-9 px-3 bg-white rounded-xl flex items-center justify-center border border-white/20 shadow-xs shrink-0">
-                        <img src="{{ asset('images/logo/Faraja.png') }}" alt="Faraja" class="h-5.5 w-auto object-contain" onerror="this.style.display='none'">
+                    <div class="h-9 px-3 bg-white rounded-xl flex items-center justify-center border border-white/20 shadow-xs shrink-0 overflow-hidden">
+                        <img src="{{ asset('images/logo/Faraja.png') }}" alt="Faraja" class="h-5 max-h-5 w-auto object-contain" onerror="this.parentElement.style.display='none'">
                     </div>
                 </div>
                 <p class="text-xs text-white/50 leading-relaxed">Secure STK Push checkout and delivery PIN verification for safer handovers.</p>
