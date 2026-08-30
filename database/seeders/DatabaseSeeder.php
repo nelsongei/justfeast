@@ -15,29 +15,29 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // 1. Create Default Users for staff roles
-        $vendorUser1 = User::create([
-            'name' => 'Alex Vendor (Burger World)',
-            'email' => 'vendor@justfeast.com',
-            'phone' => '0722345678',
-            'role' => 'vendor',
-            'password' => Hash::make('password'),
-        ]);
-
-        $vendorUser2 = User::create([
-            'name' => 'Maria Vendor (Taco Fiesta)',
-            'email' => 'taco@justfeast.com',
-            'phone' => '0722000000',
-            'role' => 'vendor',
-            'password' => Hash::make('password'),
-        ]);
-
-        $vendorUser3 = User::create([
-            'name' => 'David Vendor (Choma Zone)',
-            'email' => 'choma@justfeast.com',
-            'phone' => '0722111111',
-            'role' => 'vendor',
-            'password' => Hash::make('password'),
-        ]);
+//        $vendorUser1 = User::create([
+//            'name' => 'Alex Vendor (Burger World)',
+//            'email' => 'vendor@justfeast.com',
+//            'phone' => '0722345678',
+//            'role' => 'vendor',
+//            'password' => Hash::make('password'),
+//        ]);
+//
+//        $vendorUser2 = User::create([
+//            'name' => 'Maria Vendor (Taco Fiesta)',
+//            'email' => 'taco@justfeast.com',
+//            'phone' => '0722000000',
+//            'role' => 'vendor',
+//            'password' => Hash::make('password'),
+//        ]);
+//
+//        $vendorUser3 = User::create([
+//            'name' => 'David Vendor (Choma Zone)',
+//            'email' => 'choma@justfeast.com',
+//            'phone' => '0722111111',
+//            'role' => 'vendor',
+//            'password' => Hash::make('password'),
+//        ]);
 
         $runner = User::create([
             'name' => 'Mike Runner',
@@ -90,132 +90,132 @@ class DatabaseSeeder extends Seeder
             'status' => 'active',
         ]);
 
-        // 4. Onboard Vendors
-        $vendor1 = Vendor::create([
-            'user_id' => $vendorUser1->id,
-            'business_name' => 'Burger World',
-            'event_id' => $event->id,
-            'status' => 'active',
-            'logo_url' => '🍔',
-        ]);
-
-        $vendor2 = Vendor::create([
-            'user_id' => $vendorUser2->id,
-            'business_name' => 'Taco Fiesta',
-            'event_id' => $event->id,
-            'status' => 'active',
-            'logo_url' => '🌮',
-        ]);
-
-        $vendor3 = Vendor::create([
-            'user_id' => $vendorUser3->id,
-            'business_name' => 'Choma Zone',
-            'event_id' => $event->id,
-            'status' => 'active',
-            'logo_url' => '🥩',
-        ]);
+//        // 4. Onboard Vendors
+//        $vendor1 = Vendor::create([
+//            'user_id' => $vendorUser1->id,
+//            'business_name' => 'Burger World',
+//            'event_id' => $event->id,
+//            'status' => 'active',
+//            'logo_url' => '🍔',
+//        ]);
+//
+//        $vendor2 = Vendor::create([
+//            'user_id' => $vendorUser2->id,
+//            'business_name' => 'Taco Fiesta',
+//            'event_id' => $event->id,
+//            'status' => 'active',
+//            'logo_url' => '🌮',
+//        ]);
+//
+//        $vendor3 = Vendor::create([
+//            'user_id' => $vendorUser3->id,
+//            'business_name' => 'Choma Zone',
+//            'event_id' => $event->id,
+//            'status' => 'active',
+//            'logo_url' => '🥩',
+//        ]);
 
         // 5. Seed Products/Menu Items
-        // Burger World Menu
-        Product::create([
-            'vendor_id' => $vendor1->id,
-            'name' => 'Cheesy Bacon Smash Burger',
-            'description' => 'Premium beef patty smashed with double cheddar, crispy bacon, and our signature burger sauce.',
-            'price' => 850.00,
-            'image_url' => '/images/smash_burger.png',
-            'stock_status' => 'in_stock',
-        ]);
-        Product::create([
-            'vendor_id' => $vendor1->id,
-            'name' => 'Double Smash Supreme',
-            'description' => 'Two smashed beef patties, caramelized onions, melted Swiss cheese, pickles, and garlic aioli.',
-            'price' => 1000.00,
-            'image_url' => '/images/smash_burger.png',
-            'stock_status' => 'in_stock',
-        ]);
-        Product::create([
-            'vendor_id' => $vendor1->id,
-            'name' => 'Spicy Inferno Chicken Burger',
-            'description' => 'Crispy fried chicken breast dipped in hot buffalo glaze, jalapeños, and pepper jack cheese.',
-            'price' => 900.00,
-            'image_url' => '/images/smash_burger.png',
-            'stock_status' => 'in_stock',
-        ]);
-        Product::create([
-            'vendor_id' => $vendor1->id,
-            'name' => 'Loaded Cheesy Fries',
-            'description' => 'Crispy golden fries loaded with cheddar cheese sauce, bacon bits, and chopped chives.',
-            'price' => 450.00,
-            'image_url' => 'bg-gradient-to-br from-yellow-400 to-amber-600',
-            'stock_status' => 'in_stock',
-        ]);
-
-        // Taco Fiesta Menu
-        Product::create([
-            'vendor_id' => $vendor2->id,
-            'name' => 'Barbacoa Beef Tacos (3x)',
-            'description' => 'Slow-braised beef on fresh corn tortillas topped with fresh onions, cilantro, and lime wedges.',
-            'price' => 750.00,
-            'image_url' => '/images/barbacoa_tacos.png',
-            'stock_status' => 'in_stock',
-        ]);
-        Product::create([
-            'vendor_id' => $vendor2->id,
-            'name' => 'Chipotle Chicken Quesadilla',
-            'description' => 'Grilled flour tortilla loaded with chipotle-spiced chicken, melted Monterey Jack, and pico de gallo.',
-            'price' => 800.00,
-            'image_url' => '/images/barbacoa_tacos.png',
-            'stock_status' => 'in_stock',
-        ]);
-        Product::create([
-            'vendor_id' => $vendor2->id,
-            'name' => 'Loaded Fiesta Nachos',
-            'description' => 'Crispy corn tortilla chips piled high with black beans, melted cheese, guacamole, sour cream, and jalapeños.',
-            'price' => 600.00,
-            'image_url' => '/images/barbacoa_tacos.png',
-            'stock_status' => 'in_stock',
-        ]);
-        Product::create([
-            'vendor_id' => $vendor2->id,
-            'name' => 'Churros with Chocolate Sauce',
-            'description' => 'Golden fried dough pastry dusted in cinnamon sugar, served warm with rich dark chocolate dip.',
-            'price' => 350.00,
-            'image_url' => '/images/barbacoa_tacos.png',
-            'stock_status' => 'in_stock',
-        ]);
-
-        // Choma Zone Menu
-        Product::create([
-            'vendor_id' => $vendor3->id,
-            'name' => 'Uhuru Park Premium Nyama Choma (Quarter Goat)',
-            'description' => 'Slow wood-fired tender goat meat seasoned to perfection, served with fresh kachumbari.',
-            'price' => 950.00,
-            'image_url' => '/images/nyama_choma.png',
-            'stock_status' => 'in_stock',
-        ]);
-        Product::create([
-            'vendor_id' => $vendor3->id,
-            'name' => 'Grilled Beef Skewers (Mshikaki 2x)',
-            'description' => 'Marinated flame-kissed beef chunks skewered with bell peppers and red onions.',
-            'price' => 600.00,
-            'image_url' => '/images/nyama_choma.png',
-            'stock_status' => 'in_stock',
-        ]);
-        Product::create([
-            'vendor_id' => $vendor3->id,
-            'name' => 'Masala Garlic Choma Fries',
-            'description' => 'Fries tossed in our secret spicy wet masala tomato glaze and fresh garlic flakes.',
-            'price' => 400.00,
-            'image_url' => '/images/nyama_choma.png',
-            'stock_status' => 'in_stock',
-        ]);
-        Product::create([
-            'vendor_id' => $vendor3->id,
-            'name' => 'Ice Cold Passion Fruit Juice (500ml Can)',
-            'description' => '100% natural freshly squeezed local passion fruit juice, served ice-cold to beat the heat.',
-            'price' => 350.00,
-            'image_url' => '/images/nyama_choma.png',
-            'stock_status' => 'in_stock',
-        ]);
+//        // Burger World Menu
+//        Product::create([
+//            'vendor_id' => $vendor1->id,
+//            'name' => 'Cheesy Bacon Smash Burger',
+//            'description' => 'Premium beef patty smashed with double cheddar, crispy bacon, and our signature burger sauce.',
+//            'price' => 850.00,
+//            'image_url' => '/images/smash_burger.png',
+//            'stock_status' => 'in_stock',
+//        ]);
+//        Product::create([
+//            'vendor_id' => $vendor1->id,
+//            'name' => 'Double Smash Supreme',
+//            'description' => 'Two smashed beef patties, caramelized onions, melted Swiss cheese, pickles, and garlic aioli.',
+//            'price' => 1000.00,
+//            'image_url' => '/images/smash_burger.png',
+//            'stock_status' => 'in_stock',
+//        ]);
+//        Product::create([
+//            'vendor_id' => $vendor1->id,
+//            'name' => 'Spicy Inferno Chicken Burger',
+//            'description' => 'Crispy fried chicken breast dipped in hot buffalo glaze, jalapeños, and pepper jack cheese.',
+//            'price' => 900.00,
+//            'image_url' => '/images/smash_burger.png',
+//            'stock_status' => 'in_stock',
+//        ]);
+//        Product::create([
+//            'vendor_id' => $vendor1->id,
+//            'name' => 'Loaded Cheesy Fries',
+//            'description' => 'Crispy golden fries loaded with cheddar cheese sauce, bacon bits, and chopped chives.',
+//            'price' => 450.00,
+//            'image_url' => 'bg-gradient-to-br from-yellow-400 to-amber-600',
+//            'stock_status' => 'in_stock',
+//        ]);
+//
+//        // Taco Fiesta Menu
+//        Product::create([
+//            'vendor_id' => $vendor2->id,
+//            'name' => 'Barbacoa Beef Tacos (3x)',
+//            'description' => 'Slow-braised beef on fresh corn tortillas topped with fresh onions, cilantro, and lime wedges.',
+//            'price' => 750.00,
+//            'image_url' => '/images/barbacoa_tacos.png',
+//            'stock_status' => 'in_stock',
+//        ]);
+//        Product::create([
+//            'vendor_id' => $vendor2->id,
+//            'name' => 'Chipotle Chicken Quesadilla',
+//            'description' => 'Grilled flour tortilla loaded with chipotle-spiced chicken, melted Monterey Jack, and pico de gallo.',
+//            'price' => 800.00,
+//            'image_url' => '/images/barbacoa_tacos.png',
+//            'stock_status' => 'in_stock',
+//        ]);
+//        Product::create([
+//            'vendor_id' => $vendor2->id,
+//            'name' => 'Loaded Fiesta Nachos',
+//            'description' => 'Crispy corn tortilla chips piled high with black beans, melted cheese, guacamole, sour cream, and jalapeños.',
+//            'price' => 600.00,
+//            'image_url' => '/images/barbacoa_tacos.png',
+//            'stock_status' => 'in_stock',
+//        ]);
+//        Product::create([
+//            'vendor_id' => $vendor2->id,
+//            'name' => 'Churros with Chocolate Sauce',
+//            'description' => 'Golden fried dough pastry dusted in cinnamon sugar, served warm with rich dark chocolate dip.',
+//            'price' => 350.00,
+//            'image_url' => '/images/barbacoa_tacos.png',
+//            'stock_status' => 'in_stock',
+//        ]);
+//
+//        // Choma Zone Menu
+//        Product::create([
+//            'vendor_id' => $vendor3->id,
+//            'name' => 'Uhuru Park Premium Nyama Choma (Quarter Goat)',
+//            'description' => 'Slow wood-fired tender goat meat seasoned to perfection, served with fresh kachumbari.',
+//            'price' => 950.00,
+//            'image_url' => '/images/nyama_choma.png',
+//            'stock_status' => 'in_stock',
+//        ]);
+//        Product::create([
+//            'vendor_id' => $vendor3->id,
+//            'name' => 'Grilled Beef Skewers (Mshikaki 2x)',
+//            'description' => 'Marinated flame-kissed beef chunks skewered with bell peppers and red onions.',
+//            'price' => 600.00,
+//            'image_url' => '/images/nyama_choma.png',
+//            'stock_status' => 'in_stock',
+//        ]);
+//        Product::create([
+//            'vendor_id' => $vendor3->id,
+//            'name' => 'Masala Garlic Choma Fries',
+//            'description' => 'Fries tossed in our secret spicy wet masala tomato glaze and fresh garlic flakes.',
+//            'price' => 400.00,
+//            'image_url' => '/images/nyama_choma.png',
+//            'stock_status' => 'in_stock',
+//        ]);
+//        Product::create([
+//            'vendor_id' => $vendor3->id,
+//            'name' => 'Ice Cold Passion Fruit Juice (500ml Can)',
+//            'description' => '100% natural freshly squeezed local passion fruit juice, served ice-cold to beat the heat.',
+//            'price' => 350.00,
+//            'image_url' => '/images/nyama_choma.png',
+//            'stock_status' => 'in_stock',
+//        ]);
     }
 }
