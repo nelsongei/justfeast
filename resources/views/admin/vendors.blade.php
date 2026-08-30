@@ -736,6 +736,8 @@
         </div>
       </form>
     </div>
+  </div>
+
   <!-- Add Vendor Menu Product Modal -->
   <div class="modal-overlay" id="product-modal-overlay" onclick="if(event.target===this) closeAddProductModal()">
     <div class="modal-card" style="max-width:540px;">
