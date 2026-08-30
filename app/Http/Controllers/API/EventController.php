@@ -25,9 +25,18 @@ class EventController extends Controller
     public function settings()
     {
         $deliveryFee = floatval(\App\Models\Setting::get('delivery_fee', 30));
+        $stageRaw    = \App\Models\Setting::get('stage_location');
+        $stageObj    = $stageRaw ? json_decode($stageRaw, true) : [
+            'name'        => 'Main Stage Grounds',
+            'description' => 'Uhuru Park, Cathedral Road Entrance',
+            'latitude'    => -1.28817042,
+            'longitude'   => 36.81647301,
+        ];
+
         return response()->json([
-            'status'       => 'success',
-            'delivery_fee' => $deliveryFee,
+            'status'         => 'success',
+            'delivery_fee'   => $deliveryFee,
+            'stage_location' => $stageObj,
         ]);
     }
 

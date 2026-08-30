@@ -10,7 +10,7 @@
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; width: 100%;">
         <div>
           <h3 style="font-size: .95rem; font-weight: 800; color: var(--text);">Uhuru Park GIS Heatmap & Venue Section Manager</h3>
-          <p style="font-size: .75rem; color: var(--muted); margin-top: 2px;">Real-time Leaflet GIS mapping, custom section drawing, and order volume analytics</p>
+          <p style="font-size: .75rem; color: var(--muted); margin-top: 2px;">Real-time Leaflet GIS mapping, custom section drawing, and stage location management</p>
         </div>
         <div class="heat-legend">
           <div class="legend-item"><div class="legend-color" style="background:#05A357"></div> Low (1-2)</div>
@@ -28,6 +28,7 @@
         <button type="button" onclick="selectStadiumSection('gen_a')" id="sec-pill-gen_a" class="sec-pill" style="padding: 4px 12px; border-radius: 20px; font-size: 0.72rem; font-weight: 800; cursor: pointer; border: 1px solid var(--border); background: var(--surface2); color: var(--text);">🎪 GEN A</button>
         <button type="button" onclick="selectStadiumSection('gen_b')" id="sec-pill-gen_b" class="sec-pill" style="padding: 4px 12px; border-radius: 20px; font-size: 0.72rem; font-weight: 800; cursor: pointer; border: 1px solid var(--border); background: var(--surface2); color: var(--text);">🎪 GEN B</button>
         <button type="button" onclick="toggleDrawingMode()" id="btn-draw-mode" class="sec-pill" style="padding: 4px 12px; border-radius: 20px; font-size: 0.72rem; font-weight: 800; cursor: pointer; border: 1px dashed var(--brand); background: #FFF8E7; color: var(--brand); transition: all 0.2s;"><i class="fas fa-pen-ruler mr-1"></i> ✏️ Draw Custom Section</button>
+        <button type="button" onclick="openEditStageModal()" class="sec-pill" style="padding: 4px 12px; border-radius: 20px; font-size: 0.72rem; font-weight: 800; cursor: pointer; border: 1px solid #A31D1D; background: #FEF2F2; color: #991B1B; transition: all 0.2s;"><i class="fas fa-music mr-1"></i> 🎭 Edit Stage Location</button>
         <button type="button" onclick="resetVenueLayout()" class="sec-pill" style="padding: 4px 12px; border-radius: 20px; font-size: 0.72rem; font-weight: 800; cursor: pointer; border: 1px solid var(--border); background: var(--surface2); color: var(--muted);"><i class="fas fa-rotate-left mr-1"></i> Reset Layout</button>
       </div>
 
@@ -77,15 +78,80 @@
       </div>
     </div>
   </div>
+
+  <!-- Edit Stage Location Modal -->
+  <div class="modal-overlay" id="edit-stage-modal-overlay" onclick="if(event.target===this) closeEditStageModal()">
+    <div class="modal-card" style="max-width:480px;">
+      <div class="modal-header">
+        <h3 style="font-size:1.1rem;font-weight:900;color:var(--text);display:flex;align-items:center;gap:0.5rem;">
+          <i class="fas fa-music" style="color:var(--brand)"></i>
+          Edit Main Stage Location
+        </h3>
+        <button type="button" class="modal-close-btn" onclick="closeEditStageModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <form id="edit-stage-form" onsubmit="handleSaveStageLocation(event)">
+        <div style="padding:1.5rem;display:flex;flex-direction:column;gap:1.1rem;">
+          
+          <div>
+            <label style="display:block;font-size:.72rem;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;">Stage Title / Label *</label>
+            <input type="text" id="stage-name-input" required placeholder="Main Stage Grounds" style="width:100%;padding:.65rem .85rem;border-radius:10px;background:var(--surface2);border:1px solid var(--border);color:var(--text);outline:none;font-weight:700;">
+          </div>
+
+          <div>
+            <label style="display:block;font-size:.72rem;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;">Sub-location / Description</label>
+            <input type="text" id="stage-desc-input" placeholder="Uhuru Park, Cathedral Road Entrance" style="width:100%;padding:.65rem .85rem;border-radius:10px;background:var(--surface2);border:1px solid var(--border);color:var(--text);outline:none;font-weight:600;">
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+            <div>
+              <label style="display:block;font-size:.72rem;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;">Latitude *</label>
+              <input type="number" step="any" id="stage-lat-input" required style="width:100%;padding:.65rem .85rem;border-radius:10px;background:var(--surface2);border:1px solid var(--border);color:var(--text);outline:none;font-weight:700;">
+            </div>
+            <div>
+              <label style="display:block;font-size:.72rem;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;">Longitude *</label>
+              <input type="number" step="any" id="stage-lng-input" required style="width:100%;padding:.65rem .85rem;border-radius:10px;background:var(--surface2);border:1px solid var(--border);color:var(--text);outline:none;font-weight:700;">
+            </div>
+          </div>
+
+          <div style="background:#FFF8E7;border:1px solid #F7E5B2;padding:0.75rem 1rem;border-radius:12px;font-size:0.75rem;color:#0F172A;font-weight:600;display:flex;align-items:center;justify-content:space-between;">
+            <span><i class="fas fa-location-crosshairs text-brand mr-1"></i> Pick coords directly on map:</span>
+            <button type="button" onclick="enableMapPickForStage()" style="padding:0.35rem 0.85rem;background:var(--brand);color:#FFF;border:none;border-radius:20px;font-size:0.7rem;font-weight:800;cursor:pointer;">
+              📍 Pick Coords on Map
+            </button>
+          </div>
+
+          <div style="display:flex;justify-content:flex-end;gap:0.75rem;padding-top:1rem;border-top:1px solid var(--border);">
+            <button type="button" class="btn-page" onclick="closeEditStageModal()">Cancel</button>
+            <button type="submit" id="btn-save-stage" style="padding:.65rem 1.4rem;background:#05A357;color:#FFF;border:none;border-radius:12px;font-weight:800;font-size:.82rem;cursor:pointer;display:flex;align-items:center;gap:0.4rem;">
+              <i class="fas fa-save"></i> Save Stage Location
+            </button>
+          </div>
+
+        </div>
+      </form>
+    </div>
+  </div>
 @endsection
 
 @section('scripts')
 <script>
 let adminMap = null;
+let stageMarkerInstance = null;
 let mapPolygons = {};
 let mapOrderMarkers = [];
 let selectedSectionKey = 'all';
 let cachedStats = null;
+let isPickingStageCoordsOnMap = false;
+
+let stageConfig = {
+  name: 'Main Stage Grounds',
+  description: 'Uhuru Park, Cathedral Road Entrance',
+  latitude: -1.28817042,
+  longitude: 36.81647301
+};
 
 // Drawing mode state
 let isDrawingMode = false;
@@ -95,12 +161,30 @@ let draftMarkers = [];
 let customSections = {};
 
 window.addEventListener('DOMContentLoaded', () => {
+  fetchStageConfig();
   setTimeout(() => {
     initAdminHeatmapMap();
     syncHeatmapData();
   }, 100);
   setInterval(syncHeatmapData, 5000);
 });
+
+async function fetchStageConfig() {
+  try {
+    const res = await fetch(`${API_BASE}/admin/settings`, {
+      headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data.settings && data.settings.stage_location) {
+        stageConfig = data.settings.stage_location;
+        if (adminMap) {
+          renderStageMarkerOnMap();
+        }
+      }
+    }
+  } catch(e) {}
+}
 
 async function syncHeatmapData() {
   try {
@@ -129,20 +213,14 @@ function initAdminHeatmapMap() {
   adminMap = L.map('admin-heatmap-map', {
     zoomControl: true,
     scrollWheelZoom: true
-  }).setView([-1.28817042, 36.81647301], 17);
+  }).setView([stageConfig.latitude, stageConfig.longitude], 17);
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
     attribution: '© OpenStreetMap contributors'
   }).addTo(adminMap);
 
-  const stageIcon = L.divIcon({
-    className: 'custom-stage-pin',
-    html: `<div style="background:#A31D1D; color:#FFF; font-weight:900; font-size:10px; padding:6px 12px; border-radius:20px; border:2px solid #FFC244; box-shadow:0 4px 14px rgba(0,0,0,0.3); white-space:nowrap;"><i class="fas fa-music mr-1"></i> MAIN STAGE (UHURU PARK)</div>`,
-    iconSize: [170, 30],
-    iconAnchor: [85, 15]
-  });
-  L.marker([-1.28817042, 36.81647301], { icon: stageIcon }).addTo(adminMap).bindPopup("<b>Main Stage Grounds</b><br>Uhuru Park, Cathedral Road Entrance");
+  renderStageMarkerOnMap();
 
   adminMap.on('click', handleAdminMapClick);
 
@@ -180,6 +258,143 @@ function initAdminHeatmapMap() {
   renderSectionPillsToolbar();
 }
 
+function renderStageMarkerOnMap() {
+  if (!adminMap) return;
+
+  if (stageMarkerInstance) {
+    adminMap.removeLayer(stageMarkerInstance);
+  }
+
+  const labelText = stageConfig.name.toUpperCase();
+  const stageIcon = L.divIcon({
+    className: 'custom-stage-pin',
+    html: `<div style="background:#A31D1D; color:#FFF; font-weight:900; font-size:10px; padding:6px 12px; border-radius:20px; border:2px solid #FFC244; box-shadow:0 4px 14px rgba(0,0,0,0.35); white-space:nowrap; cursor:grab;"><i class="fas fa-music mr-1"></i> 🎵 ${labelText}</div>`,
+    iconSize: [200, 30],
+    iconAnchor: [100, 15]
+  });
+
+  stageMarkerInstance = L.marker([stageConfig.latitude, stageConfig.longitude], {
+    icon: stageIcon,
+    draggable: true
+  }).addTo(adminMap);
+
+  stageMarkerInstance.bindPopup(`<b>${stageConfig.name}</b><br>${stageConfig.description}<br><span style="font-size:10px;color:#64748B;">Drag pin to move stage location</span>`);
+
+  stageMarkerInstance.on('dragend', (e) => {
+    const latlng = e.target.getLatLng();
+    stageConfig.latitude = parseFloat(latlng.lat.toFixed(8));
+    stageConfig.longitude = parseFloat(latlng.lng.toFixed(8));
+    
+    // Update modal inputs if modal open
+    if (document.getElementById('stage-lat-input')) document.getElementById('stage-lat-input').value = stageConfig.latitude;
+    if (document.getElementById('stage-lng-input')) document.getElementById('stage-lng-input').value = stageConfig.longitude;
+
+    if (typeof showNotification === 'function') {
+      showNotification(`Stage pin moved to ${stageConfig.latitude}, ${stageConfig.longitude}. Click 'Edit Stage Location' to save!`, 'info');
+    }
+  });
+}
+
+function openEditStageModal() {
+  const modal = document.getElementById('edit-stage-modal-overlay');
+  const nameIn = document.getElementById('stage-name-input');
+  const descIn = document.getElementById('stage-desc-input');
+  const latIn = document.getElementById('stage-lat-input');
+  const lngIn = document.getElementById('stage-lng-input');
+
+  if (nameIn) nameIn.value = stageConfig.name || 'Main Stage Grounds';
+  if (descIn) descIn.value = stageConfig.description || 'Uhuru Park, Cathedral Road Entrance';
+  if (latIn) latIn.value = stageConfig.latitude;
+  if (lngIn) lngIn.value = stageConfig.longitude;
+
+  if (modal) modal.classList.add('is-active');
+}
+
+function closeEditStageModal() {
+  const modal = document.getElementById('edit-stage-modal-overlay');
+  if (modal) modal.classList.remove('is-active');
+  isPickingStageCoordsOnMap = false;
+}
+
+function enableMapPickForStage() {
+  closeEditStageModal();
+  isPickingStageCoordsOnMap = true;
+  alert("📍 Click anywhere on the map to set the new Stage Location!");
+}
+
+async function handleSaveStageLocation(event) {
+  event.preventDefault();
+  const name = document.getElementById('stage-name-input').value.trim();
+  const description = document.getElementById('stage-desc-input').value.trim();
+  const latitude = parseFloat(document.getElementById('stage-lat-input').value);
+  const longitude = parseFloat(document.getElementById('stage-lng-input').value);
+
+  const btn = document.getElementById('btn-save-stage');
+  if (!btn) return;
+
+  const originalHtml = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-1"></i> Saving...`;
+
+  stageConfig = { name, description, latitude, longitude };
+
+  try {
+    const res = await fetch(`${API_BASE}/admin/settings`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+      },
+      body: JSON.stringify({ stage_location: stageConfig })
+    });
+
+    const data = await res.json();
+
+    if (res.ok && (data.status === 'success' || data.success)) {
+      renderStageMarkerOnMap();
+      adminMap.panTo([latitude, longitude]);
+      closeEditStageModal();
+      alert(`Stage location updated successfully to '${name}'!`);
+    } else {
+      alert(data.message || 'Failed to save stage location.');
+    }
+  } catch(e) {
+    alert('Network error while saving stage location.');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = originalHtml;
+  }
+}
+
+function handleAdminMapClick(e) {
+  if (isPickingStageCoordsOnMap) {
+    isPickingStageCoordsOnMap = false;
+    stageConfig.latitude = parseFloat(e.latlng.lat.toFixed(8));
+    stageConfig.longitude = parseFloat(e.latlng.lng.toFixed(8));
+    renderStageMarkerOnMap();
+    openEditStageModal();
+    return;
+  }
+
+  if (!isDrawingMode) return;
+  draftPoints.push([e.latlng.lat, e.latlng.lng]);
+
+  const marker = L.circleMarker(e.latlng, {
+    radius: 5,
+    color: '#A31D1D',
+    fillColor: '#FFC244',
+    fillOpacity: 1
+  }).addTo(adminMap);
+  draftMarkers.push(marker);
+
+  if (draftPolyline) {
+    adminMap.removeLayer(draftPolyline);
+  }
+  draftPolyline = L.polyline(draftPoints, { color: '#A31D1D', dashArray: '4, 4' }).addTo(adminMap);
+}
+
 function renderSectorPolygonOnMap(secKey, sec) {
   if (mapPolygons[secKey]) {
     adminMap.removeLayer(mapPolygons[secKey]);
@@ -205,102 +420,150 @@ function renderSectionPillsToolbar() {
   const bar = document.getElementById('section-pills-bar');
   if (!bar) return;
 
-  const basePills = `
-    <span style="font-size: 0.72rem; font-weight: 800; text-transform: uppercase; color: var(--muted); margin-right: 0.2rem;"><i class="fas fa-layer-group text-[#A31D1D] mr-1"></i> Venue Sections:</span>
-    <button type="button" onclick="selectStadiumSection('all')" id="sec-pill-all" class="sec-pill" style="padding: 4px 12px; border-radius: 20px; font-size: 0.72rem; font-weight: 800; cursor: pointer; border: 1px solid var(--brand); background: var(--brand); color: #FFF;">All Sections</button>
-    <button type="button" onclick="selectStadiumSection('vip_a')" id="sec-pill-vip_a" class="sec-pill" style="padding: 4px 12px; border-radius: 20px; font-size: 0.72rem; font-weight: 800; cursor: pointer; border: 1px solid var(--border); background: var(--surface2); color: var(--text);">🌟 VIP A</button>
-    <button type="button" onclick="selectStadiumSection('vip_b')" id="sec-pill-vip_b" class="sec-pill" style="padding: 4px 12px; border-radius: 20px; font-size: 0.72rem; font-weight: 800; cursor: pointer; border: 1px solid var(--border); background: var(--surface2); color: var(--text);">⭐ VIP B</button>
-    <button type="button" onclick="selectStadiumSection('gen_a')" id="sec-pill-gen_a" class="sec-pill" style="padding: 4px 12px; border-radius: 20px; font-size: 0.72rem; font-weight: 800; cursor: pointer; border: 1px solid var(--border); background: var(--surface2); color: var(--text);">🎪 GEN A</button>
-    <button type="button" onclick="selectStadiumSection('gen_b')" id="sec-pill-gen_b" class="sec-pill" style="padding: 4px 12px; border-radius: 20px; font-size: 0.72rem; font-weight: 800; cursor: pointer; border: 1px solid var(--border); background: var(--surface2); color: var(--text);">🎪 GEN B</button>
-  `;
+  const baseSectors = ['vip_a', 'vip_b', 'gen_a', 'gen_b'];
+  const baseIds = new Set(['sec-pill-all', 'sec-pill-vip_a', 'sec-pill-vip_b', 'sec-pill-gen_a', 'sec-pill-gen_b', 'btn-draw-mode']);
 
-  let customPills = '';
-  Object.keys(customSections).forEach(key => {
-    const sec = customSections[key];
-    customPills += `<button type="button" onclick="selectStadiumSection('${key}')" id="sec-pill-${key}" class="sec-pill" style="padding: 4px 12px; border-radius: 20px; font-size: 0.72rem; font-weight: 800; cursor: pointer; border: 1px solid #FFC244; background: #FFF8E7; color: #0F172A;">📍 ${sec.name}</button>`;
+  Array.from(bar.children).forEach(child => {
+    if (child.tagName === 'BUTTON' && !baseIds.has(child.id) && !child.textContent.includes('Reset') && !child.textContent.includes('Edit Stage')) {
+      child.remove();
+    }
   });
 
-  const toolPills = `
-    <button type="button" onclick="toggleDrawingMode()" id="btn-draw-mode" class="sec-pill" style="padding: 4px 12px; border-radius: 20px; font-size: 0.72rem; font-weight: 800; cursor: pointer; border: 1px dashed var(--brand); background: #FFF8E7; color: var(--brand); transition: all 0.2s;"><i class="fas fa-pen-ruler mr-1"></i> ✏️ Draw Custom Section</button>
-    <button type="button" onclick="resetVenueLayout()" class="sec-pill" style="padding: 4px 12px; border-radius: 20px; font-size: 0.72rem; font-weight: 800; cursor: pointer; border: 1px solid var(--border); background: var(--surface2); color: var(--muted);"><i class="fas fa-rotate-left mr-1"></i> Reset Layout</button>
-  `;
+  Object.keys(customSections).forEach(key => {
+    const sec = customSections[key];
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'sec-pill';
+    btn.id = `sec-pill-${key}`;
+    btn.style.cssText = 'padding: 4px 12px; border-radius: 20px; font-size: 0.72rem; font-weight: 800; cursor: pointer; border: 1px solid var(--border); background: var(--surface2); color: var(--text);';
+    btn.innerHTML = `📐 ${sec.name}`;
+    btn.onclick = () => selectStadiumSection(key);
+    
+    const drawBtn = document.getElementById('btn-draw-mode');
+    bar.insertBefore(btn, drawBtn);
+  });
+}
 
-  bar.innerHTML = basePills + customPills + toolPills;
-  highlightActivePill(selectedSectionKey);
+function selectStadiumSection(key) {
+  selectedSectionKey = key;
+  document.querySelectorAll('.sec-pill').forEach(btn => {
+    btn.style.background = 'var(--surface2)';
+    btn.style.color = 'var(--text)';
+    btn.style.borderColor = 'var(--border)';
+  });
+
+  const activeBtn = document.getElementById(`sec-pill-${key}`);
+  if (activeBtn) {
+    activeBtn.style.background = 'var(--brand)';
+    activeBtn.style.color = '#FFF';
+    activeBtn.style.borderColor = 'var(--brand)';
+  }
+
+  const actionBox = document.getElementById('section-action-box');
+  if (actionBox) {
+    actionBox.style.display = customSections[key] ? 'block' : 'none';
+  }
+
+  updateHeatmapUI();
+}
+
+function updateHeatmapUI() {
+  if (!cachedStats) return;
+
+  const nameEl = document.getElementById('h-sec-name');
+  const ordersEl = document.getElementById('h-sec-orders');
+  const revEl = document.getElementById('h-sec-rev');
+  const avgEl = document.getElementById('h-sec-avg');
+  const ratingEl = document.getElementById('h-sec-rating');
+
+  const heat = cachedStats.section_heatmap || {};
+  
+  if (selectedSectionKey === 'all') {
+    nameEl.textContent = 'All Venue Sections';
+    const totalOrders = cachedStats.orders_count || 0;
+    const totalRev = cachedStats.total_revenue || 0;
+    const avgOrder = totalOrders > 0 ? (totalRev / totalOrders) : 0;
+
+    ordersEl.textContent = totalOrders;
+    revEl.textContent = `Ksh ${Number(totalRev).toLocaleString()}`;
+    avgEl.textContent = `Ksh ${Math.round(avgOrder).toLocaleString()}`;
+    ratingEl.textContent = totalOrders > 5 ? 'High Volume' : totalOrders > 2 ? 'Medium Volume' : 'Optimal';
+    ratingEl.className = `status-pill ${totalOrders > 5 ? 's-preparing' : 's-ready'}`;
+  } else {
+    const counts = heat[selectedSectionKey] || 0;
+    const secNameMap = { vip_a: 'VIP Section A', vip_b: 'VIP Section B', gen_a: 'General Arena A', gen_b: 'General Arena B' };
+    const secName = customSections[selectedSectionKey]?.name || secNameMap[selectedSectionKey] || 'Custom Section';
+
+    nameEl.textContent = secName;
+    ordersEl.textContent = counts;
+    const estimatedRev = counts * 850;
+    revEl.textContent = `Ksh ${Number(estimatedRev).toLocaleString()}`;
+    avgEl.textContent = counts > 0 ? 'Ksh 850' : '—';
+    ratingEl.textContent = counts > 5 ? 'High (6+)' : counts > 2 ? 'Med (3-5)' : 'Low (1-2)';
+    ratingEl.className = `status-pill ${counts > 5 ? 's-preparing' : counts > 2 ? 's-ready' : 's-created'}`;
+  }
+
+  mapOrderMarkers.forEach(m => adminMap.removeLayer(m));
+  mapOrderMarkers = [];
+
+  const recent = cachedStats.recent_orders || [];
+  recent.forEach(order => {
+    const loc = order.seat_location || {};
+    let lat = null, lng = null;
+
+    if (loc.latitude && loc.longitude) {
+      lat = parseFloat(loc.latitude);
+      lng = parseFloat(loc.longitude);
+    } else {
+      const sec = (loc.section || '').toLowerCase();
+      if (sec.includes('vip') && sec.includes('a')) { lat = -1.2876; lng = 36.8159; }
+      else if (sec.includes('vip') && sec.includes('b')) { lat = -1.2876; lng = 36.8170; }
+      else if (sec.includes('gen') && sec.includes('a')) { lat = -1.2887; lng = 36.8159; }
+      else { lat = -1.2887; lng = 36.8170; }
+    }
+
+    if (lat && lng) {
+      const marker = L.circleMarker([lat, lng], {
+        radius: 7,
+        color: '#FFFFFF',
+        weight: 1.5,
+        fillColor: '#A31D1D',
+        fillOpacity: 0.9
+      }).addTo(adminMap);
+      
+      marker.bindPopup(`<b>Order #${order.id}</b><br>Amount: Ksh ${Number(order.total_amount).toLocaleString()}<br>Status: ${order.order_status}`);
+      mapOrderMarkers.push(marker);
+    }
+  });
 }
 
 function toggleDrawingMode() {
   isDrawingMode = !isDrawingMode;
-  const btn = document.getElementById('btn-draw-mode');
   const banner = document.getElementById('drawing-banner');
+  const btn = document.getElementById('btn-draw-mode');
 
   if (isDrawingMode) {
-    btn.style.background = '#A31D1D';
-    btn.style.color = '#FFFFFF';
     banner.style.display = 'flex';
+    btn.style.background = '#A31D1D';
+    btn.style.color = '#FFF';
+    btn.style.borderColor = '#A31D1D';
+    btn.innerHTML = `<i class="fas fa-times mr-1"></i> Cancel Drawing`;
     draftPoints = [];
-    adminMap.getContainer().style.cursor = 'crosshair';
   } else {
     cancelDrawingSection();
   }
 }
 
-function handleAdminMapClick(e) {
-  if (!isDrawingMode) return;
-
-  const latlng = [e.latlng.lat, e.latlng.lng];
-  draftPoints.push(latlng);
-
-  const dot = L.circleMarker(latlng, {
-    radius: 5,
-    fillColor: '#A31D1D',
-    color: '#FFF',
-    weight: 2,
-    fillOpacity: 1
-  }).addTo(adminMap);
-  draftMarkers.push(dot);
-
-  if (draftPolyline) adminMap.removeLayer(draftPolyline);
-  draftPolyline = L.polyline(draftPoints, { color: '#A31D1D', weight: 3, dashArray: '6, 6' }).addTo(adminMap);
-}
-
-function finishDrawingSection() {
-  if (draftPoints.length < 3) {
-    alert("⚠️ Please click at least 3 points on the map to define a section boundary.");
-    return;
-  }
-
-  const name = prompt("Enter a name for this custom venue section (e.g. VVIP Terrace, Beer Garden, Food Court):");
-  if (!name || !name.trim()) {
-    cancelDrawingSection();
-    return;
-  }
-
-  const key = 'custom_' + Date.now();
-  const newSec = {
-    name: name.trim(),
-    coords: draftPoints
-  };
-
-  customSections[key] = newSec;
-  localStorage.setItem('justfeast_custom_sections', JSON.stringify(customSections));
-
-  renderSectorPolygonOnMap(key, newSec);
-  cancelDrawingSection();
-  renderSectionPillsToolbar();
-  selectStadiumSection(key);
-}
-
 function cancelDrawingSection() {
   isDrawingMode = false;
-  adminMap.getContainer().style.cursor = '';
-  document.getElementById('drawing-banner').style.display = 'none';
-
+  const banner = document.getElementById('drawing-banner');
   const btn = document.getElementById('btn-draw-mode');
-  if (btn) {
-    btn.style.background = '#FFF8E7';
-    btn.style.color = 'var(--brand)';
-  }
+
+  banner.style.display = 'none';
+  btn.style.background = '#FFF8E7';
+  btn.style.color = 'var(--brand)';
+  btn.style.borderColor = 'var(--brand)';
+  btn.innerHTML = `<i class="fas fa-pen-ruler mr-1"></i> ✏️ Draw Custom Section`;
 
   if (draftPolyline) {
     adminMap.removeLayer(draftPolyline);
@@ -311,167 +574,58 @@ function cancelDrawingSection() {
   draftPoints = [];
 }
 
-function deleteCurrentSelectedSection() {
-  if (!selectedSectionKey || !customSections[selectedSectionKey]) return;
-
-  if (confirm(`Delete custom section "${customSections[selectedSectionKey].name}"?`)) {
-    if (mapPolygons[selectedSectionKey]) {
-      adminMap.removeLayer(mapPolygons[selectedSectionKey]);
-      delete mapPolygons[selectedSectionKey];
-    }
-    delete customSections[selectedSectionKey];
-    localStorage.setItem('justfeast_custom_sections', JSON.stringify(customSections));
-
-    renderSectionPillsToolbar();
-    selectStadiumSection('all');
-  }
-}
-
-function resetVenueLayout() {
-  if (confirm("Reset layout to default Uhuru Park stadium sectors?")) {
-    Object.keys(customSections).forEach(key => {
-      if (mapPolygons[key]) adminMap.removeLayer(mapPolygons[key]);
-    });
-    customSections = {};
-    localStorage.removeItem('justfeast_custom_sections');
-    renderSectionPillsToolbar();
-    selectStadiumSection('all');
-  }
-}
-
-function highlightActivePill(secKey) {
-  document.querySelectorAll('.sec-pill').forEach(btn => {
-    if (btn.id === `sec-pill-${secKey}`) {
-      btn.style.background = '#A31D1D';
-      btn.style.color = '#FFFFFF';
-      btn.style.borderColor = '#A31D1D';
-    } else if (btn.id !== 'btn-draw-mode') {
-      btn.style.background = 'var(--surface2)';
-      btn.style.color = 'var(--text)';
-      btn.style.borderColor = 'var(--border)';
-    }
-  });
-}
-
-function updateHeatmapUI() {
-  if (!cachedStats) return;
-  const heat = cachedStats.section_heatmap || {};
-
-  Object.keys(mapPolygons).forEach(secKey => {
-    const count = heat[secKey] || 0;
-    let color = '#64748B';
-    let opacity = 0.25;
-    if (count > 0 && count <= 2) { color = '#05A357'; opacity = 0.35; }
-    else if (count <= 5) { color = '#FFC244'; opacity = 0.5; }
-    else if (count > 5) { color = '#A31D1D'; opacity = 0.65; }
-
-    if (mapPolygons[secKey]) {
-      mapPolygons[secKey].setStyle({
-        fillColor: color,
-        color: color,
-        fillOpacity: opacity
-      });
-    }
-  });
-
-  if (!adminMap) return;
-
-  mapOrderMarkers.forEach(m => adminMap.removeLayer(m));
-  mapOrderMarkers = [];
-
-  if (cachedStats.recent_orders) {
-    cachedStats.recent_orders.forEach(o => {
-      let lat = -1.28817042 + (Math.random() - 0.5) * 0.002;
-      let lng = 36.81647301 + (Math.random() - 0.5) * 0.002;
-
-      if (o.seat_location && o.seat_location.type === 'gps' && o.seat_location.latitude) {
-        lat = o.seat_location.latitude;
-        lng = o.seat_location.longitude;
-      }
-
-      const marker = L.circleMarker([lat, lng], {
-        radius: 8,
-        fillColor: '#A31D1D',
-        color: '#FFFFFF',
-        weight: 2,
-        opacity: 1,
-        fillOpacity: 0.9
-      }).addTo(adminMap);
-
-      marker.bindPopup(`
-        <div style="font-family:'Outfit',sans-serif; padding:4px;">
-          <strong style="color:#A31D1D;">Order #${o.id}</strong><br>
-          <b>Customer:</b> ${o.user?.name || 'Guest'}<br>
-          <b>Vendor:</b> ${o.vendor?.business_name || 'Stall'}<br>
-          <b>Amount:</b> Ksh ${Number(o.total_amount).toLocaleString()}
-        </div>
-      `);
-
-      mapOrderMarkers.push(marker);
-    });
-  }
-}
-
-function selectStadiumSection(secKey) {
-  selectedSectionKey = secKey;
-  highlightActivePill(secKey);
-
-  const actionBox = document.getElementById('section-action-box');
-  if (actionBox) {
-    actionBox.style.display = customSections[secKey] ? 'block' : 'none';
-  }
-
-  if (!cachedStats) return;
-
-  if (secKey === 'all') {
-    document.getElementById('h-sec-name').textContent = "All Venue Sections";
-    document.getElementById('h-sec-orders').textContent = `${cachedStats.orders_count || 0} active orders`;
-    document.getElementById('h-sec-rev').textContent = `Ksh ${Number(cachedStats.total_revenue || 0).toLocaleString()}`;
-    const avg = cachedStats.orders_count > 0 ? cachedStats.total_revenue / cachedStats.orders_count : 0;
-    document.getElementById('h-sec-avg').textContent = `Ksh ${Math.round(avg).toLocaleString()}`;
-
-    const ratingEl = document.getElementById('h-sec-rating');
-    ratingEl.textContent = 'Consolidated Monitor';
-    ratingEl.className = 'status-pill s-ready';
-
-    if (adminMap) {
-      adminMap.setView([-1.28817042, 36.81647301], 17);
-    }
+function finishDrawingSection() {
+  if (draftPoints.length < 3) {
+    alert("Please click at least 3 points on the map to outline a valid venue polygon section.");
     return;
   }
 
-  const names = {
-    vip_a: 'VIP Section A (Northwest)',
-    vip_b: 'VIP Section B (Northeast)',
-    gen_a: 'General Arena A (Southwest)',
-    gen_b: 'General Arena B (Southeast)'
+  const secName = prompt("Enter a name for this custom venue section (e.g. VIP Terrace A, Backstage Concourse):");
+  if (!secName || !secName.trim()) {
+    return;
+  }
+
+  const secKey = 'custom_' + Date.now();
+  const newSec = {
+    name: secName.trim(),
+    coords: draftPoints
   };
 
-  const name = customSections[secKey] ? customSections[secKey].name : (names[secKey] || secKey.toUpperCase());
-  const count = cachedStats.section_heatmap[secKey] || 0;
-  const orders = (cachedStats.recent_orders || []).filter(o => {
-    const sec = o.seat_location?.section?.toLowerCase().replace(/\s+/g, '_') || '';
-    return sec === secKey || (secKey.startsWith('vip') && sec.includes('vip')) || (secKey.startsWith('gen') && sec.includes('gen'));
-  });
+  customSections[secKey] = newSec;
+  localStorage.setItem('justfeast_custom_sections', JSON.stringify(customSections));
 
-  let totalRev = 0;
-  orders.forEach(o => totalRev += parseFloat(o.total_amount));
-  const avg = count > 0 ? totalRev / count : 0;
+  renderSectorPolygonOnMap(secKey, newSec);
+  renderSectionPillsToolbar();
+  cancelDrawingSection();
+  selectStadiumSection(secKey);
 
-  document.getElementById('h-sec-name').textContent = name;
-  document.getElementById('h-sec-orders').textContent = `${count} active orders`;
-  document.getElementById('h-sec-rev').textContent = `Ksh ${Math.round(totalRev).toLocaleString()}`;
-  document.getElementById('h-sec-avg').textContent = `Ksh ${Math.round(avg).toLocaleString()}`;
+  alert(`Custom section '${secName}' created and saved successfully!`);
+}
 
-  const ratingEl = document.getElementById('h-sec-rating');
-  if (count === 0) { ratingEl.textContent = 'Low Traffic'; ratingEl.className = 'status-pill s-created'; }
-  else if (count <= 2) { ratingEl.textContent = 'Moderate Traffic'; ratingEl.className = 'status-pill s-ready'; }
-  else if (count <= 5) { ratingEl.textContent = 'High Demand'; ratingEl.className = 'status-pill s-preparing'; }
-  else { ratingEl.textContent = 'Peak Hotzone'; ratingEl.className = 'status-pill s-enroute'; }
+function deleteCurrentSelectedSection() {
+  if (!customSections[selectedSectionKey]) return;
 
-  if (mapPolygons[secKey] && adminMap) {
-    adminMap.fitBounds(mapPolygons[secKey].getBounds(), { padding: [40, 40] });
+  const secName = customSections[selectedSectionKey].name;
+  if (!confirm(`Are you sure you want to delete custom section '${secName}'?`)) return;
+
+  if (mapPolygons[selectedSectionKey]) {
+    adminMap.removeLayer(mapPolygons[selectedSectionKey]);
+    delete mapPolygons[selectedSectionKey];
   }
+
+  delete customSections[selectedSectionKey];
+  localStorage.setItem('justfeast_custom_sections', JSON.stringify(customSections));
+
+  renderSectionPillsToolbar();
+  selectStadiumSection('all');
+  alert(`Custom section '${secName}' deleted successfully.`);
+}
+
+function resetVenueLayout() {
+  if (!confirm("Are you sure you want to reset custom venue section polygons to default?")) return;
+  localStorage.removeItem('justfeast_custom_sections');
+  customSections = {};
+  location.reload();
 }
 </script>
 @endsection

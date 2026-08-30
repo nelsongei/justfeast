@@ -606,11 +606,19 @@ class AdminController extends Controller
     public function getSettings()
     {
         $deliveryFee = floatval(Setting::get('delivery_fee', 30));
+        $stageLocationRaw = Setting::get('stage_location');
+        $stageLocation = $stageLocationRaw ? json_decode($stageLocationRaw, true) : [
+            'name'        => 'Main Stage Grounds',
+            'description' => 'Uhuru Park, Cathedral Road Entrance',
+            'latitude'    => -1.28817042,
+            'longitude'   => 36.81647301,
+        ];
 
         return response()->json([
             'status'   => 'success',
             'settings' => [
-                'delivery_fee' => $deliveryFee,
+                'delivery_fee'   => $deliveryFee,
+                'stage_location' => $stageLocation,
             ],
         ]);
     }
@@ -618,16 +626,31 @@ class AdminController extends Controller
     public function updateSettings(Request $request)
     {
         $validated = $request->validate([
-            'delivery_fee' => 'required|numeric|min:0',
+            'delivery_fee'              => 'nullable|numeric|min:0',
+            'stage_location'             => 'nullable|array',
+            'stage_location.name'        => 'nullable|string|max:255',
+            'stage_location.description' => 'nullable|string|max:255',
+            'stage_location.latitude'    => 'nullable|numeric',
+            'stage_location.longitude'   => 'nullable|numeric',
         ]);
 
-        Setting::set('delivery_fee', $validated['delivery_fee']);
+        if (isset($validated['delivery_fee'])) {
+            Setting::set('delivery_fee', $validated['delivery_fee']);
+        }
+
+        if (isset($validated['stage_location'])) {
+            Setting::set('stage_location', json_encode($validated['stage_location']));
+        }
+
+        $stageRaw = Setting::get('stage_location');
+        $stageObj = $stageRaw ? json_decode($stageRaw, true) : null;
 
         return response()->json([
             'status'   => 'success',
-            'message'  => 'System seat delivery fee updated to Ksh ' . number_format($validated['delivery_fee'], 2) . ' successfully.',
+            'message'  => 'System settings updated successfully.',
             'settings' => [
-                'delivery_fee' => floatval($validated['delivery_fee']),
+                'delivery_fee'   => floatval(Setting::get('delivery_fee', 30)),
+                'stage_location' => $stageObj,
             ],
         ]);
     }

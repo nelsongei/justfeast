@@ -2837,6 +2837,12 @@
     }
 
     let systemDeliveryFee = 30;
+    let systemStageConfig = {
+        name: 'Main Stage Grounds',
+        description: 'Uhuru Park, Cathedral Road Entrance',
+        latitude: -1.28817042,
+        longitude: 36.81647301
+    };
 
     async function fetchSystemSettings() {
         try {
@@ -2846,6 +2852,9 @@
                 if (data.delivery_fee !== undefined) {
                     systemDeliveryFee = Number(data.delivery_fee);
                     renderBasket();
+                }
+                if (data.stage_location) {
+                    systemStageConfig = data.stage_location;
                 }
             }
         } catch (e) {}
