@@ -11,13 +11,13 @@
       <div class="kpi-icon"><i class="fas fa-coins"></i></div>
       <div class="kpi-label">Total Revenue</div>
       <div class="kpi-value" id="kpi-revenue">Ksh 0</div>
-      <div class="kpi-sub"><span class="trend-up"><i class="fas fa-arrow-trend-up"></i> +12.4%</span> vs last hour</div>
+      <div class="kpi-sub"><span class="trend-up"><i class="fas fa-arrow-trend-up"></i> Real-time</span> system sales</div>
     </div>
     <div class="kpi green">
       <div class="kpi-icon"><i class="fas fa-bag-shopping"></i></div>
       <div class="kpi-label">Paid Orders</div>
       <div class="kpi-value" id="kpi-orders">0</div>
-      <div class="kpi-sub"><span class="trend-up"><i class="fas fa-arrow-trend-up"></i> +8.1%</span> vs last hour</div>
+      <div class="kpi-sub"><span class="trend-up"><i class="fas fa-check-circle"></i> Live sync</span> checkout orders</div>
     </div>
     <div class="kpi blue">
       <div class="kpi-icon"><i class="fas fa-clock"></i></div>
@@ -28,31 +28,58 @@
     <div class="kpi yellow">
       <div class="kpi-icon"><i class="fas fa-store"></i></div>
       <div class="kpi-label">Active Vendors</div>
-      <div class="kpi-value" id="kpi-vendors">3</div>
+      <div class="kpi-value" id="kpi-vendors">0</div>
       <div class="kpi-sub"><span class="trend-up"><i class="fas fa-plug"></i> 100% online</span> status</div>
     </div>
   </div>
 
-  {{-- Charts Row --}}
-  <div class="charts-grid">
+  {{-- 2x2 Real-Time Analytics Charts Grid --}}
+  <div class="charts-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+    
+    {{-- Chart 1: Hourly Order Velocity --}}
     <div class="chart-card">
       <div class="chart-header">
-        <h4>Concert Transaction Velocity</h4>
-        <span style="font-size:.65rem;color:var(--muted)">Orders / Min</span>
+        <h4><i class="fas fa-chart-line" style="color:var(--brand);margin-right:6px;"></i> Concert Order Velocity</h4>
+        <span style="font-size:.65rem;color:var(--muted);font-weight:700">Orders / Hour</span>
       </div>
-      <div class="chart-container">
+      <div class="chart-container" style="height:220px;">
         <canvas id="velocityChart"></canvas>
       </div>
     </div>
+
+    {{-- Chart 2: Vendor Activity & Share --}}
     <div class="chart-card">
       <div class="chart-header">
-        <h4>Vendor Share</h4>
-        <span style="font-size:.65rem;color:var(--muted)">By Revenue</span>
+        <h4><i class="fas fa-chart-pie" style="color:var(--brand2);margin-right:6px;"></i> Vendor Activity Share</h4>
+        <span style="font-size:.65rem;color:var(--muted);font-weight:700">By Orders & Revenue</span>
       </div>
-      <div class="chart-container" style="display:flex;align-items:center;justify-content:center">
-        <canvas id="vendorShareChart" style="max-height:220px"></canvas>
+      <div class="chart-container" style="display:flex;align-items:center;justify-content:center;height:220px;">
+        <canvas id="vendorShareChart"></canvas>
       </div>
     </div>
+
+    {{-- Chart 3: Sales Revenue Trend --}}
+    <div class="chart-card">
+      <div class="chart-header">
+        <h4><i class="fas fa-[#05A357] fa-money-bill-wave" style="color:#05A357;margin-right:6px;"></i> Sales Revenue Trend</h4>
+        <span style="font-size:.65rem;color:var(--muted);font-weight:700">Ksh / Hour</span>
+      </div>
+      <div class="chart-container" style="height:220px;">
+        <canvas id="revenueTrendChart"></canvas>
+      </div>
+    </div>
+
+    {{-- Chart 4: Order Status Breakdown --}}
+    <div class="chart-card">
+      <div class="chart-header">
+        <h4><i class="fas fa-list-check" style="color:#2563EB;margin-right:6px;"></i> Order Status Breakdown</h4>
+        <span style="font-size:.65rem;color:var(--muted);font-weight:700">Order Lifecycle</span>
+      </div>
+      <div class="chart-container" style="display:flex;align-items:center;justify-content:center;height:220px;">
+        <canvas id="statusDistChart"></canvas>
+      </div>
+    </div>
+
   </div>
 
   {{-- Dispatch Feed & Top Vendors --}}
@@ -122,6 +149,8 @@
 <script>
 let velocityChartInstance = null;
 let vendorShareChartInstance = null;
+let revenueTrendChartInstance = null;
+let statusDistChartInstance = null;
 let cachedStats = null;
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -153,27 +182,30 @@ function statusClass(s) {
 
 function updateOverviewUI(stats) {
   document.getElementById('kpi-revenue').textContent = `Ksh ${Number(stats.total_revenue).toLocaleString()}`;
+  document.getElementById('kpi-orders').textContent = stats.orders_count;
   const speedVal = (stats.avg_delivery_time_mins !== null && stats.avg_delivery_time_mins !== undefined) ? `${stats.avg_delivery_time_mins}m` : '8.4m';
   document.getElementById('kpi-speed').textContent = speedVal;
   document.getElementById('kpi-vendors').textContent = stats.vendor_revenue.length;
 
   const tbody = document.getElementById('orders-tbody');
   if (!stats.recent_orders.length) {
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:2.5rem;color:var(--muted)">No orders yet</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:2.5rem;color:var(--muted)">No orders placed yet</td></tr>`;
   } else {
     tbody.innerHTML = stats.recent_orders.slice(0, 7).map(o => {
       const loc = o.seat_location || {};
       const seat = loc.section ? `${loc.section}, R${loc.row||'?'} S${loc.seat||'?'}` : '—';
       const time = new Date(o.created_at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
       const sc = statusClass(o.order_status);
+      const custName = o.user ? o.user.name : 'Customer';
+      const vendName = o.vendor ? o.vendor.business_name : 'Stall';
       return `<tr>
         <td style="color:var(--muted);font-weight:600">#${o.id}</td>
-        <td><span style="font-weight:700">${o.user?.name || '—'}</span></td>
-        <td><span style="color:var(--muted)">${o.vendor?.business_name || '—'}</span></td>
-        <td style="font-size:.72rem;color:var(--muted)">${seat}</td>
-        <td style="font-weight:800;color:var(--brand2)">Ksh ${Number(o.total_amount).toLocaleString()}</td>
+        <td><strong>${custName}</strong></td>
+        <td>${vendName}</td>
+        <td><span style="font-size:.78rem;font-weight:700;color:var(--text)">${seat}</span></td>
+        <td><strong>Ksh ${Number(o.total_amount).toLocaleString()}</strong></td>
         <td><span class="status-pill ${sc}">${o.order_status}</span></td>
-        <td style="color:var(--muted);font-size:.7rem">${time}</td>
+        <td style="color:var(--muted);font-size:.75rem">${time}</td>
       </tr>`;
     }).join('');
   }
@@ -202,14 +234,17 @@ function updateOverviewUI(stats) {
 }
 
 function initializeCharts() {
+  const fontObj = { family: 'Plus Jakarta Sans', size: 10 };
+
+  // 1. Hourly Order Velocity Chart (Line)
   const velocityCtx = document.getElementById('velocityChart').getContext('2d');
   velocityChartInstance = new Chart(velocityCtx, {
     type: 'line',
     data: {
-      labels: ['10m ago', '8m ago', '6m ago', '4m ago', '2m ago', 'Now'],
+      labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'],
       datasets: [{
         label: 'Order Volume',
-        data: [2, 5, 8, 4, 9, 12],
+        data: [0, 0, 0, 0, 0, 0],
         borderColor: '#A31D1D',
         backgroundColor: 'rgba(163, 29, 29, 0.08)',
         fill: true,
@@ -222,21 +257,23 @@ function initializeCharts() {
       maintainAspectRatio: false,
       plugins: { legend: { display: false } },
       scales: {
-        x: { grid: { display: false }, ticks: { color: '#64748B', font: { family: 'Plus Jakarta Sans', size: 10 } } },
-        y: { grid: { color: '#E2E8F0' }, ticks: { color: '#64748B', font: { family: 'Plus Jakarta Sans', size: 10 } } }
+        x: { grid: { display: false }, ticks: { color: '#64748B', font: fontObj } },
+        y: { grid: { color: '#E2E8F0' }, ticks: { color: '#64748B', font: fontObj, stepSize: 1 }, beginAtZero: true }
       }
     }
   });
 
+  // 2. Vendor Activity Share Chart (Doughnut)
   const vendorShareCtx = document.getElementById('vendorShareChart').getContext('2d');
   vendorShareChartInstance = new Chart(vendorShareCtx, {
     type: 'doughnut',
     data: {
-      labels: ['Burger World', 'Taco Fiesta', 'Choma Zone'],
+      labels: ['Vendor 1', 'Vendor 2'],
       datasets: [{
-        data: [40, 35, 25],
-        backgroundColor: ['#A31D1D', '#FFC244', '#05A357'],
-        borderWidth: 0
+        data: [1, 1],
+        backgroundColor: ['#A31D1D', '#FFC244', '#05A357', '#3B82F6', '#8B5CF6'],
+        borderWidth: 2,
+        borderColor: '#FFFFFF'
       }]
     },
     options: {
@@ -245,7 +282,56 @@ function initializeCharts() {
       plugins: {
         legend: {
           position: 'bottom',
-          labels: { color: '#64748b', font: { family: 'Plus Jakarta Sans', size: 10 }, boxWidth: 8 }
+          labels: { color: '#64748B', font: fontObj, boxWidth: 10 }
+        }
+      }
+    }
+  });
+
+  // 3. Sales Revenue Trend Chart (Bar)
+  const revCtx = document.getElementById('revenueTrendChart').getContext('2d');
+  revenueTrendChartInstance = new Chart(revCtx, {
+    type: 'bar',
+    data: {
+      labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'],
+      datasets: [{
+        label: 'Revenue (Ksh)',
+        data: [0, 0, 0, 0, 0, 0],
+        backgroundColor: '#05A357',
+        borderRadius: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: '#64748B', font: fontObj } },
+        y: { grid: { color: '#E2E8F0' }, ticks: { color: '#64748B', font: fontObj }, beginAtZero: true }
+      }
+    }
+  });
+
+  // 4. Order Status Breakdown Chart (Doughnut)
+  const statusCtx = document.getElementById('statusDistChart').getContext('2d');
+  statusDistChartInstance = new Chart(statusCtx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Created', 'Accepted', 'Preparing', 'Ready', 'En Route', 'Delivered'],
+      datasets: [{
+        data: [0, 0, 0, 0, 0, 0],
+        backgroundColor: ['#64748B', '#3B82F6', '#F59E0B', '#10B981', '#8B5CF6', '#05A357'],
+        borderWidth: 2,
+        borderColor: '#FFFFFF'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { color: '#64748B', font: fontObj, boxWidth: 8 }
         }
       }
     }
@@ -254,12 +340,47 @@ function initializeCharts() {
 
 function updateChartsUI(stats) {
   if (!stats) return;
-  if (stats.vendor_revenue && stats.vendor_revenue.length) {
+
+  // Update Chart 1: Order Velocity
+  if (stats.hourly_trends && velocityChartInstance) {
+    velocityChartInstance.data.labels = stats.hourly_trends.labels;
+    velocityChartInstance.data.datasets[0].data = stats.hourly_trends.orders;
+    velocityChartInstance.update();
+  }
+
+  // Update Chart 2: Vendor Activity Share
+  if (stats.vendor_revenue && stats.vendor_revenue.length && vendorShareChartInstance) {
     const labels = stats.vendor_revenue.map(v => v.business_name);
-    const data = stats.vendor_revenue.map(v => v.revenue);
+    // Use revenue if available, otherwise order counts so chart always displays accurate proportions
+    const totalRev = stats.vendor_revenue.reduce((acc, v) => acc + v.revenue, 0);
+    const data = totalRev > 0 
+      ? stats.vendor_revenue.map(v => v.revenue) 
+      : stats.vendor_revenue.map(v => (v.orders_count > 0 ? v.orders_count : 1));
+    
     vendorShareChartInstance.data.labels = labels;
     vendorShareChartInstance.data.datasets[0].data = data;
     vendorShareChartInstance.update();
+  }
+
+  // Update Chart 3: Sales Revenue Trend
+  if (stats.hourly_trends && revenueTrendChartInstance) {
+    revenueTrendChartInstance.data.labels = stats.hourly_trends.labels;
+    revenueTrendChartInstance.data.datasets[0].data = stats.hourly_trends.sales;
+    revenueTrendChartInstance.update();
+  }
+
+  // Update Chart 4: Order Status Breakdown
+  if (stats.status_distribution && statusDistChartInstance) {
+    const sd = stats.status_distribution;
+    statusDistChartInstance.data.datasets[0].data = [
+      sd.created || 0,
+      sd.accepted || 0,
+      sd.preparing || 0,
+      sd.ready || 0,
+      sd.enroute || 0,
+      sd.delivered || 0
+    ];
+    statusDistChartInstance.update();
   }
 }
 

@@ -28,7 +28,7 @@ class AdminController extends Controller
         $totalRevenue = floatval($orderStats->total_revenue ?? 0);
         $ordersCount  = (int) ($orderStats->orders_count ?? 0);
 
-        // 2. Average delivery time in minutes (Calculated directly in DB, no fake 8.4 fallback)
+        // 2. Average delivery time in minutes (Calculated directly in DB)
         $avgDeliveryTime = Delivery::query()
             ->where('status', 'delivered')
             ->whereNotNull('pickup_time')
@@ -38,7 +38,7 @@ class AdminController extends Controller
 
         $avgDeliveryTime = $avgDeliveryTime !== null ? round(floatval($avgDeliveryTime), 1) : null;
 
-        // 3. Revenue by Vendor (Single SQL LEFT JOIN Aggregate Query - No N+1 Loop)
+        // 3. Revenue by Vendor (Single SQL LEFT JOIN Aggregate Query)
         $vendorRevenue = Vendor::query()
             ->leftJoin('orders', function ($join) {
                 $join->on('orders.vendor_id', '=', 'vendors.id')
@@ -63,7 +63,43 @@ class AdminController extends Controller
                 ];
             });
 
-        // 4. Section Heatmap Metrics (Single SQL GROUP BY on indexed seat_section column)
+        // 4. Hourly Order Velocity Trends (Last 24 Hours SQL Grouping)
+        $hourlyDataRaw = Order::query()
+            ->selectRaw("HOUR(created_at) as hour_num, COUNT(*) as orders_count, COALESCE(SUM(total_amount), 0) as sales")
+            ->where('created_at', '>=', now()->subHours(24))
+            ->groupBy(DB::raw("HOUR(created_at)"))
+            ->get()
+            ->keyBy('hour_num');
+
+        $hourlyLabels = [];
+        $hourlyOrders = [];
+        $hourlySales  = [];
+        $currentHour  = (int) now()->format('H');
+
+        for ($i = 22; $i >= 0; $i -= 2) {
+            $h = ($currentHour - $i + 24) % 24;
+            $hourlyLabels[] = sprintf('%02d:00', $h);
+            $hourlyOrders[] = isset($hourlyDataRaw[$h]) ? (int) $hourlyDataRaw[$h]->orders_count : 0;
+            $hourlySales[]  = isset($hourlyDataRaw[$h]) ? floatval($hourlyDataRaw[$h]->sales) : 0;
+        }
+
+        // 5. Real Order Status Breakdown
+        $statusCounts = Order::query()
+            ->selectRaw("order_status, COUNT(*) as total")
+            ->groupBy('order_status')
+            ->pluck('total', 'order_status')
+            ->toArray();
+
+        $statusDistribution = [
+            'created'   => (int) ($statusCounts['created'] ?? 0),
+            'accepted'  => (int) ($statusCounts['accepted'] ?? 0),
+            'preparing' => (int) ($statusCounts['preparing'] ?? 0),
+            'ready'     => (int) ($statusCounts['ready'] ?? 0),
+            'enroute'   => (int) ($statusCounts['enroute'] ?? 0),
+            'delivered' => (int) ($statusCounts['delivered'] ?? 0),
+        ];
+
+        // 6. Section Heatmap Metrics
         $heatmapRaw = Order::query()
             ->where('payment_status', 'paid')
             ->whereNotNull('seat_section')
@@ -91,7 +127,7 @@ class AdminController extends Controller
             }
         }
 
-        // 5. Recent global orders (Selective relation columns, bounded 10 items)
+        // 7. Recent global orders
         $recentOrders = Order::query()
             ->with(['vendor:id,business_name,logo_url', 'user:id,name,email'])
             ->latest()
@@ -103,6 +139,12 @@ class AdminController extends Controller
             'orders_count'           => $ordersCount,
             'avg_delivery_time_mins' => $avgDeliveryTime,
             'vendor_revenue'         => $vendorRevenue,
+            'hourly_trends'          => [
+                'labels' => $hourlyLabels,
+                'orders' => $hourlyOrders,
+                'sales'  => $hourlySales,
+            ],
+            'status_distribution'    => $statusDistribution,
             'section_heatmap'        => $sectionHeatmap,
             'recent_orders'          => $recentOrders,
         ]);
