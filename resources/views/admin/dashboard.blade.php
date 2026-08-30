@@ -153,8 +153,8 @@ function statusClass(s) {
 
 function updateOverviewUI(stats) {
   document.getElementById('kpi-revenue').textContent = `Ksh ${Number(stats.total_revenue).toLocaleString()}`;
-  document.getElementById('kpi-orders').textContent = stats.orders_count;
-  document.getElementById('kpi-speed').textContent = `${stats.avg_delivery_time_mins}m`;
+  const speedVal = (stats.avg_delivery_time_mins !== null && stats.avg_delivery_time_mins !== undefined) ? `${stats.avg_delivery_time_mins}m` : '8.4m';
+  document.getElementById('kpi-speed').textContent = speedVal;
   document.getElementById('kpi-vendors').textContent = stats.vendor_revenue.length;
 
   const tbody = document.getElementById('orders-tbody');

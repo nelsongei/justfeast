@@ -191,6 +191,68 @@ tbody td{padding:1.1rem 1.5rem;vertical-align:middle;color:var(--text)}
 .tool-btn{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1rem;color:var(--text);font-size:.8rem;font-weight:800;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;cursor:pointer;transition:.15s;box-shadow:0 2px 8px rgba(15,23,42,0.03)}
 .tool-btn:hover{background:#FFF8E7;border-color:var(--brand);box-shadow:0 6px 20px rgba(163,29,29,0.1);transform:translateY(-1px)}
 .tool-btn i{font-size:1.2rem;color:var(--brand)}
+
+/* ── Global Modal Overlay & Dialog Styling ── */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(8px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.modal-overlay.is-active {
+  opacity: 1;
+  visibility: visible;
+}
+.modal-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 28px;
+  width: 100%;
+  max-width: 640px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  transform: scale(0.95) translateY(10px);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.modal-overlay.is-active .modal-card {
+  transform: scale(1) translateY(0);
+}
+.modal-header {
+  padding: 1.5rem 1.75rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #FFFFFF;
+}
+.modal-close-btn {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.15s ease;
+}
+.modal-close-btn:hover {
+  background: #FEF2F2;
+  color: #991B1B;
+  border-color: #FCA5A5;
+}
 </style>
 </head>
 <body>
