@@ -816,52 +816,89 @@
 
 <footer class="mt-10 bg-[#0B1117] text-white relative overflow-hidden">
     <div class="h-1 bg-[#A31D1D]"></div>
-    <div class="max-w-[1480px] mx-auto px-5 md:px-8 py-12 grid grid-cols-1 md:grid-cols-12 gap-8">
-        <div class="md:col-span-5 space-y-4">
+    <div class="max-w-[1480px] mx-auto px-5 md:px-8 py-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-8">
+        <div class="md:col-span-4 space-y-4">
             <div class="flex items-center gap-3">
                 <img src="{{ asset('images/logo/jm.png') }}" alt="justFeast Logo" class="h-10 w-auto rounded-2xl shadow-sm border border-white/10 shrink-0">
-                <h2 class="text-2xl font-black">just<span class="text-[#FFC244]">Feast</span></h2></div>
-            <p class="text-sm text-white/55 leading-relaxed max-w-md">Live event food ordering for concerts, stadiums
-                and festivals. Vendors sell more, attendees miss less, runners deliver to the exact location.</p>
+                <h2 class="text-2xl font-black">just<span class="text-[#FFC244]">Feast</span></h2>
+            </div>
+            <p class="text-sm text-white/55 leading-relaxed max-w-md">Live event food ordering for concerts, stadiums and festivals. Vendors sell more, attendees miss less, runners deliver to the exact location.</p>
         </div>
-        <div class="md:col-span-2 space-y-3"><h4 class="text-[11px] font-black uppercase tracking-widest text-white/40">
-                For attendees</h4><a href="#vendors" class="block text-sm text-white/65 hover:text-[#FFC244]">Browse
-                vendors</a>
-            <button onclick="openSeatModal()" class="block text-sm text-white/65 hover:text-[#FFC244]">Delivery map
-            </button>
-            <a href="#how-it-works" class="block text-sm text-white/65 hover:text-[#FFC244]">How it works</a></div>
-        <div class="md:col-span-2 space-y-3"><h4 class="text-[11px] font-black uppercase tracking-widest text-white/40">
-                For events</h4><a href="#" class="block text-sm text-white/65 hover:text-[#FFC244]">Vendor
-                onboarding</a><a href="#" class="block text-sm text-white/65 hover:text-[#FFC244]">Runner ops</a><a
-                href="#" class="block text-sm text-white/65 hover:text-[#FFC244]">Support</a></div>
-        <div class="md:col-span-3 space-y-3"><h4 class="text-[11px] font-black uppercase tracking-widest text-white/40">
-                Payments</h4>
+        <div class="md:col-span-2 space-y-3">
+            <h4 class="text-[11px] font-black uppercase tracking-widest text-white/40">For attendees</h4>
+            <a href="#vendors" class="block text-sm text-white/65 hover:text-[#FFC244]">Browse vendors</a>
+            <button onclick="openSeatModal()" class="block text-sm text-white/65 hover:text-[#FFC244]">Delivery map</button>
+            <a href="#how-it-works" class="block text-sm text-white/65 hover:text-[#FFC244]">How it works</a>
+        </div>
+        <div class="md:col-span-3 space-y-3">
+            <h4 class="text-[11px] font-black uppercase tracking-widest text-white/40">Legal & Policies</h4>
+            <button onclick="openPolicyModal('privacy')" class="block text-sm text-white/65 hover:text-[#FFC244] text-left cursor-pointer transition">Privacy Policy</button>
+            <button onclick="openPolicyModal('terms')" class="block text-sm text-white/65 hover:text-[#FFC244] text-left cursor-pointer transition">Terms & Conditions</button>
+            <button onclick="openPolicyModal('returns')" class="block text-sm text-white/65 hover:text-[#FFC244] text-left cursor-pointer transition">Return Policy</button>
+        </div>
+        <div class="md:col-span-3 space-y-3">
+            <h4 class="text-[11px] font-black uppercase tracking-widest text-white/40">Payments</h4>
             <div class="bg-white/5 border border-white/10 rounded-3xl p-4 space-y-3">
                 <div class="flex items-center gap-3">
-                    <img src="{{ asset('images/logo/mpesa.png') }}" alt="M-Pesa" class="h-7 w-auto object-contain"
-                         onerror="this.style.display='none'">
-                    <img src="{{ asset('images/logo/Faraja.png') }}" alt="Faraja" class="h-7 w-auto object-contain"
-                         onerror="this.style.display='none'">
+                    <img src="{{ asset('images/logo/mpesa.png') }}" alt="M-Pesa" class="h-7 w-auto object-contain" onerror="this.style.display='none'">
+                    <img src="{{ asset('images/logo/Faraja.png') }}" alt="Faraja" class="h-7 w-auto object-contain" onerror="this.style.display='none'">
                 </div>
-                <p class="text-xs text-white/50 leading-relaxed">Secure STK Push checkout and delivery PIN
-                    verification for safer handovers.</p>
+                <p class="text-xs text-white/50 leading-relaxed">Secure STK Push checkout and delivery PIN verification for safer handovers.</p>
             </div>
         </div>
     </div>
     <div class="border-t border-white/10">
-        <div
-            class="max-w-[1480px] mx-auto px-5 md:px-8 py-4 flex flex-col md:flex-row items-center justify-between gap-3">
+        <div class="max-w-[1480px] mx-auto px-5 md:px-8 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
             <p class="text-[11px] text-white/35 font-bold">© 2026 justFeast. All rights reserved.</p>
+            <div class="flex flex-wrap items-center justify-center gap-4 text-[11px] text-white/50 font-bold">
+                <button onclick="openPolicyModal('privacy')" class="hover:text-white transition cursor-pointer">Privacy Policy</button>
+                <span>•</span>
+                <button onclick="openPolicyModal('terms')" class="hover:text-white transition cursor-pointer">Terms & Conditions</button>
+                <span>•</span>
+                <button onclick="openPolicyModal('returns')" class="hover:text-white transition cursor-pointer">Return Policy</button>
+            </div>
             <div class="flex items-center gap-2 text-[11px] text-white/45 font-black uppercase tracking-wider">
                 <span>Powered by</span>
-                <img src="{{asset('/images/logo/basemathai.jpeg')}}"
-                     onerror="this.style.display='none'; document.getElementById('basemath-wordmark').classList.remove('hidden');"
-                     alt="Basemath" class="h-6 w-auto object-contain">
+                <img src="{{asset('/images/logo/basemathai.jpeg')}}" onerror="this.style.display='none'; document.getElementById('basemath-wordmark').classList.remove('hidden');" alt="Basemath" class="h-6 w-auto object-contain">
                 <span id="basemath-wordmark" class="hidden text-white">Basemath</span>
             </div>
         </div>
     </div>
 </footer>
+
+<!-- Policy Documents Modal Overlay -->
+<div id="policy-modal-overlay" class="fixed inset-0 bg-slate-900/75 backdrop-blur-md z-[120] hidden flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+    <div class="bg-white rounded-[32px] max-w-2xl w-full shadow-2xl overflow-hidden border border-slate-200 my-auto flex flex-col max-h-[85vh]">
+        <!-- Header -->
+        <div class="p-6 bg-gradient-to-r from-[#0F172A] to-[#1E293B] text-white flex items-center justify-between shrink-0">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-2xl bg-[#FFC244] text-[#0F172A] flex items-center justify-center text-lg font-black shadow-sm" id="policy-icon">
+                    📜
+                </div>
+                <div>
+                    <h3 class="text-lg font-black tracking-tight" id="policy-title">Privacy Policy</h3>
+                    <p class="text-[11px] text-slate-400 font-medium">justFeast RheamFeast Legal Notice</p>
+                </div>
+            </div>
+            <button onclick="closePolicyModal()" class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition cursor-pointer">
+                <i class="fas fa-xmark text-base"></i>
+            </button>
+        </div>
+
+        <!-- Body Scroll Content -->
+        <div class="p-6 overflow-y-auto space-y-5 text-slate-600 text-xs leading-relaxed font-medium" id="policy-content">
+            <!-- Dynamic Copy Populated Here -->
+        </div>
+
+        <!-- Footer -->
+        <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between shrink-0">
+            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">RheamFeast Live Events</span>
+            <button onclick="closePolicyModal()" class="px-5 py-2.5 rounded-full bg-[#0F172A] hover:bg-[#05A357] text-white text-xs font-black transition cursor-pointer">
+                I Understand
+            </button>
+        </div>
+    </div>
+</div>
 <!-- M-Pesa Payment Overlay -->
 <div id="mpesa-payment-overlay"
      class="hidden fixed inset-0 bg-[#111827]/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -3035,6 +3072,84 @@
         if (feeEl) feeEl.textContent = feeText;
         if (document.getElementById('cart-tray-total')) document.getElementById('cart-tray-total').textContent = grandTotalText;
         if (document.getElementById('desktop-cart-tray-total')) document.getElementById('desktop-cart-tray-total').textContent = grandTotalText;
+    }
+
+    // Policy Documents Modal Handlers
+    const policyTexts = {
+        privacy: {
+            title: "Privacy Policy",
+            icon: "🔒",
+            content: `
+                <div class="space-y-4">
+                    <p class="text-xs font-bold text-[#0F172A]">Effective Date: August 30, 2026</p>
+                    <p>At <strong>justFeast</strong> ("we", "our", or "us"), we are committed to protecting your privacy and ensuring complete transparency in how your personal data is collected and utilized during RheamFeast and affiliated live events.</p>
+                    
+                    <h4 class="text-xs font-black uppercase tracking-wider text-[#0F172A] pt-3 border-t border-slate-200">1. Information We Collect</h4>
+                    <ul class="list-disc pl-5 space-y-1.5 text-slate-600">
+                        <li><strong>Contact & Payment Details:</strong> M-Pesa phone number used for instant STK Push transaction processing.</li>
+                        <li><strong>Delivery Location:</strong> Festival seat coordinates, section/row numbers, or live GPS pins provided for runner fulfillment.</li>
+                        <li><strong>Order Activity:</strong> Purchased food & drink items, vendor stall preferences, and delivery timestamps.</li>
+                    </ul>
+
+                    <h4 class="text-xs font-black uppercase tracking-wider text-[#0F172A] pt-3 border-t border-slate-200">2. How We Use Your Data</h4>
+                    <p>Your information is used strictly to fulfill food & drink orders directly to your festival seat, issue order status notifications, generate delivery verification PINs, and process secure payments via M-Pesa.</p>
+
+                    <h4 class="text-xs font-black uppercase tracking-wider text-[#0F172A] pt-3 border-t border-slate-200">3. Security & Data Protection</h4>
+                    <p>All sensitive transactions are encrypted via HTTPS. Delivery verification OTPs are securely hashed. We do not sell or rent your personal information to third-party advertisers.</p>
+                </div>
+            `
+        },
+        terms: {
+            title: "Terms & Conditions",
+            icon: "📜",
+            content: `
+                <div class="space-y-4">
+                    <p class="text-xs font-bold text-[#0F172A]">RheamFeast Platform Terms of Service</p>
+                    <p>By placing an order on <strong>justFeast</strong> during RheamFeast events, you agree to comply with and be bound by the following terms and conditions.</p>
+
+                    <h4 class="text-xs font-black uppercase tracking-wider text-[#0F172A] pt-3 border-t border-slate-200">1. Ordering & Seat Delivery</h4>
+                    <p>Orders are dispatched directly to the seat location or GPS coordinates specified at checkout. Customers are responsible for providing accurate seat details (Section, Row, Seat Number) to prevent runner delays.</p>
+
+                    <h4 class="text-xs font-black uppercase tracking-wider text-[#0F172A] pt-3 border-t border-slate-200">2. Delivery Verification OTP</h4>
+                    <p>Every order generates a unique 4-digit verification PIN. The customer must provide this PIN to the delivery runner upon arrival to confirm handover and complete the delivery contract.</p>
+
+                    <h4 class="text-xs font-black uppercase tracking-wider text-[#0F172A] pt-3 border-t border-slate-200">3. Multi-Vendor Pricing & Delivery Fees</h4>
+                    <p>Orders incur a standard base delivery fee. When ordering from multiple vendor stalls in a single cart, an additional delivery surcharge (+50% of base fee per extra vendor) is applied to cover multi-stall runner dispatch.</p>
+                </div>
+            `
+        },
+        returns: {
+            title: "Return & Refund Policy",
+            icon: "🔄",
+            content: `
+                <div class="space-y-4">
+                    <p class="text-xs font-bold text-[#0F172A]">Event Food & Beverage Refund Policy</p>
+                    <p>Due to the perishable and fresh-preparation nature of concert food and drinks, standard returns are governed by the following guidelines:</p>
+
+                    <h4 class="text-xs font-black uppercase tracking-wider text-[#0F172A] pt-3 border-t border-slate-200">1. Order Cancellations</h4>
+                    <p>Once an order has been accepted and preparation has commenced by a festival vendor, orders cannot be cancelled or returned for a change of mind.</p>
+
+                    <h4 class="text-xs font-black uppercase tracking-wider text-[#0F172A] pt-3 border-t border-slate-200">2. Missing or Incorrect Items</h4>
+                    <p>If your delivered order is incomplete, incorrect, or spoiled, please notify our customer support team immediately. Verified claims will be eligible for an instant M-Pesa refund or vendor re-dispatch.</p>
+
+                    <h4 class="text-xs font-black uppercase tracking-wider text-[#0F172A] pt-3 border-t border-slate-200">3. Non-Delivery & Unfulfilled Orders</h4>
+                    <p>In the rare event that a runner cannot fulfill delivery due to vendor inventory depletion or event operational constraints, full refunds are automatically credited back to your M-Pesa account within 15 minutes.</p>
+                </div>
+            `
+        }
+    };
+
+    function openPolicyModal(type) {
+        const modal = document.getElementById('policy-modal-overlay');
+        const policy = policyTexts[type] || policyTexts.privacy;
+        document.getElementById('policy-title').textContent = policy.title;
+        document.getElementById('policy-icon').textContent = policy.icon;
+        document.getElementById('policy-content').innerHTML = policy.content;
+        modal.classList.remove('hidden');
+    }
+
+    function closePolicyModal() {
+        document.getElementById('policy-modal-overlay').classList.add('hidden');
     }
 </script>
 </body>
