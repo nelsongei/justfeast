@@ -857,10 +857,9 @@
                 <span>•</span>
                 <button onclick="openPolicyModal('returns')" class="hover:text-white transition cursor-pointer">Return Policy</button>
             </div>
-            <div class="flex items-center gap-2 text-[11px] text-white/45 font-black uppercase tracking-wider">
+            <div class="flex items-center gap-2.5 text-[11px] text-white/60 font-black uppercase tracking-wider bg-white/5 border border-white/10 px-3.5 py-1.5 rounded-full">
                 <span>Powered by</span>
-                <img src="{{asset('/images/logo/basemathai.jpeg')}}" onerror="this.style.display='none'; document.getElementById('basemath-wordmark').classList.remove('hidden');" alt="Basemath" class="h-6 w-auto object-contain">
-                <span id="basemath-wordmark" class="hidden text-white">Basemath</span>
+                <img src="{{ asset('images/logo/basemathai.jpeg') }}" alt="Basemath Logo" class="h-6 w-auto object-contain rounded-md border border-white/20 shadow-xs">
             </div>
         </div>
     </div>
@@ -871,9 +870,9 @@
     <div class="bg-white rounded-[32px] max-w-2xl w-full shadow-2xl overflow-hidden border border-slate-200 my-auto flex flex-col max-h-[85vh]">
         <!-- Header -->
         <div class="p-6 bg-gradient-to-r from-[#0F172A] to-[#1E293B] text-white flex items-center justify-between shrink-0">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-2xl bg-[#FFC244] text-[#0F172A] flex items-center justify-center text-lg font-black shadow-sm" id="policy-icon">
-                    📜
+            <div class="flex items-center gap-3.5">
+                <div class="w-11 h-11 rounded-2xl bg-white/10 p-1 flex items-center justify-center border border-white/15 shadow-sm shrink-0">
+                    <img src="{{ asset('images/logo/jm.png') }}" alt="justFeast Logo" class="w-full h-full object-contain rounded-xl">
                 </div>
                 <div>
                     <h3 class="text-lg font-black tracking-tight" id="policy-title">Privacy Policy</h3>
@@ -3143,7 +3142,6 @@
         const modal = document.getElementById('policy-modal-overlay');
         const policy = policyTexts[type] || policyTexts.privacy;
         document.getElementById('policy-title').textContent = policy.title;
-        document.getElementById('policy-icon').textContent = policy.icon;
         document.getElementById('policy-content').innerHTML = policy.content;
         modal.classList.remove('hidden');
     }
