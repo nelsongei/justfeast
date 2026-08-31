@@ -130,6 +130,14 @@
       <form id="create-user-form" onsubmit="handleCreateUser(event)">
         <div style="padding:1.5rem;display:flex;flex-direction:column;gap:1.1rem;">
           
+          {{-- Inline Modal Error Banner --}}
+          <div id="create-user-error-banner" style="display:none;padding:0.85rem 1.1rem;background:#FEF2F2;border:1px solid #FCA5A5;border-radius:14px;color:#991B1B;font-size:0.8rem;font-weight:600;">
+            <div style="display:flex;align-items:center;gap:0.5rem;font-weight:800;margin-bottom:0.25rem;" id="create-user-error-title">
+              <i class="fas fa-exclamation-circle"></i> <span>Unable to Create Account</span>
+            </div>
+            <div id="create-user-error-body"></div>
+          </div>
+
           <div>
             <label style="display:block;font-size:.72rem;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;">Full Name *</label>
             <input type="text" id="new-user-name" required placeholder="Jane Doe" style="width:100%;padding:.7rem .9rem;border-radius:12px;background:var(--surface2);border:1px solid var(--border);color:var(--text);outline:none;font-weight:600;">
@@ -195,6 +203,14 @@
         <input type="hidden" id="edit-user-id">
         <div style="padding:1.5rem;display:flex;flex-direction:column;gap:1.1rem;">
           
+          {{-- Inline Modal Error Banner --}}
+          <div id="edit-user-error-banner" style="display:none;padding:0.85rem 1.1rem;background:#FEF2F2;border:1px solid #FCA5A5;border-radius:14px;color:#991B1B;font-size:0.8rem;font-weight:600;">
+            <div style="display:flex;align-items:center;gap:0.5rem;font-weight:800;margin-bottom:0.25rem;" id="edit-user-error-title">
+              <i class="fas fa-exclamation-circle"></i> <span>Unable to Update Account</span>
+            </div>
+            <div id="edit-user-error-body"></div>
+          </div>
+
           <div>
             <label style="display:block;font-size:.72rem;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;">Full Name *</label>
             <input type="text" id="edit-user-name" required style="width:100%;padding:.7rem .9rem;border-radius:12px;background:var(--surface2);border:1px solid var(--border);color:var(--text);outline:none;font-weight:700;">
@@ -460,16 +476,19 @@ function renderPagination(meta) {
 }
 
 function openCreateUserModal() {
+  hideModalError('create-user-error-banner');
   const modal = document.getElementById('create-user-modal-overlay');
   if (modal) modal.classList.add('is-active');
 }
 
 function closeCreateUserModal() {
+  hideModalError('create-user-error-banner');
   const modal = document.getElementById('create-user-modal-overlay');
   if (modal) modal.classList.remove('is-active');
 }
 
 function promptManageUser(userId) {
+  hideModalError('edit-user-error-banner');
   const user = loadedUsers.find(u => u.id === userId);
   if (!user) return;
 
@@ -496,12 +515,53 @@ function promptManageUser(userId) {
 }
 
 function closeManageUserModal() {
+  hideModalError('edit-user-error-banner');
   const modal = document.getElementById('manage-user-modal-overlay');
   if (modal) modal.classList.remove('is-active');
 }
 
+function showModalError(bannerId, bodyId, message, errors = null) {
+  const banner = document.getElementById(bannerId);
+  const body = document.getElementById(bodyId);
+  if (!banner || !body) return;
+
+  let contentHtml = '';
+  if (errors && typeof errors === 'object') {
+    const errorList = Object.values(errors).flat();
+    if (errorList.length > 0) {
+      contentHtml = `<ul style="margin:0.25rem 0 0 1.25rem;padding:0;line-height:1.4;">${errorList.map(e => `<li>${escapeHtmlUser(e)}</li>`).join('')}</ul>`;
+    }
+  }
+  
+  if (!contentHtml && message) {
+    contentHtml = `<div>${escapeHtmlUser(message)}</div>`;
+  }
+
+  body.innerHTML = contentHtml || 'An unexpected error occurred. Please check your inputs.';
+  banner.style.display = 'block';
+}
+
+function hideModalError(bannerId) {
+  const banner = document.getElementById(bannerId);
+  if (banner) {
+    banner.style.display = 'none';
+  }
+}
+
+function escapeHtmlUser(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 async function handleUpdateUser(event) {
   event.preventDefault();
+  hideModalError('edit-user-error-banner');
+
   const userId = document.getElementById('edit-user-id').value;
   const name = document.getElementById('edit-user-name').value;
   const email = document.getElementById('edit-user-email').value;
@@ -531,14 +591,15 @@ async function handleUpdateUser(event) {
     const data = await res.json();
 
     if (res.ok && (data.success || data.status === 'success')) {
-      alert(data.message || 'User account updated successfully!');
+      showNotification(data.message || `User account '${name}' updated successfully!`, 'success');
       closeManageUserModal();
       loadUsersTab(currentPage);
     } else {
-      alert(data.message || (data.errors ? Object.values(data.errors).flat().join(', ') : 'Failed to update user account.'));
+      const msg = data.message || 'Failed to update user account.';
+      showModalError('edit-user-error-banner', 'edit-user-error-body', msg, data.errors);
     }
   } catch (e) {
-    alert('Network error while updating user account');
+    showModalError('edit-user-error-banner', 'edit-user-error-body', 'Network error while updating user account.');
   } finally {
     btn.disabled = false;
     btn.innerHTML = originalHtml;
@@ -567,14 +628,14 @@ async function handleDeleteUser() {
     const data = await res.json();
 
     if (res.ok && (data.success || data.status === 'success')) {
-      alert(data.message || 'User account deleted successfully.');
+      showNotification(data.message || `User account '${name}' deleted successfully.`, 'success');
       closeManageUserModal();
       loadUsersTab(currentPage);
     } else {
-      alert(data.message || 'Failed to delete user account.');
+      showNotification(data.message || 'Failed to delete user account.', 'error');
     }
   } catch (e) {
-    alert('Network error while deleting user account');
+    showNotification('Network error while deleting user account', 'error');
   }
 }
 
@@ -588,6 +649,8 @@ function toggleVendorBizField() {
 
 async function handleCreateUser(event) {
   event.preventDefault();
+  hideModalError('create-user-error-banner');
+
   const name = document.getElementById('new-user-name').value;
   const email = document.getElementById('new-user-email').value;
   const phone = document.getElementById('new-user-phone').value;
@@ -600,13 +663,15 @@ async function handleCreateUser(event) {
 
   const originalHtml = btn.innerHTML;
   btn.disabled = true;
-  btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-1"></i> Creating...`;
+  btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-1"></i> Creating Account...`;
 
   try {
     const res = await fetch(`${API_BASE}/admin/users`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
         'X-CSRF-TOKEN': '{{ csrf_token() }}'
       },
       body: JSON.stringify({ name, email, phone, password, role, business_name })
@@ -614,16 +679,17 @@ async function handleCreateUser(event) {
     
     const data = await res.json();
     if (res.ok && data.success) {
-      alert(data.message || 'User account created successfully!');
+      showNotification(data.message || `User account for '${name}' created successfully!`, 'success');
       document.getElementById('create-user-form').reset();
       toggleVendorBizField();
       closeCreateUserModal();
       loadUsersTab(1);
     } else {
-      alert(data.message || 'Error creating user account');
+      const msg = data.message || 'Error creating user account';
+      showModalError('create-user-error-banner', 'create-user-error-body', msg, data.errors);
     }
   } catch(e) {
-    alert('Network error while creating account');
+    showModalError('create-user-error-banner', 'create-user-error-body', 'Network error while creating user account');
   } finally {
     btn.disabled = false;
     btn.innerHTML = originalHtml;

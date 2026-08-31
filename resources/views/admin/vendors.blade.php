@@ -552,8 +552,6 @@
     }
   </style>
 
-  <div id="toast-container" class="toast-container"></div>
-
   <div class="vendors-page-wrap">
 
     {{-- ── 1. Top Metric Cards ── --}}
@@ -1091,29 +1089,9 @@ async function toggleVendorStatus(vendorId, newStatus, businessName) {
 }
 
 function showNotification(message, type = 'success') {
-  const container = document.getElementById('toast-container');
-  if (!container) return;
-
-  const toast = document.createElement('div');
-  toast.className = `toast toast-${type}`;
-  
-  const icon = type === 'success' ? 'fa-check' : 'fa-exclamation-triangle';
-  
-  toast.innerHTML = `
-    <div class="toast-icon">
-      <i class="fas ${icon}"></i>
-    </div>
-    <span>${escapeHtml(message)}</span>
-  `;
-
-  container.appendChild(toast);
-
-  setTimeout(() => {
-    toast.style.opacity = '0';
-    toast.style.transform = 'translateY(-10px)';
-    toast.style.transition = 'all 0.3s ease';
-    setTimeout(() => toast.remove(), 300);
-  }, 3500);
+  if (typeof window.showNotification === 'function') {
+    window.showNotification(message, type);
+  }
 }
 
 function escapeHtml(str) {

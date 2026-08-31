@@ -253,9 +253,64 @@ tbody td{padding:1.1rem 1.5rem;vertical-align:middle;color:var(--text)}
   color: #991B1B;
   border-color: #FCA5A5;
 }
+
+/* ── Toast Container & Global Notifications ── */
+.toast-container {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  pointer-events: none;
+  max-width: 420px;
+  width: calc(100% - 3rem);
+}
+.toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.9rem 1.25rem;
+  background: var(--surface);
+  color: var(--text);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  box-shadow: 0 12px 32px -8px rgba(15, 23, 42, 0.15);
+  font-size: 0.84rem;
+  font-weight: 700;
+  transform: translateY(0);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: toastSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes toastSlideIn {
+  from { opacity: 0; transform: translateY(-15px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.toast-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+.toast-success { border-color: rgba(5, 163, 87, 0.3); }
+.toast-success .toast-icon { background: #ECFDF5; color: #05A357; }
+.toast-error { border-color: rgba(239, 68, 68, 0.3); }
+.toast-error .toast-icon { background: #FEF2F2; color: #EF4444; }
+.toast-warning { border-color: rgba(217, 119, 6, 0.3); }
+.toast-warning .toast-icon { background: #FFF8E7; color: #D97706; }
+.toast-info { border-color: rgba(37, 99, 235, 0.3); }
+.toast-info .toast-icon { background: #EFF6FF; color: #2563EB; }
 </style>
 </head>
 <body>
+
+<div id="toast-container" class="toast-container"></div>
 
 {{-- ── Sidebar Navigation ── --}}
 <aside class="sidebar">
@@ -416,20 +471,60 @@ async function handleSaveDeliveryFee(event) {
       const badge = document.getElementById('admin-delivery-fee-badge');
       if (badge) badge.textContent = `Ksh ${newFee}`;
       closeDeliveryFeeModal();
-      if (typeof showNotification === 'function') {
-        showNotification(`System delivery fee updated to Ksh ${newFee}!`, 'success');
-      } else {
-        alert(`System delivery fee updated to Ksh ${newFee}!`);
-      }
+      showNotification(`System delivery fee updated to Ksh ${newFee}!`, 'success');
     } else {
-      alert(data.message || 'Failed to update delivery fee.');
+      showNotification(data.message || 'Failed to update delivery fee.', 'error');
     }
   } catch (e) {
-    alert('Network error while saving delivery fee');
+    showNotification('Network error while saving delivery fee', 'error');
   } finally {
     btn.disabled = false;
     btn.innerHTML = originalHtml;
   }
+}
+
+window.showNotification = function(message, type = 'success') {
+  let container = document.getElementById('toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'toast-container';
+    container.className = 'toast-container';
+    document.body.appendChild(container);
+  }
+
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  
+  let iconClass = 'fa-check';
+  if (type === 'error') iconClass = 'fa-exclamation-triangle';
+  else if (type === 'warning') iconClass = 'fa-exclamation-circle';
+  else if (type === 'info') iconClass = 'fa-info-circle';
+
+  toast.innerHTML = `
+    <div class="toast-icon">
+      <i class="fas ${iconClass}"></i>
+    </div>
+    <span style="flex:1;word-break:break-word;">${escapeHtmlGlobal(message)}</span>
+  `;
+
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(-10px)';
+    toast.style.transition = 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
+    setTimeout(() => toast.remove(), 300);
+  }, 3500);
+};
+
+function escapeHtmlGlobal(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }
 
 function logoutAdmin() {
