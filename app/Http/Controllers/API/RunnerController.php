@@ -16,10 +16,14 @@ class RunnerController extends Controller
     {
         $perPage = min($request->integer('per_page', 25), 100);
 
-        $deliveries = Delivery::query()
-            ->where('runner_id', $request->user()->id)
-            ->whereIn('status', ['pending', 'picked_up'])
-            ->latest()
+        $query = Delivery::query()
+            ->where('runner_id', $request->user()->id);
+
+        if (!$request->boolean('all')) {
+            $query->whereIn('status', ['pending', 'picked_up']);
+        }
+
+        $deliveries = $query->latest()
             ->with(['order.items.product', 'order.vendor:id,business_name,logo_url', 'order.user:id,name,phone'])
             ->cursorPaginate($perPage);
 

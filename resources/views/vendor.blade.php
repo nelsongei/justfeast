@@ -240,6 +240,13 @@
             <!-- OTP Step -->
             <div id="vendor-auth-step-otp" class="hidden space-y-3 pt-2">
                 <p class="text-[11px] text-zinc-500 font-semibold" id="vendor-otp-status-text">Code sent to phone</p>
+                <div id="vendor-otp-banner" class="hidden bg-[#ECFDF5] border border-[#A7F3D0] rounded-2xl p-3.5 text-center space-y-1 my-2">
+                    <p class="text-[9px] uppercase tracking-widest text-[#047857] font-black">System Generated Login OTP</p>
+                    <p class="text-3xl font-black tracking-widest text-[#05A357]" id="vendor-generated-otp-display">------</p>
+                    <button type="button" onclick="autoFillVendorOTP()" class="text-[10px] font-extrabold text-[#047857] underline cursor-pointer inline-flex items-center gap-1">
+                        <i class="fas fa-magic"></i> Auto-fill OTP Code
+                    </button>
+                </div>
                 <input type="text" id="vendor-otp-input" placeholder="Enter 6-Digit Code" maxlength="6" class="w-full p-3.5 rounded-2xl bg-[#F7F9FA] border border-[#E2E8F0] text-base text-[#2D3748] focus:border-[#FFC244] focus:outline-none font-black text-center tracking-widest">
                 <button onclick="verifyVendorOTP()" class="w-full p-3.5 rounded-2xl bg-[#05A357] hover:bg-[#048245] text-white font-extrabold text-xs transition shadow-md">
                     Verify & Access Dashboard
@@ -550,6 +557,13 @@
             }, 3500);
         }
 
+        let lastVendorOTP = '';
+        function autoFillVendorOTP() {
+            if (lastVendorOTP) {
+                document.getElementById('vendor-otp-input').value = lastVendorOTP;
+            }
+        }
+
         async function sendVendorOTP() {
             const phone = document.getElementById('vendor-phone-input').value.trim();
             if (!phone) { showToast('Please enter your phone number.', 'danger'); return; }
@@ -563,6 +577,14 @@
                 if (res.ok) {
                     playSound('beep');
                     document.getElementById('vendor-otp-status-text').textContent = data.message;
+                    if (data.otp) {
+                        lastVendorOTP = data.otp;
+                        document.getElementById('vendor-otp-input').value = data.otp;
+                        const banner = document.getElementById('vendor-otp-banner');
+                        if (banner) banner.classList.remove('hidden');
+                        const display = document.getElementById('vendor-generated-otp-display');
+                        if (display) display.textContent = data.otp;
+                    }
                     document.getElementById('vendor-auth-step-phone').classList.add('hidden');
                     document.getElementById('vendor-auth-step-otp').classList.remove('hidden');
                     showToast('Verification OTP code sent to phone.', 'success');
@@ -641,28 +663,40 @@
             return vendors.find(v => v.user_id === currentUser.id);
         }
 
+        let lastVendorQueueHash = '';
         async function syncQueue() {
             if (!currentUser) return;
+            if (document.hidden) return;
             try {
                 const qRes = await authFetch(`${API_BASE}/vendor/orders`);
                 if (qRes.ok) {
-                    const queue = await qRes.json();
-                    renderQueue(queue);
+                    const rawData = await qRes.json();
+                    const orders = Array.isArray(rawData) ? rawData : (rawData.data || []);
+                    const currentHash = JSON.stringify(orders);
+                    if (currentHash !== lastVendorQueueHash) {
+                        lastVendorQueueHash = currentHash;
+                        renderQueue(orders);
+                    }
                 }
             } catch(e) {}
         }
 
-        function renderQueue(orders) {
+        function renderQueue(ordersList) {
+            const orders = Array.isArray(ordersList) ? ordersList : (ordersList.data || []);
             const container = document.getElementById('vendor-orders-container');
             const queueCount = document.getElementById('vendor-queue-count');
             const totalSales = document.getElementById('vendor-sales-amount');
+            const completedCount = document.getElementById('vendor-completed-count');
 
             let salesSum = 0;
-            orders.forEach(o => salesSum += parseFloat(o.total_amount));
-            totalSales.textContent = `Ksh ${salesSum.toLocaleString()}`;
+            orders.forEach(o => salesSum += parseFloat(o.total_amount || 0));
+            if (totalSales) totalSales.textContent = `Ksh ${salesSum.toLocaleString()}`;
 
-            const pending = orders.filter(o => ['accepted', 'preparing', 'ready', 'runner_assigned', 'en_route'].includes(o.order_status));
-            queueCount.textContent = `${pending.length} Active`;
+            const delivered = orders.filter(o => o.order_status === 'delivered');
+            if (completedCount) completedCount.textContent = `${delivered.length} Delivered`;
+
+            const pending = orders.filter(o => ['created', 'accepted', 'preparing', 'ready', 'runner_assigned', 'enroute', 'en_route'].includes(o.order_status));
+            if (queueCount) queueCount.textContent = `${pending.length} Active`;
 
             if (pending.length === 0) {
                 container.innerHTML = `
@@ -680,7 +714,7 @@
                 card.className = 'bg-zinc-900 border border-zinc-800 p-4 rounded-2xl space-y-3 relative overflow-hidden';
                 
                 let badgeClass = '';
-                if (o.order_status === 'accepted') badgeClass = 'bg-brand-rose/20 text-brand-rose';
+                if (o.order_status === 'created' || o.order_status === 'accepted') badgeClass = 'bg-brand-rose/20 text-brand-rose';
                 else if (o.order_status === 'preparing') badgeClass = 'bg-brand-orange/20 text-brand-orange animate-pulse';
                 else badgeClass = 'bg-brand-emerald/20 text-brand-emerald';
 
@@ -688,6 +722,8 @@
                 const locText = (loc.type === 'gps' || loc.latitude)
                     ? `GPS Pin: ${loc.description || (parseFloat(loc.latitude).toFixed(4) + ', ' + parseFloat(loc.longitude).toFixed(4))}`
                     : `${loc.section || 'Seat'}, Row ${loc.row || ''}, Seat ${loc.seat || ''}`;
+
+                const itemsList = (o.items || []).map(item => `<div>• ${item.quantity}x ${item.product ? item.product.name : 'Item'}</div>`).join('');
 
                 card.innerHTML = `
                     <div class="flex justify-between items-start">
@@ -703,14 +739,14 @@
                         </div>
                     </div>
                     <div class="text-[10px] text-zinc-400 space-y-1 py-1.5 border-y border-zinc-900">
-                        ${o.items.map(item => `<div>• ${item.quantity}x ${item.product.name}</div>`).join('')}
+                        ${itemsList}
                     </div>
                     <div class="flex justify-between items-center text-[10px] text-zinc-500">
                         <span>Location: <strong class="text-white">${locText}</strong></span>
                         <span class="font-extrabold text-brand-rose">Ksh ${parseFloat(o.total_amount).toLocaleString()}</span>
                     </div>
                     <div class="pt-1">
-                        ${o.order_status === 'accepted'
+                        ${(o.order_status === 'created' || o.order_status === 'accepted')
                             ? `<button onclick="updateStatus(${o.id}, 'preparing')" class="w-full py-2 bg-brand-rose hover:opacity-90 text-white rounded-lg text-xs font-bold transition">Start Preparing</button>`
                             : o.order_status === 'preparing'
                                 ? `<button onclick="updateStatus(${o.id}, 'ready')" class="w-full py-2 bg-brand-emerald hover:bg-emerald-600 text-white rounded-lg text-xs font-bold transition">Mark Ready & Dispatch Runner</button>`

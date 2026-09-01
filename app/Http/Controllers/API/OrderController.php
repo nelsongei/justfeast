@@ -267,10 +267,10 @@ class OrderController extends Controller
         $attempt          = min(max(1, $request->integer('attempt', 1)), count($backoffSchedule));
         $nextPollInterval = $backoffSchedule[$attempt - 1];
 
-        if ($order->payment_status === 'paid') {
+        if (in_array($order->payment_status, ['paid', 'failed'], true)) {
             return response()->json([
                 'status'                     => 'success',
-                'payment_status'             => 'paid',
+                'payment_status'             => $order->payment_status,
                 'order_status'               => $order->order_status,
                 'next_poll_interval_seconds' => 0, // Terminal state reached
             ]);
@@ -288,7 +288,14 @@ class OrderController extends Controller
         $result     = $mpesaService->queryStkPushStatus($order->mpesa_checkout_request_id);
         $freshOrder = $order->fresh();
 
-        if ($result['success'] && ((string) ($result['result_code'] ?? '')) === '0' && $freshOrder->payment_status === 'pending') {
+        $resCode = (string) ($result['result_code'] ?? '');
+        $resDesc = strtolower((string) ($result['result_desc'] ?? ''));
+        $isStillProcessing = in_array($resCode, ['4999', '1037', '500.001.1001'], true) 
+            || str_contains($resDesc, 'processing') 
+            || str_contains($resDesc, 'in progress')
+            || str_contains($resDesc, 'pending');
+
+        if ($result['success'] && $resCode === '0' && $freshOrder->payment_status === 'pending') {
             $freshOrder->update([
                 'payment_status'    => 'paid',
                 'order_status'      => 'accepted',
@@ -297,7 +304,7 @@ class OrderController extends Controller
             ]);
             $freshOrder = $freshOrder->fresh();
             event(new \App\Events\PaymentStatusUpdated($freshOrder, 'paid', $freshOrder->order_status));
-        } elseif ($result['success'] && isset($result['result_code']) && (string) $result['result_code'] !== '0' && $freshOrder->payment_status === 'pending') {
+        } elseif ($result['success'] && !empty($resCode) && $resCode !== '0' && !$isStillProcessing && $freshOrder->payment_status === 'pending') {
             $freshOrder->update([
                 'payment_status' => 'failed',
             ]);

@@ -65,6 +65,8 @@ Route::middleware('auth:sanctum,web')->group(function () {
     Route::middleware('role:admin')->prefix('admin')->group(function () {
         Route::get('/stats',   [AdminController::class, 'stats']);
         Route::get('/orders',  [AdminController::class, 'orders']);
+        Route::patch('/orders/{order}/status', [AdminController::class, 'updateOrderStatus']);
+        Route::post('/orders/{order}/pay', [AdminController::class, 'triggerOrderPayment']);
         Route::get('/users',   [AdminController::class, 'users']);
         Route::post('/users',  [AdminController::class, 'createUser']);
         Route::put('/users/{user}', [AdminController::class, 'updateUser']);

@@ -138,7 +138,7 @@ class AuthController extends Controller
         $user = User::where('phone', $phone)->first();
 
         $defaultName  = $request->filled('name') ? trim($request->name) : 'Customer (' . substr($phone, -4) . ')';
-        $defaultEmail = $request->filled('email') ? trim($request->email) : 'customer_' . preg_replace('/\D/', '', $phone) . '@justfeast.co.ke';
+        $defaultEmail = $request->filled('email') ? trim($request->email) : null;
 
         if (!$user) {
             $user = User::create([

@@ -1481,6 +1481,12 @@
         const token = getToken();
         options.headers = options.headers || {};
         if (token) options.headers['Authorization'] = `Bearer ${token}`;
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+        if (csrfToken && !options.headers['X-CSRF-TOKEN']) {
+            options.headers['X-CSRF-TOKEN'] = csrfToken;
+        }
+        if (!options.headers['Accept']) options.headers['Accept'] = 'application/json';
+        if (!options.headers['X-Requested-With']) options.headers['X-Requested-With'] = 'XMLHttpRequest';
         const res = await fetch(url, options);
         if (res.status === 401) {
             currentUser = null;
@@ -1785,74 +1791,7 @@
         renderBasket();
     }
 
-    function renderBasket() {
-        // Mobile Basket Tray
-        const mobileTray = document.getElementById('phone-cart-tray');
-        const mobileContainer = document.getElementById('cart-tray-items');
 
-        // Desktop Basket Card
-        const desktopContainer = document.getElementById('desktop-cart-tray-items');
-
-        const hasItems = basket.length > 0;
-
-        // Mobile Tray visibility
-        if (!hasItems) {
-            mobileTray.classList.add('hidden');
-            mobileContainer.innerHTML = '';
-            desktopContainer.innerHTML = '<p class="text-xs text-zinc-500 text-center py-6">Your basket is empty. Add food from stalls to get started!</p>';
-            document.getElementById('cart-tray-total').textContent = 'Ksh 0.00';
-            document.getElementById('desktop-cart-tray-total').textContent = 'Ksh 0.00';
-            return;
-        }
-
-        // Show mobile tray if on mobile
-        mobileTray.classList.remove('hidden');
-
-        mobileContainer.innerHTML = '';
-        desktopContainer.innerHTML = '';
-
-        let total = 0;
-
-        basket.forEach(item => {
-            total += item.price * item.quantity;
-
-            // Create item for mobile tray
-            const mDiv = document.createElement('div');
-            mDiv.className = 'flex justify-between items-center text-xs py-2 border-b border-[#E2E8F0]';
-            mDiv.innerHTML = `
-                    <div class="flex-1">
-                        <p class="font-bold text-[#2D3748]">${item.name}</p>
-                        <p class="text-[9px] text-zinc-500">Ksh ${item.price.toLocaleString()} each</p>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <button onclick="adjustQty(${item.id}, -1)" class="w-6 h-6 rounded-full bg-[#FFC244]/15 hover:bg-[#FFC244]/30 flex items-center justify-center text-xs text-[#2D3748] font-extrabold transition">-</button>
-                        <span class="text-xs font-black text-[#2D3748]">${item.quantity}</span>
-                        <button onclick="adjustQty(${item.id}, 1)" class="w-6 h-6 rounded-full bg-[#FFC244]/15 hover:bg-[#FFC244]/30 flex items-center justify-center text-xs text-[#2D3748] font-extrabold transition">+</button>
-                    </div>
-                `;
-            mobileContainer.appendChild(mDiv);
-
-            // Create item for desktop card
-            const dDiv = document.createElement('div');
-            dDiv.className = 'flex justify-between items-center text-xs py-2 border-b border-[#E2E8F0]';
-            dDiv.innerHTML = `
-                    <div class="flex-1">
-                        <p class="font-bold text-[#2D3748]">${item.name}</p>
-                        <p class="text-[9px] text-zinc-500">Ksh ${item.price.toLocaleString()} each</p>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <button onclick="adjustQty(${item.id}, -1)" class="w-6 h-6 rounded-full bg-[#FFC244]/15 hover:bg-[#FFC244]/30 flex items-center justify-center text-xs text-[#2D3748] font-extrabold transition">-</button>
-                        <span class="text-xs font-black text-[#2D3748]">${item.quantity}</span>
-                        <button onclick="adjustQty(${item.id}, 1)" class="w-6 h-6 rounded-full bg-[#FFC244]/15 hover:bg-[#FFC244]/30 flex items-center justify-center text-[#2D3748] font-extrabold transition">+</button>
-                    </div>
-                `;
-            desktopContainer.appendChild(dDiv);
-        });
-
-        const totalText = `Ksh ${total.toLocaleString()}`;
-        document.getElementById('cart-tray-total').textContent = totalText;
-        document.getElementById('desktop-cart-tray-total').textContent = totalText;
-    }
 
     function adjustQty(id, amt) {
         const item = basket.find(i => i.id === id);
@@ -2369,10 +2308,17 @@
             return;
         }
 
-        let total = 0;
-        basket.forEach(i => total += i.price * i.quantity);
+        let subtotal = 0;
+        basket.forEach(i => subtotal += i.price * i.quantity);
 
-        document.getElementById('mpesa-amount-display').textContent = `Ksh ${total.toLocaleString()}`;
+        const uniqueVendors = new Set(basket.map(i => i.vendorId).filter(Boolean));
+        const vendorCount   = Math.max(1, uniqueVendors.size);
+        const baseFee       = typeof systemDeliveryFee !== 'undefined' ? systemDeliveryFee : 30;
+        const extraFee      = baseFee * 0.5;
+        const effectiveDeliveryFee = baseFee + (vendorCount - 1) * extraFee;
+        const grandTotal     = subtotal + effectiveDeliveryFee;
+
+        document.getElementById('mpesa-amount-display').textContent = `Ksh ${grandTotal.toLocaleString()}`;
 
         // Pre-fill user's registered phone number if present
         const phoneInput = document.getElementById('mpesa-phone-input');
@@ -2391,12 +2337,16 @@
         });
         const target = document.getElementById(`mpesa-${state}-state`);
         if (target) target.classList.remove('hidden');
+        if (state === 'input' || state === 'error') {
+            currentOrderId = null;
+        }
     }
 
     function closeMpesaOverlay() {
         document.getElementById('mpesa-payment-overlay').classList.add('hidden');
         if (paymentPollTimer) clearInterval(paymentPollTimer);
         paymentPollTimer = null;
+        currentOrderId = null;
     }
 
     async function triggerMpesaStkPush() {
@@ -2426,6 +2376,7 @@
                 const orderData = await orderRes.json();
 
                 if (!orderRes.ok) {
+                    currentOrderId = null;
                     showMpesaState('error');
                     document.getElementById('mpesa-error-msg').textContent = orderData.message || 'Failed to create order.';
                     return;
@@ -2442,6 +2393,7 @@
             const payData = await payRes.json();
 
             if (!payRes.ok || payData.status === 'error') {
+                currentOrderId = null;
                 showMpesaState('error');
                 document.getElementById('mpesa-error-msg').textContent = payData.message || 'Failed to trigger M-Pesa STK Push.';
                 return;
@@ -2456,6 +2408,7 @@
             confirmOrderFromMpesa(currentOrderId);
 
         } catch (e) {
+            currentOrderId = null;
             showMpesaState('error');
             document.getElementById('mpesa-error-msg').textContent = 'Network error during payment initiation. Please try again.';
         }
@@ -2495,12 +2448,28 @@
                 } else if (data.payment_status === 'failed') {
                     clearInterval(paymentPollTimer);
                     paymentPollTimer = null;
+                    currentOrderId = null;
                     showMpesaState('error');
-                    document.getElementById('mpesa-error-msg').textContent = 'M-Pesa payment was cancelled or failed. Please try again.';
+
+                    let errMsg = data.mpesa_result_desc || 'M-Pesa payment was cancelled or failed.';
+                    const codeStr = String(data.mpesa_result_code || '');
+
+                    if (codeStr === '17') {
+                        errMsg = 'M-Pesa Error (Code 17): The phone number entered is invalid or not an active M-Pesa registered line. Please check the phone number and try again.';
+                    } else if (codeStr === '1032') {
+                        errMsg = 'M-Pesa payment prompt was cancelled on phone.';
+                    } else if (codeStr === '1031') {
+                        errMsg = 'M-Pesa payment prompt timed out without PIN entry.';
+                    } else if (codeStr === '2001') {
+                        errMsg = 'Invalid M-Pesa PIN entered.';
+                    }
+
+                    document.getElementById('mpesa-error-msg').textContent = errMsg;
 
                 } else if (attempts >= maxAttempts) {
                     clearInterval(paymentPollTimer);
                     paymentPollTimer = null;
+                    currentOrderId = null;
                     showMpesaState('error');
                     document.getElementById('mpesa-error-msg').textContent =
                         'M-Pesa confirmation timed out. If you entered your PIN, your order will update automatically.';

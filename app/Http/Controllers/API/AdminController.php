@@ -11,6 +11,7 @@ use App\Models\Product;
 use App\Models\Delivery;
 use App\Models\User;
 use App\Models\Setting;
+use App\Services\MpesaDarajaService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -155,13 +156,73 @@ class AdminController extends Controller
         $perPage = min($request->integer('per_page', 25), 100);
 
         $orders = Order::query()
-            ->with(['vendor:id,business_name,logo_url', 'user:id,name,email,phone', 'delivery.runner:id,name'])
+            ->with(['vendor:id,business_name,logo_url', 'user:id,name,email,phone', 'delivery.runner:id,name', 'runner:id,name,phone', 'items.product'])
             ->when($request->filled('status'), fn($q) => $q->where('order_status', $request->status))
             ->when($request->filled('payment_status'), fn($q) => $q->where('payment_status', $request->payment_status))
             ->latest()
             ->cursorPaginate($perPage);
 
         return response()->json($orders);
+    }
+
+    public function updateOrderStatus(Request $request, Order $order)
+    {
+        $validated = $request->validate([
+            'order_status'   => 'nullable|string|in:created,accepted,preparing,ready,runner_assigned,enroute,delivered,cancelled',
+            'payment_status' => 'nullable|string|in:pending,paid,failed',
+        ]);
+
+        $updateData = [];
+        if (!empty($validated['order_status'])) {
+            $updateData['order_status'] = $validated['order_status'];
+        }
+        if (!empty($validated['payment_status'])) {
+            $updateData['payment_status'] = $validated['payment_status'];
+            if ($validated['payment_status'] === 'paid' && !$order->paid_at) {
+                $updateData['paid_at'] = now();
+            }
+        }
+
+        if (!empty($updateData)) {
+            $order->update($updateData);
+        }
+
+        return response()->json([
+            'status'  => 'success',
+            'message' => "Order #{$order->id} status updated successfully.",
+            'order'   => $order->fresh(['vendor', 'user', 'items.product', 'runner', 'delivery']),
+        ]);
+    }
+
+    public function triggerOrderPayment(Request $request, Order $order, MpesaDarajaService $mpesaService)
+    {
+        $user  = $order->user;
+        $phone = $request->input('phone', $user->phone ?? '');
+
+        if (empty($phone)) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Phone number is required to trigger M-Pesa STK Push.',
+            ], 422);
+        }
+
+        $formattedPhone = MpesaDarajaService::formatPhone($phone);
+        $result = $mpesaService->initiateStkPush($order, $formattedPhone);
+
+        if ($result['success'] && isset($result['checkout_request_id'])) {
+            $order->update([
+                'mpesa_checkout_request_id' => $result['checkout_request_id'],
+                'mpesa_merchant_request_id' => $result['merchant_request_id'] ?? null,
+            ]);
+        }
+
+        return response()->json([
+            'status'              => $result['success'] ? 'success' : 'error',
+            'message'             => $result['message'],
+            'checkout_request_id' => $result['checkout_request_id'] ?? null,
+            'order_id'            => $order->id,
+            'phone'               => $formattedPhone,
+        ]);
     }
 
     public function users(Request $request)

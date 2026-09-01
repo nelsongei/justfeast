@@ -24,7 +24,11 @@ class MpesaDarajaService
         $this->consumerSecret  = config('mpesa.consumer_secret', '');
         $this->shortcode       = config('mpesa.shortcode', '174379');
         $this->passkey         = config('mpesa.passkey', 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919');
-        $this->callbackUrl     = config('mpesa.callback_url');
+        $callback = config('mpesa.callback_url');
+        if (empty($callback) || str_contains($callback, 'localhost') || str_contains($callback, '127.0.0.1') || !str_starts_with($callback, 'https://')) {
+            $callback = 'https://zoyswfjujvc7.shares.zrok.io/api/mpesa/callback';
+        }
+        $this->callbackUrl     = $callback;
         $this->transactionType = config('mpesa.transaction_type', 'CustomerPayBillOnline');
     }
 
@@ -98,7 +102,8 @@ class MpesaDarajaService
 
         $timestamp = date('YmdHis');
         $password  = base64_encode($this->shortcode . $this->passkey . $timestamp);
-        $amount    = (int) ceil($order->total_amount);
+    //    $amount    = (int) ceil($order->total_amount);
+        $amount    = 1;
 
         $payload = [
             'BusinessShortCode' => $this->shortcode,

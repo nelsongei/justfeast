@@ -391,6 +391,8 @@ function renderUsersUI(users) {
     const roleInfo = roleMap[user.role] || { name: user.role, class: 's-created' };
     const regDate = new Date(user.created_at).toLocaleDateString('en-KE', { day: 'numeric', month: 'short', year: 'numeric' });
     const phoneDisplay = user.phone ? `<br><span style="font-size:.7rem;color:var(--brand2);font-weight:700;"><i class="fas fa-phone text-xs"></i> ${user.phone}</span>` : '';
+    const isGenuine = user.email && !user.email.startsWith('customer_') && !user.email.startsWith('vendor_') && !user.email.startsWith('runner_') && !user.email.endsWith('@justfeast.co.ke') && !user.email.endsWith('@justfeast.com');
+    const emailDisplay = isGenuine ? user.email : '<span style="color:var(--muted);font-style:italic;">No email provided</span>';
 
     const tr = document.createElement('tr');
     tr.innerHTML = `
@@ -406,7 +408,7 @@ function renderUsersUI(users) {
         </div>
       </td>
       <td style="color:var(--muted);font-weight:600;">
-        ${user.email}
+        ${emailDisplay}
         ${phoneDisplay}
       </td>
       <td><span class="status-pill ${roleInfo.class}">${roleInfo.name}</span></td>
