@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>justFeast — Event Seat Delivery</title>
+    <link rel="icon" type="image/png" href="{{ asset('images/logo/jm.png') }}">
+    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
+    <link rel="apple-touch-icon" href="{{ asset('images/logo/jm.png') }}">
     <link rel="manifest" href="/manifest.json">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="theme-color" content="#A31D1D">
@@ -944,21 +947,16 @@
                 <p class="text-3xl font-black text-[#A31D1D]" id="mpesa-amount-display">Ksh 0</p>
 
                 <!-- Payment Method Selector Tabs -->
-                <div class="grid grid-cols-3 gap-1.5 p-1.5 bg-slate-100 rounded-2xl border border-slate-200/80 mt-2">
-{{--                    <button type="button" id="pay-tab-mpesa" onclick="switchPaymentMethodTab('mpesa')"--}}
-{{--                            class="py-2 px-2 rounded-xl text-[11px] font-black transition-all flex items-center justify-center gap-1 bg-white text-[#0F172A] shadow-xs cursor-pointer truncate">--}}
-{{--                        <img src="{{ asset('images/logo/mpesa.png') }}" alt="M-Pesa" class="h-3.5 w-auto object-contain shrink-0">--}}
-{{--                        <span class="truncate">M-Pesa</span>--}}
-{{--                    </button>--}}
+                <div class="grid grid-cols-2 gap-1.5 p-1.5 bg-slate-100 rounded-2xl border border-slate-200/80 mt-2">
                     <button type="button" id="pay-tab-intasend" onclick="switchPaymentMethodTab('intasend')"
-                            class="py-2 px-2 rounded-xl text-[11px] font-black transition-all flex items-center justify-center gap-1 text-slate-500 hover:text-slate-800 cursor-pointer truncate">
-                        <span class="bg-[#05A357] text-white text-[8px] px-1 py-0.5 rounded font-black shrink-0">INTASEND</span>
-                        <span class="truncate">IntaSend</span>
+                            class="py-2 px-2 rounded-xl text-[11px] font-black transition-all flex items-center justify-center gap-1 bg-[#05A357] text-white shadow-xs cursor-pointer truncate">
+                        <span class="bg-white text-[#05A357] text-[8px] px-1.5 py-0.5 rounded font-black shrink-0">INTASEND</span>
+                        <span class="truncate">IntaSend (Live)</span>
                     </button>
-{{--                    <button type="button" id="pay-tab-loop" onclick="switchPaymentMethodTab('loop')"--}}
+{{--                    <button type="button" id="pay-tab-mpesa" onclick="switchPaymentMethodTab('mpesa')"--}}
 {{--                            class="py-2 px-2 rounded-xl text-[11px] font-black transition-all flex items-center justify-center gap-1 text-slate-500 hover:text-slate-800 cursor-pointer truncate">--}}
-{{--                        <span class="bg-[#5B21B6] text-white text-[8px] px-1 py-0.5 rounded font-black shrink-0">LOOP</span>--}}
-{{--                        <span class="truncate">Paybill</span>--}}
+{{--                        <img src="{{ asset('images/logo/mpesa.png') }}" alt="M-Pesa" class="h-3.5 w-auto object-contain shrink-0">--}}
+{{--                        <span class="truncate">Daraja Sandbox</span>--}}
 {{--                    </button>--}}
                 </div>
             </div>
@@ -2322,7 +2320,7 @@
             loopPhoneInput.value = currentUser.phone || '';
         }
 
-        switchPaymentMethodTab('mpesa');
+        switchPaymentMethodTab('intasend');
         showMpesaState('input');
         document.getElementById('mpesa-payment-overlay').classList.remove('hidden');
     }
