@@ -2961,7 +2961,7 @@
         if (isSearching) {
             container.innerHTML = chipsHtml;
             let totalFound = 0;
-            let productGrid = '<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 mt-4">';
+            let productGrid = '<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-3.5 sm:gap-4 mt-4">';
 
             vendors.forEach((v, vIdx) => {
                 (v.products || []).forEach((p, pIdx) => {
@@ -3071,7 +3071,7 @@
                     </div>
                 `;
 
-                let productGrid = '<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">';
+                let productGrid = '<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-3.5 sm:gap-4">';
                 products.forEach((p, pIndex) => {
                     const out = p.stock_status !== 'in_stock';
                     const safeName = String(p.name || '').replace(/'/g, "\\'");
@@ -3184,50 +3184,59 @@
                         <h3 class="text-base sm:text-lg font-black text-[#0F172A] tracking-tight flex items-center gap-2">
                             <span>🍱</span> Featured Food & Drinks from Vendors
                         </h3>
-                        <p class="text-[11px] text-slate-500 font-bold">Popular concert meals & drinks served direct to your seat</p>
+                        <p class="text-[11px] text-slate-500 font-bold">Popular concert meals & drinks served direct to your seat (Top 20)</p>
                     </div>
                     <span class="bg-[#FFF8E7] text-[#0F172A] border border-[#F7E5B2] text-[9.5px] font-black uppercase px-3 py-1 rounded-full hidden sm:inline-block">
                         ⚡ Express Seat Delivery
                     </span>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
         `;
 
         let featuredCount = 0;
-        vendors.forEach(v => {
-            (v.products || []).forEach(p => {
+        const MAX_ITEMS = 20;
+
+        for (let i = 0; i < vendors.length; i++) {
+            if (featuredCount >= MAX_ITEMS) break;
+            const v = vendors[i];
+            const prods = v.products || [];
+
+            for (let j = 0; j < prods.length; j++) {
+                if (featuredCount >= MAX_ITEMS) break;
+                const p = prods[j];
+
                 const currentCat = (typeof selectedCategory !== 'undefined') ? selectedCategory : 'all';
                 const pCat = getProductCategory(p);
-                if (currentCat !== 'all' && pCat !== currentCat) return;
+                if (currentCat !== 'all' && pCat !== currentCat) continue;
 
                 featuredCount++;
                 const out = p.stock_status !== 'in_stock';
                 const safeName = String(p.name || '').replace(/'/g, "\\'");
                 let visual = p.image_url && p.image_url.startsWith('/')
                     ? `<img src="${API_BASE.replace('/api', '') + p.image_url}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="${p.name}">`
-                    : `<div class="w-full h-full bg-gradient-to-br from-[#FFF8E7] via-white to-[#E9F7EE] flex items-center justify-center"><span class="text-5xl drop-shadow-sm">${pCat === 'drinks' ? '🥤' : pCat === 'snacks' ? '🍿' : '🍔'}</span></div>`;
+                    : `<div class="w-full h-full bg-gradient-to-br from-[#FFF8E7] via-white to-[#E9F7EE] flex items-center justify-center"><span class="text-4xl sm:text-5xl drop-shadow-sm">${pCat === 'drinks' ? '🥤' : pCat === 'snacks' ? '🍿' : '🍔'}</span></div>`;
 
                 foodItemsHtml += `
-                    <article class="group bg-white rounded-[26px] border border-slate-200 overflow-hidden shadow-xs hover:shadow-md transition duration-300 flex flex-col">
-                        <div class="relative h-40 overflow-hidden bg-slate-50">
+                    <article class="group bg-white rounded-[22px] sm:rounded-[26px] border border-slate-200 overflow-hidden shadow-xs hover:shadow-md transition duration-300 flex flex-col">
+                        <div class="relative h-32 sm:h-36 md:h-40 overflow-hidden bg-slate-50">
                             ${visual}
-                            <span class="absolute top-2.5 left-2.5 bg-white/95 backdrop-blur text-[8.5px] font-black text-[#0F172A] px-2.5 py-0.5 rounded-full uppercase tracking-wider border border-slate-200">${pCat}</span>
-                            <span class="absolute bottom-2.5 left-2.5 bg-[#05A357] text-white text-[8.5px] font-black px-2 py-0.5 rounded-full shadow-xs"><i class="fas fa-shop mr-1"></i> ${v.business_name}</span>
+                            <span class="absolute top-2 left-2 bg-white/95 backdrop-blur text-[8px] sm:text-[8.5px] font-black text-[#0F172A] px-2 py-0.5 rounded-full uppercase tracking-wider border border-slate-200">${pCat}</span>
+                            <span class="absolute bottom-2 left-2 bg-[#05A357] text-white text-[8px] sm:text-[8.5px] font-black px-2 py-0.5 rounded-full shadow-xs truncate max-w-[85%]"><i class="fas fa-shop mr-1"></i> ${v.business_name}</span>
                         </div>
-                        <div class="p-3.5 flex-1 flex flex-col justify-between gap-3">
+                        <div class="p-3 sm:p-3.5 flex-1 flex flex-col justify-between gap-2.5">
                             <div>
-                                <h4 class="text-xs font-black tracking-tight text-[#0F172A] group-hover:text-[#05A357] ${out ? 'line-through text-slate-400' : ''}">${p.name}</h4>
+                                <h4 class="text-xs font-black tracking-tight text-[#0F172A] group-hover:text-[#05A357] line-clamp-2 ${out ? 'line-through text-slate-400' : ''}">${p.name}</h4>
                             </div>
-                            <div class="flex items-center justify-between gap-2">
-                                <div><p class="text-[8.5px] uppercase tracking-wider text-slate-400 font-black">Price</p><p class="text-base font-black text-[#05A357]">Ksh ${parseFloat(p.price).toLocaleString()}</p></div>
-                                ${out ? `<span class="text-[8.5px] bg-slate-100 border border-slate-200 text-slate-400 px-2.5 py-1.5 rounded-full font-black">Out of stock</span>` : `<button onclick="addToBasket(${p.id}, '${safeName}', ${p.price}, ${v.id})" class="h-9 px-3.5 rounded-full bg-[#FFC244] hover:bg-[#05A357] text-[#0F172A] hover:text-white flex items-center justify-center font-black transition-all shadow-xs border border-[#efb52e] text-[11px] gap-1 cursor-pointer"><i class="fas fa-plus text-[9px]"></i> Add</button>`}
+                            <div class="flex items-center justify-between gap-1.5 pt-1">
+                                <div><p class="text-[8px] uppercase tracking-wider text-slate-400 font-black">Price</p><p class="text-sm sm:text-base font-black text-[#05A357]">Ksh ${parseFloat(p.price).toLocaleString()}</p></div>
+                                ${out ? `<span class="text-[8px] bg-slate-100 border border-slate-200 text-slate-400 px-2 py-1 rounded-full font-black">Out of stock</span>` : `<button onclick="addToBasket(${p.id}, '${safeName}', ${p.price}, ${v.id})" class="h-8 sm:h-9 px-3 rounded-full bg-[#FFC244] hover:bg-[#05A357] text-[#0F172A] hover:text-white flex items-center justify-center font-black transition-all shadow-xs border border-[#efb52e] text-[10px] sm:text-[11px] gap-1 cursor-pointer whitespace-nowrap"><i class="fas fa-plus text-[8px]"></i> Add</button>`}
                             </div>
                         </div>
                     </article>
                 `;
-            });
-        });
+            }
+        }
 
         foodItemsHtml += `</div></div>`;
 
