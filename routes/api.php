@@ -9,6 +9,7 @@ use App\Http\Controllers\API\AdminController;
 use App\Http\Controllers\API\MpesaCallbackController;
 use App\Http\Controllers\API\LoopPaybillController;
 use App\Http\Controllers\API\LoopPaymentWebhookController;
+use App\Http\Controllers\API\IntaSendWebhookController;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,6 +42,10 @@ Route::middleware('auth:sanctum,web')->group(function () {
     Route::get('/orders/{order}',               [OrderController::class, 'show']);
     Route::post('/orders/{order}/pay',          [OrderController::class, 'pay']);
     Route::get('/orders/{order}/payment-status',[OrderController::class, 'checkPaymentStatus']);
+
+    // ── IntaSend Payment Gateway ───────────────────────────────────────────────
+    Route::post('/orders/{order}/pay/intasend',  [OrderController::class, 'payWithIntaSend']);
+    Route::get('/orders/{order}/intasend-status',[OrderController::class, 'checkIntaSendStatus']);
 
     // ── LOOP Paybill Payment ──────────────────────────────────────────────────
     Route::post('/orders/{order}/pay/loop',          [OrderController::class, 'payWithLoop']);
@@ -99,4 +104,8 @@ Route::post('/mpesa/callback', [MpesaCallbackController::class, 'handle'])
 // ── LOOP Paybill Callback Webhook (no Sanctum — LOOP POSTs directly) ────────
 Route::post('/webhooks/loop/payments', LoopPaymentWebhookController::class)
     ->name('webhooks.loop.payments')
+    ->middleware('throttle:webhooks');
+
+// ── IntaSend Webhook (no Sanctum — IntaSend POSTs directly) ──────────────────
+Route::post('/intasend/webhook', [IntaSendWebhookController::class, 'handle'])
     ->middleware('throttle:webhooks');

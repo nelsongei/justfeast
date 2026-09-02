@@ -692,7 +692,7 @@
                             </div>
 
                             <!-- Checkout Action Button -->
-                            <button "
+                            <button onclick="checkoutOrder()"
                                     class="w-full py-4 bg-[#A31D1D] hover:bg-[#841313] text-white rounded-full text-xs font-black shadow-xl shadow-[#A31D1D]/25 hover:shadow-2xl transition-all flex items-center justify-center gap-2.5 cursor-pointer hover:scale-[1.02] active:scale-[0.98]">
                                 <span class="inline-flex items-center justify-center bg-white px-2.5 py-0.5 rounded-full h-7 overflow-hidden shadow-xs">
                                     <img src="{{ asset('images/logo/mpesa.png') }}" alt="M-Pesa" class="h-5 w-auto object-contain scale-110">
@@ -819,7 +819,7 @@
                 <span class="text-xs text-slate-500 font-black">Total Amount:</span>
                 <span class="text-xl font-black text-[#A31D1D]" id="cart-tray-total">Ksh 0</span>
             </div>
-            <button onclick=""
+            <button onclick="checkoutOrder()"
                     class="w-full py-4 bg-[#0F172A] hover:bg-[#A31D1D] text-white rounded-full text-xs font-black flex items-center justify-center gap-2 shadow-xl">
                 <span class="inline-flex items-center justify-center bg-white px-2 rounded-full h-8 overflow-hidden">
                     <img src="{{ asset('images/logo/mpesa.png') }}" alt="M-Pesa" class="h-6 w-auto object-contain scale-110">
@@ -944,17 +944,22 @@
                 <p class="text-3xl font-black text-[#A31D1D]" id="mpesa-amount-display">Ksh 0</p>
 
                 <!-- Payment Method Selector Tabs -->
-                <div class="grid grid-cols-2 gap-1.5 p-1.5 bg-slate-100 rounded-2xl border border-slate-200/80 mt-2">
-                    <button type="button" id="pay-tab-mpesa" onclick="switchPaymentMethodTab('mpesa')"
-                            class="py-2 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 bg-white text-[#0F172A] shadow-xs cursor-pointer">
-                        <img src="{{ asset('images/logo/mpesa.png') }}" alt="M-Pesa" class="h-3.5 w-auto object-contain">
-                        <span>M-Pesa Express</span>
+                <div class="grid grid-cols-3 gap-1.5 p-1.5 bg-slate-100 rounded-2xl border border-slate-200/80 mt-2">
+{{--                    <button type="button" id="pay-tab-mpesa" onclick="switchPaymentMethodTab('mpesa')"--}}
+{{--                            class="py-2 px-2 rounded-xl text-[11px] font-black transition-all flex items-center justify-center gap-1 bg-white text-[#0F172A] shadow-xs cursor-pointer truncate">--}}
+{{--                        <img src="{{ asset('images/logo/mpesa.png') }}" alt="M-Pesa" class="h-3.5 w-auto object-contain shrink-0">--}}
+{{--                        <span class="truncate">M-Pesa</span>--}}
+{{--                    </button>--}}
+                    <button type="button" id="pay-tab-intasend" onclick="switchPaymentMethodTab('intasend')"
+                            class="py-2 px-2 rounded-xl text-[11px] font-black transition-all flex items-center justify-center gap-1 text-slate-500 hover:text-slate-800 cursor-pointer truncate">
+                        <span class="bg-[#05A357] text-white text-[8px] px-1 py-0.5 rounded font-black shrink-0">INTASEND</span>
+                        <span class="truncate">IntaSend</span>
                     </button>
-                    <button type="button" id="pay-tab-loop" onclick="switchPaymentMethodTab('loop')"
-                            class="py-2 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 cursor-pointer">
-                        <span class="bg-[#5B21B6] text-white text-[9px] px-1.5 py-0.5 rounded font-black">LOOP</span>
-                        <span>LOOP Paybill</span>
-                    </button>
+{{--                    <button type="button" id="pay-tab-loop" onclick="switchPaymentMethodTab('loop')"--}}
+{{--                            class="py-2 px-2 rounded-xl text-[11px] font-black transition-all flex items-center justify-center gap-1 text-slate-500 hover:text-slate-800 cursor-pointer truncate">--}}
+{{--                        <span class="bg-[#5B21B6] text-white text-[8px] px-1 py-0.5 rounded font-black shrink-0">LOOP</span>--}}
+{{--                        <span class="truncate">Paybill</span>--}}
+{{--                    </button>--}}
                 </div>
             </div>
 
@@ -977,6 +982,28 @@
                              onerror="this.outerHTML='<span class=\'text-[#05A357] font-black text-[9px]\'>M-PESA</span>'">
                     </span>
                     <span class="font-black text-white tracking-tight">Pay with M-Pesa Express</span>
+                    <i class="fas fa-arrow-right text-xs text-[#FFC244]"></i>
+                </button>
+            </div>
+
+            <!-- Option 2: IntaSend STK Push State -->
+            <div id="intasend-input-state" class="hidden space-y-4 pt-1">
+                <div>
+                    <label class="block text-xs font-black text-slate-700 mb-1.5">IntaSend M-Pesa Phone Number</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-[#05A357] text-sm"><i class="fas fa-phone"></i></span>
+                        <input type="tel" id="intasend-phone-input" placeholder="e.g. 0712345678"
+                               class="w-full pl-10 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-800 focus:outline-none focus:border-[#05A357] focus:bg-white transition shadow-inner">
+                    </div>
+                    <p class="text-[10px] text-slate-400 mt-1.5 font-medium">STK Push prompt will be sent via IntaSend Payment Gateway.</p>
+                </div>
+
+                <button onclick="triggerIntaSendPayment()"
+                        class="w-full py-3.5 px-4 bg-[#05A357] hover:bg-[#047A43] active:scale-[0.98] text-white rounded-2xl text-sm font-black shadow-lg shadow-[#05A357]/25 hover:shadow-xl transition-all flex items-center justify-center gap-3 cursor-pointer">
+                    <span class="bg-white px-2 py-0.5 rounded-full inline-flex items-center justify-center shadow-xs shrink-0">
+                        <span class="text-[#05A357] font-black text-[9px]">INTASEND</span>
+                    </span>
+                    <span class="font-black text-white tracking-tight">Pay via IntaSend STK</span>
                     <i class="fas fa-arrow-right text-xs text-[#FFC244]"></i>
                 </button>
             </div>
@@ -2205,34 +2232,36 @@
     // ─── Payment Integration Flow (M-Pesa STK Push & LOOP Paybill) ────────────
     let currentOrderId = null;       // order ID pending payment
     let paymentPollTimer = null;     // polling interval for payment confirmation
-    let activePaymentMethod = 'mpesa'; // 'mpesa' or 'loop'
+    let activePaymentMethod = 'intasend'; // 'mpesa', 'intasend', or 'loop'
 
     function switchPaymentMethodTab(method) {
         activePaymentMethod = method;
-        const mpesaTab = document.getElementById('pay-tab-mpesa');
-        const loopTab  = document.getElementById('pay-tab-loop');
-        const mpesaState = document.getElementById('mpesa-input-state');
-        const loopState  = document.getElementById('loop-input-state');
+        const mpesaTab    = document.getElementById('pay-tab-mpesa');
+        const intasendTab = document.getElementById('pay-tab-intasend');
+        const loopTab     = document.getElementById('pay-tab-loop');
+        const mpesaState    = document.getElementById('mpesa-input-state');
+        const intasendState = document.getElementById('intasend-input-state');
+        const loopState     = document.getElementById('loop-input-state');
+
+        // Reset all tab styling
+        if (mpesaTab)    mpesaTab.className    = 'py-2 px-2 rounded-xl text-[11px] font-black transition-all flex items-center justify-center gap-1 text-slate-500 hover:text-slate-800 cursor-pointer truncate';
+        if (intasendTab) intasendTab.className = 'py-2 px-2 rounded-xl text-[11px] font-black transition-all flex items-center justify-center gap-1 text-slate-500 hover:text-slate-800 cursor-pointer truncate';
+        if (loopTab)     loopTab.className     = 'py-2 px-2 rounded-xl text-[11px] font-black transition-all flex items-center justify-center gap-1 text-slate-500 hover:text-slate-800 cursor-pointer truncate';
+
+        // Reset state visibility
+        if (mpesaState)    mpesaState.classList.add('hidden');
+        if (intasendState) intasendState.classList.add('hidden');
+        if (loopState)     loopState.classList.add('hidden');
 
         if (method === 'loop') {
-            if (mpesaTab) {
-                mpesaTab.className = 'py-2 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 cursor-pointer';
-            }
-            if (loopTab) {
-                loopTab.className = 'py-2 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 bg-[#5B21B6] text-white shadow-xs cursor-pointer';
-            }
-            if (mpesaState) mpesaState.classList.add('hidden');
-            if (loopState)  loopState.classList.remove('hidden');
-
+            if (loopTab)   loopTab.className = 'py-2 px-2 rounded-xl text-[11px] font-black transition-all flex items-center justify-center gap-1 bg-[#5B21B6] text-white shadow-xs cursor-pointer truncate';
+            if (loopState) loopState.classList.remove('hidden');
             fetchLoopPaybillInstructions();
+        } else if (method === 'intasend') {
+            if (intasendTab)   intasendTab.className = 'py-2 px-2 rounded-xl text-[11px] font-black transition-all flex items-center justify-center gap-1 bg-[#05A357] text-white shadow-xs cursor-pointer truncate';
+            if (intasendState) intasendState.classList.remove('hidden');
         } else {
-            if (loopTab) {
-                loopTab.className = 'py-2 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 cursor-pointer';
-            }
-            if (mpesaTab) {
-                mpesaTab.className = 'py-2 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 bg-white text-[#0F172A] shadow-xs cursor-pointer';
-            }
-            if (loopState)  loopState.classList.add('hidden');
+            if (mpesaTab)   mpesaTab.className = 'py-2 px-2 rounded-xl text-[11px] font-black transition-all flex items-center justify-center gap-1 bg-white text-[#0F172A] shadow-xs cursor-pointer truncate';
             if (mpesaState) mpesaState.classList.remove('hidden');
         }
     }
@@ -2284,6 +2313,10 @@
         if (phoneInput) {
             phoneInput.value = currentUser.phone || '';
         }
+        const intasendPhoneInput = document.getElementById('intasend-phone-input');
+        if (intasendPhoneInput) {
+            intasendPhoneInput.value = currentUser.phone || '';
+        }
         const loopPhoneInput = document.getElementById('loop-phone-input');
         if (loopPhoneInput) {
             loopPhoneInput.value = currentUser.phone || '';
@@ -2301,6 +2334,8 @@
         });
         const loopInput = document.getElementById('loop-input-state');
         if (loopInput) loopInput.classList.add('hidden');
+        const intasendInput = document.getElementById('intasend-input-state');
+        if (intasendInput) intasendInput.classList.add('hidden');
 
         const target = document.getElementById(`mpesa-${state}-state`);
         if (target && state !== 'input') {
@@ -2448,6 +2483,123 @@
                 }
             } catch (e) {
                 // Ignore transient network hiccups while polling
+            }
+        }, 3000);
+    }
+
+    async function triggerIntaSendPayment() {
+        const phone = document.getElementById('intasend-phone-input').value.trim();
+        if (!phone) {
+            showToast("Please enter a valid M-Pesa phone number for IntaSend!", "warning");
+            return;
+        }
+
+        showMpesaState('loading');
+        document.getElementById('mpesa-loading-msg').textContent = "Initiating IntaSend STK Push prompt...";
+
+        try {
+            // Step 1: Create Order if not already created
+            if (!currentOrderId) {
+                const payload = {
+                    vendor_id:      basket[0].vendorId,
+                    seat_location:  selectedSeat,
+                    payment_method: 'intasend',
+                    items:          basket.map(i => ({product_id: i.id, quantity: i.quantity}))
+                };
+
+                const orderRes = await authFetch(`${API_BASE}/orders`, {
+                    method:  'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body:    JSON.stringify(payload)
+                });
+                const orderData = await orderRes.json();
+
+                if (!orderRes.ok) {
+                    currentOrderId = null;
+                    showMpesaState('error');
+                    document.getElementById('mpesa-error-msg').textContent = orderData.message || 'Failed to create order.';
+                    return;
+                }
+                currentOrderId = orderData.order.id;
+            }
+
+            // Step 2: Trigger IntaSend STK Push API call
+            const payRes = await authFetch(`${API_BASE}/orders/${currentOrderId}/pay/intasend`, {
+                method:  'POST',
+                headers: {'Content-Type': 'application/json'},
+                body:    JSON.stringify({ phone, payment_method: 'intasend' })
+            });
+            const payData = await payRes.json();
+
+            if (!payRes.ok || payData.status === 'error') {
+                currentOrderId = null;
+                showMpesaState('error');
+                document.getElementById('mpesa-error-msg').textContent = payData.message || 'Failed to trigger IntaSend payment.';
+                return;
+            }
+
+            // Step 3: IntaSend STK Push initiated successfully -> Transition to pending prompt state
+            playSound('beep');
+            showMpesaState('pending');
+            document.getElementById('mpesa-prompt-phone-label').textContent = `IntaSend STK prompt sent to ${phone}. Enter PIN to confirm.`;
+
+            // Step 4: Poll IntaSend payment status until confirmed
+            confirmOrderFromIntaSend(currentOrderId);
+
+        } catch (e) {
+            currentOrderId = null;
+            showMpesaState('error');
+            document.getElementById('mpesa-error-msg').textContent = 'Network error during IntaSend payment initiation. Please try again.';
+        }
+    }
+
+    async function confirmOrderFromIntaSend(orderId) {
+        if (paymentPollTimer) clearInterval(paymentPollTimer);
+
+        let attempts = 0;
+        const maxAttempts = 25; // 25 × 3s = 75s max poll duration
+
+        paymentPollTimer = setInterval(async () => {
+            attempts++;
+            try {
+                const res = await authFetch(`${API_BASE}/orders/${orderId}/intasend-status?attempt=${attempts}`);
+                const data = await res.json();
+
+                if (data.payment_status === 'paid') {
+                    clearInterval(paymentPollTimer);
+                    paymentPollTimer = null;
+                    playSound('success');
+
+                    const orderRes = await authFetch(`${API_BASE}/orders/${orderId}`);
+                    const orderData = await orderRes.json();
+                    activeOrder = { order: orderData };
+                    basket = [];
+                    renderBasket();
+
+                    closeMpesaOverlay();
+                    currentOrderId = null;
+                    document.getElementById('cust-main').classList.add('hidden');
+                    document.getElementById('cust-tracker').classList.remove('hidden');
+                    updateRadarUI(orderData);
+                    syncActiveOrder();
+
+                } else if (data.payment_status === 'failed') {
+                    clearInterval(paymentPollTimer);
+                    paymentPollTimer = null;
+                    currentOrderId = null;
+                    showMpesaState('error');
+                    document.getElementById('mpesa-error-msg').textContent = 'IntaSend payment was cancelled or failed.';
+
+                } else if (attempts >= maxAttempts) {
+                    clearInterval(paymentPollTimer);
+                    paymentPollTimer = null;
+                    currentOrderId = null;
+                    showMpesaState('error');
+                    document.getElementById('mpesa-error-msg').textContent =
+                        'IntaSend confirmation timed out. If you completed payment, your order will update automatically.';
+                }
+            } catch (e) {
+                // Ignore transient network errors during polling
             }
         }, 3000);
     }

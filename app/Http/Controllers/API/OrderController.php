@@ -13,6 +13,7 @@ use App\Models\Setting;
 use App\Models\LoopPayment;
 use App\Services\Loop\InitiateLoopPaybillPayment;
 use App\Services\MpesaDarajaService;
+use App\Services\IntaSendService;
 use App\Services\RunnerAllocationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -144,6 +145,7 @@ class OrderController extends Controller
                     'longitude'       => isset($loc['longitude']) ? floatval($loc['longitude']) : null,
                     'total_amount'    => $vTotal,
                     'payment_status'  => 'pending',
+                    'payment_method'  => $request->input('payment_method', 'mpesa'),
                     'order_status'    => 'created',
                     'idempotency_key' => $vendorIdempotencyKey,
                 ]);
@@ -232,11 +234,17 @@ class OrderController extends Controller
 
     /**
      * POST /api/orders/{order}/pay
-     * Triggers an M-Pesa STK Push prompt to the customer's phone number.
+     * Triggers payment STK Push (IntaSend or Safaricom M-Pesa Daraja based on payment_method request/order attribute).
      */
-    public function pay(Request $request, Order $order, MpesaDarajaService $mpesaService)
+    public function pay(Request $request, Order $order, MpesaDarajaService $mpesaService, IntaSendService $intasendService)
     {
         $this->authorize('pay', $order);
+
+        $method = strtolower((string) ($request->input('payment_method') ?: ($request->input('method') ?: ($request->input('provider') ?: ($order->payment_method ?: '')))));
+
+        if ($method === 'intasend' || !empty($order->intasend_invoice_id)) {
+            return $this->payWithIntaSend($request, $order, $intasendService);
+        }
 
         $user   = $request->user();
         $phone  = MpesaDarajaService::formatPhone($request->input('phone', $user->phone ?? '0700000000'));
@@ -244,6 +252,7 @@ class OrderController extends Controller
 
         if ($result['success'] && isset($result['checkout_request_id'])) {
             $order->update([
+                'payment_method'            => 'mpesa',
                 'mpesa_checkout_request_id' => $result['checkout_request_id'],
                 'mpesa_merchant_request_id' => $result['merchant_request_id'] ?? null,
             ]);
@@ -254,6 +263,100 @@ class OrderController extends Controller
             'message'             => $result['message'],
             'checkout_request_id' => $result['checkout_request_id'] ?? null,
             'order_id'            => $order->id,
+        ]);
+    }
+
+    /**
+     * POST /api/orders/{order}/pay/intasend
+     * Triggers an M-Pesa STK Push prompt via IntaSend payment gateway.
+     */
+    public function payWithIntaSend(Request $request, Order $order, IntaSendService $intasendService)
+    {
+        $this->authorize('pay', $order);
+
+        $user      = $request->user();
+        $phone     = IntaSendService::formatPhone($request->input('phone', $user->phone ?? '0700000000'));
+        $email     = $user->email ?? 'customer@glovopro.com';
+        $firstName = explode(' ', trim($user->name ?? 'Customer'))[0] ?? 'Customer';
+        $lastName  = explode(' ', trim($user->name ?? 'User'))[1] ?? 'Order';
+
+        $result = $intasendService->initiateSTKPush($order, $phone, $email, $firstName, $lastName);
+
+        if ($result['success'] && !empty($result['invoice_id'])) {
+            $order->update([
+                'payment_method'      => 'intasend',
+                'intasend_invoice_id' => $result['invoice_id'],
+                'intasend_ref'        => $result['api_ref'] ?? ('order-' . $order->id),
+            ]);
+        }
+
+        return response()->json([
+            'status'     => $result['success'] ? 'success' : 'error',
+            'message'    => $result['message'],
+            'invoice_id' => $result['invoice_id'] ?? null,
+            'order_id'   => $order->id,
+        ]);
+    }
+
+    /**
+     * GET /api/orders/{order}/intasend-status
+     * Returns IntaSend payment status for order with backoff interval.
+     */
+    public function checkIntaSendStatus(Request $request, Order $order, IntaSendService $intasendService)
+    {
+        $this->authorize('view', $order);
+
+        $backoffSchedule  = [2, 3, 5, 8, 15, 30];
+        $attempt          = min(max(1, $request->integer('attempt', 1)), count($backoffSchedule));
+        $nextPollInterval = $backoffSchedule[$attempt - 1];
+
+        $freshOrder = $order->fresh();
+        if (in_array($freshOrder->payment_status, ['paid', 'failed'], true)) {
+            return response()->json([
+                'status'                     => 'success',
+                'payment_status'             => $freshOrder->payment_status,
+                'order_status'               => $freshOrder->order_status,
+                'next_poll_interval_seconds' => 0,
+            ]);
+        }
+
+        if (!$freshOrder->intasend_invoice_id) {
+            return response()->json([
+                'status'                     => 'pending',
+                'payment_status'             => $freshOrder->payment_status,
+                'order_status'               => $freshOrder->order_status,
+                'next_poll_interval_seconds' => $nextPollInterval,
+            ]);
+        }
+
+        $result = $intasendService->checkPaymentStatus($freshOrder->intasend_invoice_id);
+        $state  = strtoupper((string) ($result['state'] ?? ''));
+
+        if ($result['success'] && $state === 'COMPLETE' && $freshOrder->payment_status === 'pending') {
+            $freshOrder->update([
+                'payment_status'    => 'paid',
+                'order_status'      => 'accepted',
+                'paid_at'           => now(),
+                'payment_method'    => 'intasend',
+                'payment_reference' => $freshOrder->intasend_invoice_id,
+            ]);
+            $freshOrder = $freshOrder->fresh();
+            event(new \App\Events\PaymentStatusUpdated($freshOrder, 'paid', $freshOrder->order_status));
+        } elseif ($result['success'] && $state === 'FAILED' && $freshOrder->payment_status === 'pending') {
+            $freshOrder->update([
+                'payment_status' => 'failed',
+            ]);
+            $freshOrder = $freshOrder->fresh();
+        }
+
+        $isTerminal = in_array($freshOrder->payment_status, ['paid', 'failed'], true);
+
+        return response()->json([
+            'status'                     => $result['success'] ? 'success' : 'error',
+            'payment_status'             => $freshOrder->payment_status,
+            'intasend_state'             => $state,
+            'order_status'               => $freshOrder->order_status,
+            'next_poll_interval_seconds' => $isTerminal ? 0 : $nextPollInterval,
         ]);
     }
 
@@ -359,11 +462,15 @@ class OrderController extends Controller
 
     /**
      * GET /api/orders/{order}/payment-status
-     * Returns payment status and calculates exponential backoff polling interval: 2s -> 3s -> 5s -> 8s -> 15s -> 30s
+     * Returns payment status (IntaSend or Safaricom M-Pesa Daraja) with exponential backoff polling interval.
      */
-    public function checkPaymentStatus(Request $request, Order $order, MpesaDarajaService $mpesaService)
+    public function checkPaymentStatus(Request $request, Order $order, MpesaDarajaService $mpesaService, IntaSendService $intasendService)
     {
         $this->authorize('view', $order);
+
+        if (!empty($order->intasend_invoice_id) || strtolower((string) $order->payment_method) === 'intasend') {
+            return $this->checkIntaSendStatus($request, $order, $intasendService);
+        }
 
         $backoffSchedule  = [2, 3, 5, 8, 15, 30];
         $attempt          = min(max(1, $request->integer('attempt', 1)), count($backoffSchedule));

@@ -33,6 +33,8 @@ class Order extends Model
         'mpesa_checkout_request_id',
         'mpesa_merchant_request_id',
         'mpesa_receipt_number',
+        'intasend_invoice_id',
+        'intasend_ref',
         'idempotency_key',
     ];
 
