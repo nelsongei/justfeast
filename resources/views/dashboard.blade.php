@@ -381,6 +381,10 @@
                                 <span class="text-zinc-400">Delivery location:</span>
                                 <span class="font-bold text-white" id="cart-location-text">Not configured!</span>
                             </div>
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-zinc-400">Seat Delivery Fee:</span>
+                                <span class="font-bold text-brand-rose" id="cart-delivery-fee">Ksh 30</span>
+                            </div>
                             <div class="flex justify-between items-center">
                                 <span class="text-xs text-zinc-400">Total:</span>
                                 <span class="text-sm font-extrabold text-brand-rose" id="cart-tray-total">Ksh 0.00</span>
@@ -1013,7 +1017,18 @@
             vendors.forEach(vendor => {
                 // Filter products by search and category
                 const matchingProducts = vendor.products.filter(p => {
-                    const matchesSearch = p.name.toLowerCase().includes(searchVal) || p.description.toLowerCase().includes(searchVal);
+                    const pCat = getProductCategory(p).toLowerCase();
+                    const vName = (vendor.business_name || '').toLowerCase();
+                    const matchesSearch = p.name.toLowerCase().includes(searchVal) ||
+                                          p.description.toLowerCase().includes(searchVal) ||
+                                          pCat.includes(searchVal) ||
+                                          vName.includes(searchVal) ||
+                                          (searchVal === 'meals' && pCat === 'food') ||
+                                          (searchVal === 'meal' && pCat === 'food') ||
+                                          (searchVal === 'drinks' && pCat === 'drinks') ||
+                                          (searchVal === 'drink' && pCat === 'drinks') ||
+                                          (searchVal === 'snacks' && pCat === 'snacks') ||
+                                          (searchVal === 'snack' && pCat === 'snacks');
                     const matchesCategory = selectedCustomerCategory === 'all' || getProductCategory(p) === selectedCustomerCategory;
                     return matchesSearch && matchesCategory;
                 });
@@ -1230,7 +1245,11 @@
                 itemsContainer.appendChild(itemDiv);
             });
 
-            document.getElementById('cart-tray-total').textContent = `Ksh ${total.toLocaleString()}`;
+            const deliveryFee = 30;
+            const grandTotal = total > 0 ? total + deliveryFee : 0;
+            const feeEl = document.getElementById('cart-delivery-fee');
+            if (feeEl) feeEl.textContent = `Ksh ${deliveryFee.toLocaleString()}`;
+            document.getElementById('cart-tray-total').textContent = `Ksh ${grandTotal.toLocaleString()}`;
         }
 
         function adjustQty(id, amount) {

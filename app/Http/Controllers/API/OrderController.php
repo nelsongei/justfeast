@@ -10,6 +10,8 @@ use App\Models\Vendor;
 use App\Models\User;
 use App\Models\Delivery;
 use App\Models\Setting;
+use App\Models\LoopPayment;
+use App\Services\Loop\InitiateLoopPaybillPayment;
 use App\Services\MpesaDarajaService;
 use App\Services\RunnerAllocationService;
 use Illuminate\Http\Request;
@@ -252,6 +254,106 @@ class OrderController extends Controller
             'message'             => $result['message'],
             'checkout_request_id' => $result['checkout_request_id'] ?? null,
             'order_id'            => $order->id,
+        ]);
+    }
+
+    /**
+     * POST /api/orders/{order}/pay/loop
+     * Generates LOOP Paybill customer payment intent with instructions and unique account reference.
+     */
+    public function payWithLoop(Request $request, Order $order, InitiateLoopPaybillPayment $initiator)
+    {
+        $this->authorize('pay', $order);
+
+        $payment = $initiator->handle($order, $request->all(), $request->user());
+
+        return response()->json([
+            'status'             => 'success',
+            'message'            => 'LOOP Paybill payment instructions generated.',
+            'public_id'          => $payment->public_id,
+            'merchant_reference' => $payment->merchant_reference,
+            'paybill_number'     => $payment->paybill_number,
+            'account_reference'  => $payment->account_reference,
+            'amount'             => number_format((float) $payment->amount, 2, '.', ''),
+            'currency'           => $payment->currency,
+            'payment_status'     => $payment->status,
+            'expires_at'         => $payment->expires_at?->toIso8601String(),
+            'instructions'       => [
+                'Open M-Pesa on your phone',
+                'Select Lipa na M-Pesa -> Pay Bill',
+                'Enter Business Number: ' . $payment->paybill_number,
+                'Enter Account Number: ' . $payment->account_reference,
+                'Enter Exact Amount: KES ' . number_format((float) $payment->amount, 2),
+                'Enter your M-Pesa PIN and complete payment',
+                'Return here and tap "I Have Paid"',
+            ],
+            'order_id'           => $order->id,
+        ]);
+    }
+
+    /**
+     * POST /api/orders/{order}/pay/loop/claim
+     * Customer claims they have completed the M-Pesa Paybill payment.
+     */
+    public function claimLoopPaybill(Request $request, Order $order)
+    {
+        $this->authorize('pay', $order);
+
+        $request->validate([
+            'mpesa_receipt' => ['required', 'string', 'regex:/^[A-Za-z0-9]{6,25}$/'],
+        ]);
+
+        $payment = $order->loopPayment;
+
+        if (!$payment) {
+            return response()->json(['status' => 'error', 'message' => 'No active LOOP payment intent found for this order.'], 404);
+        }
+
+        if ($payment->status === LoopPayment::STATUS_SUCCESSFUL || $order->payment_status === 'paid') {
+            return response()->json(['status' => 'success', 'message' => 'Payment already confirmed!']);
+        }
+
+        $payment->update([
+            'submitted_receipt'   => strtoupper($request->input('mpesa_receipt')),
+            'status'              => LoopPayment::STATUS_CLAIMED,
+            'customer_claimed_at' => now(),
+        ]);
+
+        return response()->json([
+            'status'         => 'success',
+            'message'        => 'Payment claim received. Verification in progress...',
+            'payment_status' => 'verifying',
+            'receipt'        => $payment->submitted_receipt,
+            'order_id'       => $order->id,
+        ]);
+    }
+
+    /**
+     * GET /api/orders/{order}/loop-status
+     * Returns LOOP payment status for order with backoff interval.
+     */
+    public function checkLoopStatus(Request $request, Order $order)
+    {
+        $this->authorize('view', $order);
+
+        $backoffSchedule  = [2, 3, 5, 8, 15, 30];
+        $attempt          = min(max(1, $request->integer('attempt', 1)), count($backoffSchedule));
+        $nextPollInterval = $backoffSchedule[$attempt - 1];
+
+        $payment    = $order->loopPayment;
+        $freshOrder = $order->fresh();
+        $isTerminal = in_array($freshOrder->payment_status, ['paid', 'failed'], true);
+
+        return response()->json([
+            'status'                     => 'success',
+            'payment_status'             => $freshOrder->payment_status,
+            'order_status'               => $freshOrder->order_status,
+            'loop_status'                => $payment?->status,
+            'account_reference'          => $payment?->account_reference,
+            'submitted_receipt'          => $payment?->submitted_receipt,
+            'provider_receipt'           => $payment?->provider_receipt,
+            'provider_message'           => $payment?->provider_message,
+            'next_poll_interval_seconds' => $isTerminal ? 0 : $nextPollInterval,
         ]);
     }
 

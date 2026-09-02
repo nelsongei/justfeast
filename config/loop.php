@@ -1,0 +1,27 @@
+<?php
+
+return [
+    'environment'      => env('LOOP_ENV', 'sandbox'),
+    'mpesa_prompt_url' => env('LOOP_MPESA_PROMPT_URL', 'https://sandbox.loop.co.ke/gateway/mpesa-prompt/2.0/services/process-request'),
+    'base_url'         => rtrim((string) env('LOOP_BASE_URL', 'https://sandbox.loop.co.ke/gateway/mpesa-prompt/2.0'), '/'),
+    'prompt_path'      => env('LOOP_PROMPT_PATH', '/services/process-request'),
+    'token_url'        => env('LOOP_TOKEN_URL', 'https://sandbox.loop.co.ke/oauth/v2/token'),
+    'paybill_url'      => env('LOOP_PAYBILL_URL', 'https://sandbox.loop.co.ke/gateway/pay-to-paybill/1.0/services/process-request'),
+    'paybill_path'     => env('LOOP_PAYBILL_PATH', '/pay-to-paybill'),
+    'inquiry_path'     => env('LOOP_INQUIRY_PATH', '/merchant-transaction-inquiry'),
+    'client_id'        => env('LOOP_CLIENT_ID', env('LOOP_CONSUMER_KEY', '')),
+    'client_secret'    => env('LOOP_CLIENT_SECRET', env('LOOP_CONSUMER_SECRET', '')),
+    'api_key'          => env('LOOP_API_KEY', ''),
+    'subscription_key' => env('LOOP_SUBSCRIPTION_KEY', ''),
+    'source_account'   => env('LOOP_SOURCE_ACCOUNT', ''),
+    'paybill_number'   => env('LOOP_PAYBILL_NUMBER', '600100'),
+    'till_number'      => env('LOOP_TILL_NUMBER', env('LOOP_TILL_NO', '133238')),
+    'signing_secret'   => env('LOOP_SIGNING_SECRET', 'hyqd7bwMr9Kv-C5PW4n7uF4TiMnMp_hyvyhYYkYlcU8'),
+    'service_code'     => 'NEO_MRCHNT_STK',
+    'currency'         => env('LOOP_CURRENCY', 'KES'),
+    'callback_url'     => env('LOOP_CALLBACK_URL', 'https://zoyswfjujvc7.shares.zrok.io/api/webhooks/loop/payments'),
+    'webhook_secret'   => env('LOOP_WEBHOOK_SECRET', ''),
+    'connect_timeout'  => (int) env('LOOP_CONNECT_TIMEOUT', 10),
+    'request_timeout'  => (int) env('LOOP_REQUEST_TIMEOUT', 30),
+    'max_retries'      => (int) env('LOOP_MAX_RETRIES', 2),
+];

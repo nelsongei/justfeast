@@ -25,6 +25,8 @@ class Order extends Model
         'longitude',
         'total_amount',
         'payment_status',
+        'payment_method',
+        'loop_payment_id',
         'paid_at',
         'payment_reference',
         'order_status',
@@ -62,5 +64,10 @@ class Order extends Model
     public function delivery(): HasOne
     {
         return $this->hasOne(Delivery::class);
+    }
+
+    public function loopPayment(): BelongsTo
+    {
+        return $this->belongsTo(LoopPayment::class, 'loop_payment_id');
     }
 }

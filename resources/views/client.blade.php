@@ -21,6 +21,16 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
             integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-9250RBEY90"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-9250RBEY90');
+    </script>
+
     <script>
         tailwind.config = {
             theme: {
@@ -682,7 +692,7 @@
                             </div>
 
                             <!-- Checkout Action Button -->
-                            <button onclick="checkoutOrder()"
+                            <button "
                                     class="w-full py-4 bg-[#A31D1D] hover:bg-[#841313] text-white rounded-full text-xs font-black shadow-xl shadow-[#A31D1D]/25 hover:shadow-2xl transition-all flex items-center justify-center gap-2.5 cursor-pointer hover:scale-[1.02] active:scale-[0.98]">
                                 <span class="inline-flex items-center justify-center bg-white px-2.5 py-0.5 rounded-full h-7 overflow-hidden shadow-xs">
                                     <img src="{{ asset('images/logo/mpesa.png') }}" alt="M-Pesa" class="h-5 w-auto object-contain scale-110">
@@ -797,11 +807,19 @@
                 <span class="text-slate-500 font-black">Location:</span>
                 <span class="font-black text-[#0F172A]" id="cart-location-text">Not configured</span>
             </div>
-            <div class="flex justify-between items-center">
+            <div class="flex justify-between items-center text-xs">
+                <span class="text-slate-500 font-medium">Subtotal:</span>
+                <span class="font-bold text-slate-700" id="cart-subtotal">Ksh 0</span>
+            </div>
+            <div class="flex justify-between items-center text-xs">
+                <span class="text-slate-500 font-medium">Seat Delivery Fee:</span>
+                <span class="font-black text-[#A31D1D]" id="cart-delivery-fee">Ksh 30</span>
+            </div>
+            <div class="flex justify-between items-center pt-1 border-t border-slate-100">
                 <span class="text-xs text-slate-500 font-black">Total Amount:</span>
                 <span class="text-xl font-black text-[#A31D1D]" id="cart-tray-total">Ksh 0</span>
             </div>
-            <button onclick="checkoutOrder()"
+            <button onclick=""
                     class="w-full py-4 bg-[#0F172A] hover:bg-[#A31D1D] text-white rounded-full text-xs font-black flex items-center justify-center gap-2 shadow-xl">
                 <span class="inline-flex items-center justify-center bg-white px-2 rounded-full h-8 overflow-hidden">
                     <img src="{{ asset('images/logo/mpesa.png') }}" alt="M-Pesa" class="h-6 w-auto object-contain scale-110">
@@ -902,38 +920,46 @@
         </div>
     </div>
 </div>
-<!-- M-Pesa Payment Overlay -->
+<!-- Multi-Option Payment Overlay (M-Pesa + LOOP Paybill) -->
 <div id="mpesa-payment-overlay"
      class="hidden fixed inset-0 bg-[#111827]/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="w-full max-w-[420px] bg-white rounded-[32px] shadow-2xl border border-[#E2E8F0] overflow-hidden">
+    <div class="w-full max-w-[440px] bg-white rounded-[32px] shadow-2xl border border-[#E2E8F0] overflow-hidden">
 
         <!-- Modal header -->
-        <div class="bg-[#05A357] px-6 py-4 flex items-center justify-between">
+        <div class="bg-[#0F172A] px-6 py-4 flex items-center justify-between text-white" id="payment-modal-header">
             <div class="flex items-center gap-2.5">
-                <span class="inline-flex items-center justify-center bg-white px-2.5 py-1 rounded-full h-7 overflow-hidden shadow-xs border border-emerald-200 shrink-0">
-                    <img src="{{ asset('images/logo/mpesa.png') }}" alt="M-Pesa" class="h-4 max-h-5 max-w-[60px] object-contain"
-                         onerror="this.outerHTML='<span class=\'text-[#05A357] font-black text-[11px]\'>M-PESA</span>'">
+                <span class="inline-flex items-center justify-center bg-white px-2.5 py-1 rounded-full h-7 overflow-hidden shadow-xs border border-slate-200 shrink-0" id="payment-modal-logo-wrap">
+                    <img src="{{ asset('images/logo/mpesa.png') }}" alt="Payment" class="h-4 max-h-5 max-w-[60px] object-contain" id="payment-modal-logo">
                 </span>
-                <span class="text-white/50 text-xs font-bold">·</span>
-                <span class="text-white font-black text-sm tracking-tight leading-none">M-Pesa Express Checkout</span>
+                <span class="text-white/40 text-xs font-bold">·</span>
+                <span class="text-white font-black text-sm tracking-tight leading-none" id="payment-modal-title">Secure Checkout</span>
             </div>
             <button onclick="closeMpesaOverlay()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center text-lg font-bold leading-none cursor-pointer transition">&times;</button>
         </div>
 
-        <!-- Order summary & states -->
+        <!-- Order summary & Payment Method Switcher -->
         <div class="px-6 py-5 space-y-4">
             <div class="text-center space-y-2 py-1">
                 <p class="text-[10px] uppercase tracking-widest text-slate-400 font-black">Total Payment</p>
-                <p class="text-3xl font-black text-[#05A357]" id="mpesa-amount-display">Ksh 0</p>
-                <div class="inline-flex items-center justify-center gap-2 bg-[#05A357]/10 text-[#05A357] px-3.5 py-1.5 rounded-full text-xs font-black">
-                    <img src="{{ asset('images/logo/mpesa.png') }}" alt="M-Pesa" class="h-4 max-h-4 max-w-[50px] object-contain shrink-0"
-                         onerror="this.outerHTML='<span class=\'text-[#05A357] font-black text-[9px]\'>M-PESA</span>'">
-                    <span>Lipa Na M-Pesa STK Push</span>
+                <p class="text-3xl font-black text-[#A31D1D]" id="mpesa-amount-display">Ksh 0</p>
+
+                <!-- Payment Method Selector Tabs -->
+                <div class="grid grid-cols-2 gap-1.5 p-1.5 bg-slate-100 rounded-2xl border border-slate-200/80 mt-2">
+                    <button type="button" id="pay-tab-mpesa" onclick="switchPaymentMethodTab('mpesa')"
+                            class="py-2 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 bg-white text-[#0F172A] shadow-xs cursor-pointer">
+                        <img src="{{ asset('images/logo/mpesa.png') }}" alt="M-Pesa" class="h-3.5 w-auto object-contain">
+                        <span>M-Pesa Express</span>
+                    </button>
+                    <button type="button" id="pay-tab-loop" onclick="switchPaymentMethodTab('loop')"
+                            class="py-2 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 cursor-pointer">
+                        <span class="bg-[#5B21B6] text-white text-[9px] px-1.5 py-0.5 rounded font-black">LOOP</span>
+                        <span>LOOP Paybill</span>
+                    </button>
                 </div>
             </div>
 
-            <!-- Input state (Enter / Confirm phone number) -->
-            <div id="mpesa-input-state" class="space-y-4 pt-2">
+            <!-- Option 1: M-Pesa Input State -->
+            <div id="mpesa-input-state" class="space-y-4 pt-1">
                 <div>
                     <label class="block text-xs font-black text-slate-700 mb-1.5">M-Pesa Phone Number</label>
                     <div class="relative">
@@ -955,31 +981,113 @@
                 </button>
             </div>
 
-            <!-- Loading state (Creating order & sending STK Push) -->
+            <!-- Option 2: LOOP Paybill Collection State -->
+            <div id="loop-input-state" class="hidden space-y-3 pt-1">
+                <div class="bg-purple-950/5 border border-purple-500/20 p-3.5 rounded-2xl space-y-2.5">
+                    <div class="flex items-center justify-between border-b border-purple-100/80 pb-2">
+                        <div class="flex items-center gap-2">
+                            <div class="w-7 h-7 rounded-lg bg-[#5B21B6] text-white flex items-center justify-center text-xs font-black shadow-xs">
+                                <i class="fas fa-building-columns"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-xs font-black text-[#5B21B6]">LOOP M-Pesa Paybill</h4>
+                                <p class="text-[10px] text-slate-500 font-medium">Lipa na M-Pesa → Pay Bill</p>
+                            </div>
+                        </div>
+                        <span class="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
+                            <i class="fas fa-clock text-[9px] mr-1"></i> Expires in 30m
+                        </span>
+                    </div>
+
+                    <!-- Paybill Credentials with Copy buttons -->
+                    <div class="grid grid-cols-3 gap-2 text-left">
+                        <div class="bg-white p-2.5 rounded-xl border border-slate-200/80 shadow-xs relative">
+                            <span class="block text-[9px] font-black text-slate-400 uppercase tracking-wider mb-0.5">Paybill No.</span>
+                            <span id="loop-display-paybill" class="font-black text-xs text-slate-800 tracking-tight">600100</span>
+                            <button onclick="copyToClipboard('600100', 'btn-copy-paybill')" id="btn-copy-paybill"
+                                    class="mt-1 text-[9px] font-bold text-[#5B21B6] hover:underline flex items-center gap-1 cursor-pointer">
+                                <i class="fas fa-copy text-[9px]"></i> Copy
+                            </button>
+                        </div>
+
+                        <div class="bg-white p-2.5 rounded-xl border border-slate-200/80 shadow-xs relative">
+                            <span class="block text-[9px] font-black text-slate-400 uppercase tracking-wider mb-0.5">Account No.</span>
+                            <span id="loop-display-acc-ref" class="font-black text-xs text-[#5B21B6] tracking-tight">...</span>
+                            <button onclick="copyToClipboard(document.getElementById('loop-display-acc-ref').textContent, 'btn-copy-ref')" id="btn-copy-ref"
+                                    class="mt-1 text-[9px] font-bold text-[#5B21B6] hover:underline flex items-center gap-1 cursor-pointer">
+                                <i class="fas fa-copy text-[9px]"></i> Copy
+                            </button>
+                        </div>
+
+                        <div class="bg-white p-2.5 rounded-xl border border-slate-200/80 shadow-xs relative">
+                            <span class="block text-[9px] font-black text-slate-400 uppercase tracking-wider mb-0.5">Amount</span>
+                            <span id="loop-display-amount" class="font-black text-xs text-emerald-700 tracking-tight">KES 0</span>
+                            <button onclick="copyToClipboard(document.getElementById('loop-display-amount').textContent.replace('KES ', '').replace(/,/g, ''), 'btn-copy-amt')" id="btn-copy-amt"
+                                    class="mt-1 text-[9px] font-bold text-[#5B21B6] hover:underline flex items-center gap-1 cursor-pointer">
+                                <i class="fas fa-copy text-[9px]"></i> Copy
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step-by-step instructions -->
+                    <ol class="text-[10px] text-slate-600 font-bold space-y-1 pl-4 list-decimal marker:text-[#5B21B6] marker:font-black">
+                        <li>Open M-Pesa menu & select <span class="text-slate-800 font-black">Lipa na M-Pesa</span> → <span class="text-slate-800 font-black">Pay Bill</span></li>
+                        <li>Enter Business No. <span class="font-black text-slate-800">600100</span> & Account No. <span class="font-black text-[#5B21B6]" id="loop-step-acc-ref">...</span></li>
+                        <li>Enter exact amount & your M-Pesa PIN to complete payment</li>
+                    </ol>
+                </div>
+
+                <!-- Toggle Claim Box Button -->
+                <button onclick="toggleLoopClaimBox()"
+                        class="w-full py-3 px-4 bg-[#5B21B6] hover:bg-[#4C1D95] active:scale-[0.98] text-white rounded-2xl text-sm font-black shadow-lg shadow-[#5B21B6]/25 hover:shadow-xl transition-all flex items-center justify-center gap-2.5 cursor-pointer">
+                    <i class="fas fa-check-circle text-xs text-[#FFC244]"></i>
+                    <span class="font-black text-white tracking-tight">I Have Paid</span>
+                    <i class="fas fa-chevron-down text-xs text-white/60 transition-transform" id="loop-claim-chevron"></i>
+                </button>
+
+                <!-- Hidden Claim Input Box -->
+                <div id="loop-claim-box" class="hidden space-y-2.5 bg-slate-50 border border-slate-200 p-3.5 rounded-2xl animate-fade-in">
+                    <div>
+                        <label class="block text-[11px] font-black text-slate-700 mb-1">M-Pesa Receipt Code</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 text-xs"><i class="fas fa-receipt"></i></span>
+                            <input type="text" id="loop-receipt-input" placeholder="e.g. QGH82910X"
+                                   class="w-full pl-8 pr-3 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-black text-slate-800 tracking-wider focus:outline-none focus:border-[#5B21B6]">
+                        </div>
+                        <p class="text-[9px] text-slate-400 mt-1 font-medium">Enter the M-Pesa confirmation code sent to your phone (e.g. QGH82910X).</p>
+                    </div>
+
+                    <button onclick="submitLoopPaymentClaim()"
+                            class="w-full py-3 px-3 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white rounded-xl text-xs font-black shadow-md shadow-emerald-600/20 transition flex items-center justify-center gap-2 cursor-pointer">
+                        <i class="fas fa-shield-halved text-xs"></i>
+                        <span>Submit Receipt & Verify Payment</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Loading state (Creating order & sending API request) -->
             <div id="mpesa-loading-state" class="hidden text-center py-6 space-y-3">
                 <div class="relative w-14 h-14 mx-auto flex items-center justify-center">
-                    <div class="absolute inset-0 border-4 border-[#05A357]/20 rounded-full"></div>
-                    <div class="absolute inset-0 border-4 border-[#05A357] border-t-transparent rounded-full animate-spin"></div>
-                    <img src="{{ asset('images/logo/mpesa.png') }}" alt="M-Pesa" class="h-5 w-auto object-contain"
-                         onerror="this.outerHTML='<span class=\'text-[#05A357] font-black text-[9px]\'>M-PESA</span>'">
+                    <div class="absolute inset-0 border-4 border-[#0F172A]/20 rounded-full"></div>
+                    <div class="absolute inset-0 border-4 border-[#0F172A] border-t-transparent rounded-full animate-spin"></div>
+                    <i class="fas fa-credit-card text-[#0F172A] text-lg"></i>
                 </div>
-                <p class="text-xs text-zinc-600 font-bold" id="mpesa-loading-msg">Sending M-Pesa prompt to phone...</p>
+                <p class="text-xs text-zinc-600 font-bold" id="mpesa-loading-msg">Processing payment request...</p>
             </div>
 
             <!-- Pending / Prompt Sent state -->
             <div id="mpesa-pending-state" class="hidden text-center py-4 space-y-3">
-                <div class="w-16 h-16 mx-auto bg-[#05A357]/10 rounded-full flex items-center justify-center animate-bounce border border-[#05A357]/20 p-2">
-                    <img src="{{ asset('images/logo/mpesa.png') }}" alt="M-Pesa" class="h-8 w-auto object-contain"
-                         onerror="this.outerHTML='<i class=\'fas fa-mobile-screen-button text-2xl text-[#05A357]\'></i>'">
+                <div class="w-16 h-16 mx-auto bg-slate-100 rounded-full flex items-center justify-center animate-bounce border border-slate-200 p-2 text-[#0F172A]">
+                    <i class="fas fa-spinner fa-spin text-2xl"></i>
                 </div>
                 <div>
-                    <p class="text-base font-black text-[#111827]">Check Your Phone!</p>
-                    <p class="text-xs text-zinc-500 mt-1" id="mpesa-prompt-phone-label">Enter your M-Pesa PIN on your phone to authorize payment.</p>
+                    <p class="text-base font-black text-[#111827]">Payment Processing!</p>
+                    <p class="text-xs text-zinc-500 mt-1" id="mpesa-prompt-phone-label">Authorizing transaction with provider...</p>
                 </div>
                 <div class="h-1.5 w-full bg-zinc-100 rounded-full overflow-hidden">
-                    <div class="h-full bg-[#05A357] rounded-full animate-pulse" style="width:75%"></div>
+                    <div class="h-full bg-[#0F172A] rounded-full animate-pulse" style="width:75%"></div>
                 </div>
-                <p class="text-[10px] text-zinc-400 font-medium">Waiting for M-Pesa confirmation...</p>
+                <p class="text-[10px] text-zinc-400 font-medium">Waiting for transaction confirmation...</p>
             </div>
 
             <!-- Error state -->
@@ -993,6 +1101,7 @@
         </div>
     </div>
 </div>
+
 
 
 <!-- Authentication Modal Overlay (OTP Login & Registration) -->
@@ -1084,7 +1193,7 @@
         <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-zinc-400 hover:text-zinc-600 cursor-pointer"><i class="fas fa-times"></i></button>
         <div class="text-center space-y-5">
             <h3 class="text-xl font-black text-[#2D3748]">Confirm OTP Code</h3>
-            
+
             <!-- System OTP Display Banner -->
             <div class="bg-[#05A357]/10 border border-[#05A357]/30 rounded-2xl p-4 text-center space-y-1">
                 <p class="text-[9px] uppercase tracking-widest text-[#05A357] font-black">System Generated OTP Code</p>
@@ -1497,11 +1606,12 @@
     }
 
     function getProductCategory(p) {
-        const name = p.name.toLowerCase();
-        if (name.includes('beer') || name.includes('lager') || name.includes('coca') || name.includes('coke') || name.includes('soda') || name.includes('drink') || name.includes('water') || name.includes('juice')) {
+        if (!p) return 'food';
+        const name = ((p.name || '') + ' ' + (p.category || '') + ' ' + (p.description || '')).toLowerCase();
+        if (name.includes('beer') || name.includes('lager') || name.includes('coca') || name.includes('coke') || name.includes('soda') || name.includes('drink') || name.includes('water') || name.includes('juice') || name.includes('beverage') || name.includes('wine') || name.includes('whiskey') || name.includes('spirit') || name.includes('cocktail') || name.includes('fanta') || name.includes('sprite') || name.includes('pepsi') || name.includes('tea') || name.includes('coffee') || name.includes('mocktail')) {
             return 'drinks';
         }
-        if (name.includes('fries') || name.includes('churros') || name.includes('nachos') || name.includes('chips') || name.includes('onion rings')) {
+        if (name.includes('fries') || name.includes('churros') || name.includes('nachos') || name.includes('chips') || name.includes('onion rings') || name.includes('snack') || name.includes('popcorn') || name.includes('nuts') || name.includes('crisps') || name.includes('biscuit') || name.includes('cookie') || name.includes('candy') || name.includes('sweets')) {
             return 'snacks';
         }
         return 'food';
@@ -1525,205 +1635,8 @@
         renderVendors();
     }
 
-    function renderVendors() {
-        const container = document.getElementById('vendor-list-container');
-        container.innerHTML = '';
-
-        const searchVal = document.getElementById('menu-search').value.toLowerCase();
-
-        if (!vendors || vendors.length === 0) {
-            container.innerHTML = `
-                <div class="text-center py-16 px-4 bg-white rounded-[32px] border border-slate-200/90 shadow-sm space-y-3">
-                    <div class="w-16 h-16 rounded-full bg-amber-50 text-[#A31D1D] mx-auto flex items-center justify-center text-2xl shadow-inner">
-                        🏪
-                    </div>
-                    <h3 class="text-base font-black text-[#0F172A]">No active food stalls found</h3>
-                    <p class="text-xs text-slate-500 max-w-sm mx-auto font-medium">Stalls registered by admins will appear here automatically.</p>
-                </div>
-            `;
-            return;
-        }
-
-        let renderedCount = 0;
-
-        vendors.forEach(vendor => {
-            const vendorProducts = vendor.products || [];
-            const matchingProducts = vendorProducts.filter(p => {
-                const matchesSearch = p.name.toLowerCase().includes(searchVal) || (p.description && p.description.toLowerCase().includes(searchVal));
-                const matchesCategory = selectedCategory === 'all' || getProductCategory(p) === selectedCategory;
-                return matchesSearch && matchesCategory;
-            });
-
-            // If user is actively searching/filtering and no items match, hide this vendor
-            if ((searchVal !== '' || selectedCategory !== 'all') && matchingProducts.length === 0) {
-                return;
-            }
-
-            renderedCount++;
-
-            const stallSection = document.createElement('div');
-            stallSection.className = 'space-y-4 mb-8';
-
-            let rating = "4.8";
-            let deliveryTime = "10-15 min";
-
-            if (vendor.id === 1) {
-                rating = "4.9";
-                deliveryTime = "8-12 min";
-            } else if (vendor.id === 2) {
-                rating = "4.7";
-                deliveryTime = "12-18 min";
-            }
-
-            let logoTag = '🍔';
-            if (vendor.logo_url && (vendor.logo_url.startsWith('/') || vendor.logo_url.startsWith('http'))) {
-                logoTag = `<img src="${vendor.logo_url}" class="w-full h-full object-cover rounded-[20px]" alt="${vendor.business_name}">`;
-            } else if (vendor.logo_url) {
-                logoTag = vendor.logo_url;
-            }
-
-            const headerCard = `
-    <div class="vendor-showcase-card group relative rounded-[32px] bg-white border border-slate-200 shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden p-5 md:p-6">
-        <!-- Top row: Logo, vendor details, and status badges -->
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-5 border-b border-slate-100 pb-5">
-            <div class="flex items-center gap-4.5">
-                <div class="w-16 h-16 rounded-[22px] bg-slate-100 border border-slate-200 shadow-inner flex items-center justify-center text-3xl shrink-0 group-hover:scale-105 transition-transform duration-300 overflow-hidden">
-                    ${logoTag}
-                </div>
-                <div>
-                    <div class="flex items-center gap-2.5 flex-wrap">
-                        <h4 class="text-xl md:text-2xl font-black text-[#0F172A] tracking-tight leading-tight">
-                            ${vendor.business_name}
-                        </h4>
-                        <span class="inline-flex items-center gap-1.5 bg-[#FFC244]/20 text-[#0F172A] px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border border-[#FFC244]/40">
-                            <span class="w-2 h-2 rounded-full bg-[#05A357] animate-pulse"></span>
-                            Open Now
-                        </span>
-                    </div>
-
-                    <div class="flex items-center gap-3 mt-2 flex-wrap text-xs font-bold text-slate-500">
-                        <span class="inline-flex items-center gap-1.5 text-[#0F172A] bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-lg">
-                            <i class="fas fa-star text-[#FFC244]"></i>
-                            ${rating}
-                        </span>
-
-                        <span class="inline-flex items-center gap-1.5 text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg">
-                            <i class="far fa-clock text-slate-400"></i>
-                            ${deliveryTime}
-                        </span>
-
-                        <span class="inline-flex items-center gap-1.5 text-[#05A357] bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg">
-                            <i class="fas fa-person-running"></i>
-                            Seat Runners Active
-                        </span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="flex items-center gap-3 shrink-0 self-start md:self-auto">
-                <span class="inline-flex items-center gap-1.5 bg-slate-100 text-slate-700 px-3.5 py-2 rounded-full text-xs font-black border border-slate-200">
-                    <i class="fas fa-map-pin text-[#05A357]"></i> Gate B Zone
-                </span>
-                <button onclick="openSeatModal()" class="bg-[#0F172A] hover:bg-[#05A357] text-white px-5 py-2.5 rounded-full text-xs font-black shadow-md hover:shadow-lg transition-all flex items-center gap-2">
-                    <i class="fas fa-location-dot text-[#FFC244]"></i> Check Seat Zone
-                </button>
-            </div>
-        </div>
-
-        <!-- Bottom row: Quick stats strip -->
-        <div class="mt-4 grid grid-cols-3 gap-3">
-            <div class="rounded-2xl bg-slate-50/80 border border-slate-200/70 p-3 text-center">
-                <p class="text-[9px] uppercase tracking-wider text-slate-400 font-black">Min Order</p>
-                <p class="text-xs font-black text-[#0F172A] mt-0.5">Ksh 300</p>
-            </div>
-
-            <div class="rounded-2xl bg-slate-50/80 border border-slate-200/70 p-3 text-center">
-                <p class="text-[9px] uppercase tracking-wider text-slate-400 font-black">Fulfillment</p>
-                <p class="text-xs font-black text-[#05A357] mt-0.5">Direct to GPS Pin</p>
-            </div>
-
-            <div class="rounded-2xl bg-slate-50/80 border border-slate-200/70 p-3 text-center">
-                <p class="text-[9px] uppercase tracking-wider text-slate-400 font-black">Payment</p>
-                <p class="text-xs font-black text-[#0F172A] mt-0.5">Instant M-Pesa</p>
-            </div>
-        </div>
-    </div>
-`;
-
-            let productsHtml = '';
-            if (matchingProducts.length > 0) {
-                productsHtml = '<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 mt-4">';
-                matchingProducts.forEach(p => {
-                    const out = p.stock_status !== 'in_stock';
-                    let imageTag = '';
-                    if (p.image_url && p.image_url.startsWith('/')) {
-                        imageTag = `<img src="${API_BASE.replace('/api', '') + p.image_url}" class="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500" alt="${p.name}">`;
-                    } else {
-                        const gradient = p.image_url || 'bg-[#A31D1D]';
-                        imageTag = `
-                                <div class="w-full h-full ${gradient} flex flex-col items-center justify-center text-white p-4 text-center">
-                                    <span class="text-2xl font-black uppercase tracking-wider">${p.name.substring(0, 2)}</span>
-                                </div>
-                            `;
-                    }
-
-                    productsHtml += `
-                            <div class="product-card-hover group bg-white rounded-[26px] border border-[#E2E8F0] overflow-hidden flex flex-col h-full relative">
-                                <div class="h-44 relative overflow-hidden bg-slate-100 flex-shrink-0">
-                                    ${imageTag}
-                                    <span class="absolute top-3 left-3 bg-white/95 backdrop-blur-md text-[9.5px] font-black text-[#0F172A] px-3 py-1 rounded-full uppercase tracking-wider shadow-sm border border-slate-200/80">
-                                        ${getProductCategory(p)}
-                                    </span>
-                                    <span class="absolute bottom-3 right-3 bg-[#0F172A]/85 backdrop-blur-md text-[9px] font-extrabold text-[#FFC244] px-2.5 py-1 rounded-full uppercase tracking-wider">
-                                        Fast seat drop
-                                    </span>
-                                </div>
-                                <div class="p-4 flex-1 flex flex-col justify-between space-y-3">
-                                    <div>
-                                        <h5 class="text-sm font-black text-[#0F172A] tracking-tight group-hover:text-[#05A357] transition duration-200 ${out ? 'text-zinc-400 line-through' : ''}">${p.name}</h5>
-                                    </div>
-                                    <div class="flex items-center justify-between pt-2 border-t border-slate-100">
-                                        <div>
-                                            <p class="text-[9px] uppercase tracking-wider text-zinc-400 font-bold">Price</p>
-                                            <p class="text-sm font-black text-[#05A357]">Ksh ${parseFloat(p.price).toLocaleString()}</p>
-                                        </div>
-                                        <div>
-                                            ${out
-                        ? `<span class="text-[9px] bg-zinc-100 border border-zinc-200 text-zinc-400 px-3 py-1.5 rounded-full font-bold">Out of stock</span>`
-                        : `<button onclick="addToBasket(${p.id}, '${p.name}', ${p.price}, ${vendor.id})" class="px-4 py-2 rounded-full bg-[#FFC244] hover:bg-[#FFB71B] text-[#0F172A] flex items-center gap-1.5 font-black text-xs transition-all shadow-md shadow-[#FFC244]/25 border border-[#E6A920] cursor-pointer hover:scale-105 active:scale-95">
-                                                            <i class="fas fa-plus text-[10px]"></i> Add
-                                                       </button>`
-                    }
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                });
-                productsHtml += '</div>';
-            } else {
-                productsHtml = `
-                    <div class="mt-4 p-5 rounded-2xl bg-[#FFF8E7] border border-dashed border-[#F7E5B2] text-center text-xs font-bold text-slate-600 flex items-center justify-center gap-2">
-                        <i class="fas fa-store text-[#FFC244] text-base"></i> Stall onboarded! Festival menu items coming soon.
-                    </div>
-                `;
-            }
-
-            stallSection.innerHTML = headerCard + productsHtml;
-            container.appendChild(stallSection);
-        });
-
-        if (renderedCount === 0 && (searchVal !== '' || selectedCategory !== 'all')) {
-            container.innerHTML = `
-                <div class="text-center py-16 px-4 bg-white rounded-[32px] border border-slate-200/90 shadow-sm space-y-3">
-                    <div class="w-16 h-16 rounded-full bg-amber-50 text-[#A31D1D] mx-auto flex items-center justify-center text-2xl shadow-inner">
-                        🔍
-                    </div>
-                    <h3 class="text-base font-black text-[#0F172A]">No stalls matching your filter</h3>
-                    <p class="text-xs text-slate-500 max-w-sm mx-auto font-medium">Try selecting "All Vendors" or resetting your search query.</p>
-                </div>
-            `;
-        }
+    function searchMenu() {
+        renderVendors();
     }
 
     function searchMenu() {
@@ -2289,9 +2202,55 @@
         closeSeatModal();
     }
 
-    // ─── Safaricom M-Pesa Express Checkout Flow ──────────────────────────────
+    // ─── Payment Integration Flow (M-Pesa STK Push & LOOP Paybill) ────────────
     let currentOrderId = null;       // order ID pending payment
     let paymentPollTimer = null;     // polling interval for payment confirmation
+    let activePaymentMethod = 'mpesa'; // 'mpesa' or 'loop'
+
+    function switchPaymentMethodTab(method) {
+        activePaymentMethod = method;
+        const mpesaTab = document.getElementById('pay-tab-mpesa');
+        const loopTab  = document.getElementById('pay-tab-loop');
+        const mpesaState = document.getElementById('mpesa-input-state');
+        const loopState  = document.getElementById('loop-input-state');
+
+        if (method === 'loop') {
+            if (mpesaTab) {
+                mpesaTab.className = 'py-2 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 cursor-pointer';
+            }
+            if (loopTab) {
+                loopTab.className = 'py-2 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 bg-[#5B21B6] text-white shadow-xs cursor-pointer';
+            }
+            if (mpesaState) mpesaState.classList.add('hidden');
+            if (loopState)  loopState.classList.remove('hidden');
+
+            fetchLoopPaybillInstructions();
+        } else {
+            if (loopTab) {
+                loopTab.className = 'py-2 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 cursor-pointer';
+            }
+            if (mpesaTab) {
+                mpesaTab.className = 'py-2 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 bg-white text-[#0F172A] shadow-xs cursor-pointer';
+            }
+            if (loopState)  loopState.classList.add('hidden');
+            if (mpesaState) mpesaState.classList.remove('hidden');
+        }
+    }
+
+    function copyToClipboard(text, btnId) {
+        if (!text) return;
+        navigator.clipboard.writeText(text).then(() => {
+            const btn = document.getElementById(btnId);
+            if (btn) {
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check text-emerald-600 text-[9px]"></i> Copied!';
+                setTimeout(() => { btn.innerHTML = originalHTML; }, 2000);
+            }
+            showToast("Copied to clipboard!", "info");
+        }).catch(err => {
+            showToast("Copied!", "info");
+        });
+    }
 
     function checkoutOrder() {
         if (basket.length === 0) {
@@ -2325,7 +2284,12 @@
         if (phoneInput) {
             phoneInput.value = currentUser.phone || '';
         }
+        const loopPhoneInput = document.getElementById('loop-phone-input');
+        if (loopPhoneInput) {
+            loopPhoneInput.value = currentUser.phone || '';
+        }
 
+        switchPaymentMethodTab('mpesa');
         showMpesaState('input');
         document.getElementById('mpesa-payment-overlay').classList.remove('hidden');
     }
@@ -2335,8 +2299,16 @@
             const el = document.getElementById(`mpesa-${s}-state`);
             if (el) el.classList.add('hidden');
         });
+        const loopInput = document.getElementById('loop-input-state');
+        if (loopInput) loopInput.classList.add('hidden');
+
         const target = document.getElementById(`mpesa-${state}-state`);
-        if (target) target.classList.remove('hidden');
+        if (target && state !== 'input') {
+            target.classList.remove('hidden');
+        } else if (state === 'input') {
+            switchPaymentMethodTab(activePaymentMethod);
+        }
+
         if (state === 'input' || state === 'error') {
             currentOrderId = null;
         }
@@ -2476,6 +2448,155 @@
                 }
             } catch (e) {
                 // Ignore transient network hiccups while polling
+            }
+        }, 3000);
+    }
+
+    function toggleLoopClaimBox() {
+        const box = document.getElementById('loop-claim-box');
+        const chevron = document.getElementById('loop-claim-chevron');
+        if (box) {
+            box.classList.toggle('hidden');
+            if (chevron) {
+                chevron.classList.toggle('rotate-180');
+            }
+        }
+    }
+
+    async function fetchLoopPaybillInstructions() {
+        if (basket.length === 0) return;
+
+        try {
+            // Step 1: Create Order if not created yet
+            if (!currentOrderId) {
+                const payload = {
+                    vendor_id:     basket[0].vendorId,
+                    seat_location: selectedSeat,
+                    items:         basket.map(i => ({product_id: i.id, quantity: i.quantity}))
+                };
+
+                const orderRes = await authFetch(`${API_BASE}/orders`, {
+                    method:  'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body:    JSON.stringify(payload)
+                });
+                const orderData = await orderRes.json();
+
+                if (!orderRes.ok) {
+                    currentOrderId = null;
+                    showToast(orderData.message || 'Failed to create order.', 'error');
+                    return;
+                }
+                currentOrderId = orderData.order.id;
+            }
+
+            // Step 2: Fetch Paybill instructions & account reference for currentOrderId
+            const res = await authFetch(`${API_BASE}/orders/${currentOrderId}/pay/loop`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'}
+            });
+            const data = await res.json();
+
+            if (res.ok && data.status === 'success') {
+                if (document.getElementById('loop-display-paybill')) document.getElementById('loop-display-paybill').textContent = data.paybill_number || '600100';
+                if (document.getElementById('loop-display-acc-ref')) document.getElementById('loop-display-acc-ref').textContent = data.account_reference || '...';
+                if (document.getElementById('loop-step-acc-ref')) document.getElementById('loop-step-acc-ref').textContent = data.account_reference || '...';
+
+                let total = 0;
+                basket.forEach(i => total += i.price * i.quantity);
+                const baseFee = typeof systemDeliveryFee !== 'undefined' ? systemDeliveryFee : 30;
+                const uniqueVendors = new Set(basket.map(i => i.vendorId).filter(Boolean));
+                const grandTotal = total + (baseFee + (Math.max(1, uniqueVendors.size) - 1) * (baseFee * 0.5));
+
+                if (document.getElementById('loop-display-amount')) document.getElementById('loop-display-amount').textContent = `KES ${grandTotal.toLocaleString()}`;
+            }
+        } catch (e) {
+            console.error("LOOP Instructions Error:", e);
+        }
+    }
+
+    async function submitLoopPaymentClaim() {
+        const receipt = document.getElementById('loop-receipt-input').value.trim();
+        if (!receipt) {
+            showToast("Please enter your M-Pesa receipt code!", "warning");
+            return;
+        }
+
+        showMpesaState('loading');
+        document.getElementById('mpesa-loading-msg').textContent = "Submitting receipt for verification with LOOP logs...";
+
+        try {
+            const res = await authFetch(`${API_BASE}/orders/${currentOrderId}/pay/loop/claim`, {
+                method:  'POST',
+                headers: {'Content-Type': 'application/json'},
+                body:    JSON.stringify({ mpesa_receipt: receipt })
+            });
+            const data = await res.json();
+
+            if (!res.ok || data.status === 'error') {
+                showMpesaState('error');
+                document.getElementById('mpesa-error-msg').textContent = data.message || 'Failed to submit payment claim.';
+                return;
+            }
+
+            playSound('beep');
+            showMpesaState('pending');
+            document.getElementById('mpesa-prompt-phone-label').textContent = `Receipt ${receipt.toUpperCase()} submitted! Verifying transaction against LOOP transaction log...`;
+
+            confirmOrderFromLoop(currentOrderId);
+        } catch (e) {
+            showMpesaState('error');
+            document.getElementById('mpesa-error-msg').textContent = 'Network error while submitting payment claim.';
+        }
+    }
+
+    async function confirmOrderFromLoop(orderId) {
+        if (paymentPollTimer) clearInterval(paymentPollTimer);
+
+        let attempts = 0;
+        const maxAttempts = 20;
+
+        paymentPollTimer = setInterval(async () => {
+            attempts++;
+            try {
+                const res = await authFetch(`${API_BASE}/orders/${orderId}/loop-status?attempt=${attempts}`);
+                const data = await res.json();
+
+                if (data.payment_status === 'paid') {
+                    clearInterval(paymentPollTimer);
+                    paymentPollTimer = null;
+                    playSound('success');
+
+                    const orderRes = await authFetch(`${API_BASE}/orders/${orderId}`);
+                    const orderData = await orderRes.json();
+                    activeOrder = { order: orderData };
+                    basket = [];
+                    renderBasket();
+
+                    closeMpesaOverlay();
+                    currentOrderId = null;
+                    document.getElementById('cust-main').classList.add('hidden');
+                    document.getElementById('cust-tracker').classList.remove('hidden');
+                    updateRadarUI(orderData);
+                    syncActiveOrder();
+
+                } else if (data.payment_status === 'failed') {
+                    clearInterval(paymentPollTimer);
+                    paymentPollTimer = null;
+                    currentOrderId = null;
+                    showMpesaState('error');
+                    document.getElementById('mpesa-error-msg').textContent = data.provider_message || 'LOOP Paybill payment was declined or failed.';
+
+                } else if (attempts >= maxAttempts) {
+                    clearInterval(paymentPollTimer);
+                    paymentPollTimer = null;
+                    currentOrderId = null;
+                    showMpesaState('error');
+                    document.getElementById('mpesa-error-msg').textContent =
+                        'LOOP Paybill status confirmation timed out. Your order status will update once completed.';
+                }
+            } catch (e) {
+                // Ignore transient network hiccups
             }
         }, 3000);
     }
@@ -2652,6 +2773,11 @@
         const searchEl = document.getElementById('menu-search');
         const searchVal = searchEl ? searchEl.value.trim().toLowerCase() : '';
         const isSearching = searchVal.length > 0;
+        const featContainer = document.getElementById('featured-food-container');
+
+        if (featContainer) {
+            featContainer.style.display = isSearching ? 'none' : 'block';
+        }
 
         // 1. Render Vendor Filter Chips Bar at top of marketplace
         let chipsHtml = `
@@ -2691,12 +2817,28 @@
                 (v.products || []).forEach((p, pIdx) => {
                     const desc = (p.description || '').toLowerCase();
                     const name = (p.name || '').toLowerCase();
-                    const matchesCategory = selectedCategory === 'all' || getProductCategory(p) === selectedCategory;
-                    if ((name.includes(searchVal) || desc.includes(searchVal) || (v.business_name || '').toLowerCase().includes(searchVal)) && matchesCategory) {
+                    const category = getProductCategory(p).toLowerCase();
+                    const dbCategory = (p.category || '').toLowerCase();
+                    const vName = (v.business_name || '').toLowerCase();
+
+                    const matchesCategory = selectedCategory === 'all' || category === selectedCategory;
+
+                    const matchesSearch = name.includes(searchVal) ||
+                                          desc.includes(searchVal) ||
+                                          category.includes(searchVal) ||
+                                          dbCategory.includes(searchVal) ||
+                                          vName.includes(searchVal) ||
+                                          (searchVal === 'meals' && category === 'food') ||
+                                          (searchVal === 'meal' && category === 'food') ||
+                                          (searchVal === 'drinks' && category === 'drinks') ||
+                                          (searchVal === 'drink' && category === 'drinks') ||
+                                          (searchVal === 'snacks' && category === 'snacks') ||
+                                          (searchVal === 'snack' && category === 'snacks');
+
+                    if (matchesSearch && matchesCategory) {
                         totalFound++;
                         const out = p.stock_status !== 'in_stock';
                         const safeName = String(p.name || '').replace(/'/g, "\\'");
-                        const category = getProductCategory(p);
                         let visual = p.image_url && p.image_url.startsWith('/')
                             ? `<img src="${API_BASE.replace('/api', '') + p.image_url}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="${p.name}">`
                             : `<div class="w-full h-full bg-gradient-to-br from-[#FFF8E7] via-white to-[#E9F7EE] flex items-center justify-center"><span class="text-6xl drop-shadow-sm">${category === 'drinks' ? '🥤' : category === 'snacks' ? '🍿' : '🍔'}</span></div>`;
@@ -2726,7 +2868,7 @@
             productGrid += '</div>';
 
             if (totalFound > 0) {
-                container.innerHTML += `<div class="mt-4 mb-2 text-xs font-black text-slate-500 uppercase tracking-wider">Search Results (${totalFound} items matching "${searchVal}")</div>` + productGrid;
+                container.innerHTML += `<div class="mt-4 mb-2 text-xs font-black text-slate-500 uppercase tracking-wider">Search Results (${totalFound} item${totalFound === 1 ? '' : 's'} matching "${searchVal}")</div>` + productGrid;
             } else {
                 container.innerHTML += `<div class="bg-white border border-slate-200 rounded-[32px] p-10 text-center shadow-sm mt-4"><div class="text-5xl mb-3">🔎</div><h3 class="text-xl font-black text-[#0F172A]">No matching items found</h3><p class="text-sm text-slate-500 font-bold mt-1">Try another search keyword or select a category.</p></div>`;
             }
@@ -2978,6 +3120,8 @@
         const badgeEl = document.getElementById('basket-count-badge');
         const subtotalEl = document.getElementById('desktop-cart-subtotal');
         const feeEl = document.getElementById('desktop-cart-delivery-fee');
+        const mobileSubtotalEl = document.getElementById('cart-subtotal');
+        const mobileFeeEl = document.getElementById('cart-delivery-fee');
 
         let totalQty = 0;
         basket.forEach(i => totalQty += i.quantity);
@@ -2999,7 +3143,10 @@
             if (document.getElementById('cart-tray-total')) document.getElementById('cart-tray-total').textContent = 'Ksh 0';
             if (document.getElementById('desktop-cart-tray-total')) document.getElementById('desktop-cart-tray-total').textContent = 'Ksh 0';
             if (subtotalEl) subtotalEl.textContent = 'Ksh 0';
-            if (feeEl) feeEl.textContent = systemDeliveryFee > 0 ? `Ksh ${systemDeliveryFee.toLocaleString()}` : 'FREE';
+            if (mobileSubtotalEl) mobileSubtotalEl.textContent = 'Ksh 0';
+            const defaultFeeText = systemDeliveryFee > 0 ? `Ksh ${systemDeliveryFee.toLocaleString()}` : 'FREE';
+            if (feeEl) feeEl.textContent = defaultFeeText;
+            if (mobileFeeEl) mobileFeeEl.textContent = defaultFeeText;
             return;
         }
 
@@ -3041,7 +3188,9 @@
         const grandTotalText = `Ksh ${grandTotal.toLocaleString()}`;
 
         if (subtotalEl) subtotalEl.textContent = subtotalText;
+        if (mobileSubtotalEl) mobileSubtotalEl.textContent = subtotalText;
         if (feeEl) feeEl.textContent = feeText;
+        if (mobileFeeEl) mobileFeeEl.textContent = feeText;
         if (document.getElementById('cart-tray-total')) document.getElementById('cart-tray-total').textContent = grandTotalText;
         if (document.getElementById('desktop-cart-tray-total')) document.getElementById('desktop-cart-tray-total').textContent = grandTotalText;
     }
@@ -3055,7 +3204,7 @@
                 <div class="space-y-4">
                     <p class="text-xs font-bold text-[#0F172A]">Effective Date: August 30, 2026</p>
                     <p>At <strong>justFeast</strong> ("we", "our", or "us"), we are committed to protecting your privacy and ensuring complete transparency in how your personal data is collected and utilized during RheamFeast and affiliated live events.</p>
-                    
+
                     <h4 class="text-xs font-black uppercase tracking-wider text-[#0F172A] pt-3 border-t border-slate-200">1. Information We Collect</h4>
                     <ul class="list-disc pl-5 space-y-1.5 text-slate-600">
                         <li><strong>Contact & Payment Details:</strong> M-Pesa phone number used for instant STK Push transaction processing.</li>

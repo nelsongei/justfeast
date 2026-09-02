@@ -7,6 +7,8 @@ use App\Http\Controllers\API\OrderController;
 use App\Http\Controllers\API\RunnerController;
 use App\Http\Controllers\API\AdminController;
 use App\Http\Controllers\API\MpesaCallbackController;
+use App\Http\Controllers\API\LoopPaybillController;
+use App\Http\Controllers\API\LoopPaymentWebhookController;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,6 +41,13 @@ Route::middleware('auth:sanctum,web')->group(function () {
     Route::get('/orders/{order}',               [OrderController::class, 'show']);
     Route::post('/orders/{order}/pay',          [OrderController::class, 'pay']);
     Route::get('/orders/{order}/payment-status',[OrderController::class, 'checkPaymentStatus']);
+
+    // ── LOOP Paybill Payment ──────────────────────────────────────────────────
+    Route::post('/orders/{order}/pay/loop',          [OrderController::class, 'payWithLoop']);
+    Route::post('/orders/{order}/pay/loop/claim',    [OrderController::class, 'claimLoopPaybill']);
+    Route::get('/orders/{order}/loop-status',        [OrderController::class, 'checkLoopStatus']);
+    Route::post('/loop/paybill-payments',            [LoopPaybillController::class, 'store']);
+    Route::get('/loop/paybill-payments/{payment}',   [LoopPaybillController::class, 'show']);
 
     // ── Vendor ────────────────────────────────────────────────────────────────
     Route::middleware('role:vendor')->prefix('vendor')->group(function () {
@@ -85,4 +94,9 @@ Route::middleware('auth:sanctum,web')->group(function () {
 
 // ── Safaricom M-Pesa Callback (no Sanctum — Safaricom POSTs directly) ────────
 Route::post('/mpesa/callback', [MpesaCallbackController::class, 'handle'])
+    ->middleware('throttle:webhooks');
+
+// ── LOOP Paybill Callback Webhook (no Sanctum — LOOP POSTs directly) ────────
+Route::post('/webhooks/loop/payments', LoopPaymentWebhookController::class)
+    ->name('webhooks.loop.payments')
     ->middleware('throttle:webhooks');

@@ -102,8 +102,8 @@ class MpesaDarajaService
 
         $timestamp = date('YmdHis');
         $password  = base64_encode($this->shortcode . $this->passkey . $timestamp);
-    //    $amount    = (int) ceil($order->total_amount);
-        $amount    = 1;
+        $amount    = (int) ceil($order->total_amount);
+      //  $amount    = 1;
 
         $payload = [
             'BusinessShortCode' => $this->shortcode,

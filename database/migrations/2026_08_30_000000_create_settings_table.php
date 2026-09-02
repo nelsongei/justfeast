@@ -23,7 +23,7 @@ return new class extends Migration
         try {
             Setting::create([
                 'key'   => 'delivery_fee',
-                'value' => '30',
+                'value' => '1',
             ]);
         } catch (\Throwable $e) {
             // Ignore if model or DB connection unavailable during migration dry-run

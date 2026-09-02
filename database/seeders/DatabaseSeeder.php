@@ -142,7 +142,7 @@ class DatabaseSeeder extends Seeder
             ['vendor_id' => $vendor1->id, 'name' => 'Cheesy Bacon Smash Burger'],
             [
                 'description'  => 'Premium beef patty smashed with double cheddar, crispy bacon, and our signature burger sauce.',
-                'price'        => 850.00,
+                'price'        => 1.00,
                 'image_url'    => 'bg-gradient-to-br from-amber-400 to-red-500',
                 'stock_status' => 'in_stock',
             ]
@@ -151,7 +151,7 @@ class DatabaseSeeder extends Seeder
             ['vendor_id' => $vendor1->id, 'name' => 'Double Smash Supreme'],
             [
                 'description'  => 'Two smashed beef patties, caramelized onions, melted Swiss cheese, pickles, and garlic aioli.',
-                'price'        => 1000.00,
+                'price'        => 1.00,
                 'image_url'    => 'bg-gradient-to-br from-amber-400 to-red-500',
                 'stock_status' => 'in_stock',
             ]
@@ -160,7 +160,7 @@ class DatabaseSeeder extends Seeder
             ['vendor_id' => $vendor1->id, 'name' => 'Spicy Inferno Chicken Burger'],
             [
                 'description'  => 'Crispy fried chicken breast dipped in hot buffalo glaze, jalapeños, and pepper jack cheese.',
-                'price'        => 900.00,
+                'price'        => 1.00,
                 'image_url'    => 'bg-gradient-to-br from-amber-400 to-red-500',
                 'stock_status' => 'in_stock',
             ]
@@ -169,7 +169,7 @@ class DatabaseSeeder extends Seeder
             ['vendor_id' => $vendor1->id, 'name' => 'Loaded Cheesy Fries'],
             [
                 'description'  => 'Crispy golden fries loaded with cheddar cheese sauce, bacon bits, and chopped chives.',
-                'price'        => 450.00,
+                'price'        => 1.00,
                 'image_url'    => 'bg-gradient-to-br from-yellow-400 to-amber-600',
                 'stock_status' => 'in_stock',
             ]
@@ -180,7 +180,7 @@ class DatabaseSeeder extends Seeder
             ['vendor_id' => $vendor2->id, 'name' => 'Barbacoa Beef Tacos (3x)'],
             [
                 'description'  => 'Slow-braised beef on fresh corn tortillas topped with fresh onions, cilantro, and lime wedges.',
-                'price'        => 750.00,
+                'price'        => 1.00,
                 'image_url'    => 'bg-gradient-to-br from-green-400 to-blue-500',
                 'stock_status' => 'in_stock',
             ]
@@ -189,7 +189,7 @@ class DatabaseSeeder extends Seeder
             ['vendor_id' => $vendor2->id, 'name' => 'Chipotle Chicken Quesadilla'],
             [
                 'description'  => 'Grilled flour tortilla loaded with chipotle-spiced chicken, melted Monterey Jack, and pico de gallo.',
-                'price'        => 800.00,
+                'price'        => 1.00,
                 'image_url'    => 'bg-gradient-to-br from-green-400 to-blue-500',
                 'stock_status' => 'in_stock',
             ]
@@ -198,7 +198,7 @@ class DatabaseSeeder extends Seeder
             ['vendor_id' => $vendor2->id, 'name' => 'Loaded Fiesta Nachos'],
             [
                 'description'  => 'Crispy corn tortilla chips piled high with black beans, melted cheese, guacamole, sour cream, and jalapeños.',
-                'price'        => 600.00,
+                'price'        => 1.00,
                 'image_url'    => 'bg-gradient-to-br from-green-400 to-blue-500',
                 'stock_status' => 'in_stock',
             ]
@@ -207,7 +207,7 @@ class DatabaseSeeder extends Seeder
             ['vendor_id' => $vendor2->id, 'name' => 'Churros with Chocolate Sauce'],
             [
                 'description'  => 'Golden fried dough pastry dusted in cinnamon sugar, served warm with rich dark chocolate dip.',
-                'price'        => 350.00,
+                'price'        => 1.00,
                 'image_url'    => 'bg-gradient-to-br from-yellow-400 to-amber-600',
                 'stock_status' => 'in_stock',
             ]
@@ -218,7 +218,7 @@ class DatabaseSeeder extends Seeder
             ['vendor_id' => $vendor3->id, 'name' => 'Uhuru Park Premium Nyama Choma (Quarter Goat)'],
             [
                 'description'  => 'Slow wood-fired tender goat meat seasoned to perfection, served with fresh kachumbari.',
-                'price'        => 950.00,
+                'price'        => 1.00,
                 'image_url'    => 'bg-gradient-to-br from-red-500 to-amber-600',
                 'stock_status' => 'in_stock',
             ]
@@ -227,7 +227,7 @@ class DatabaseSeeder extends Seeder
             ['vendor_id' => $vendor3->id, 'name' => 'Grilled Beef Skewers (Mshikaki 2x)'],
             [
                 'description'  => 'Marinated flame-kissed beef chunks skewered with bell peppers and red onions.',
-                'price'        => 600.00,
+                'price'        => 1.00,
                 'image_url'    => 'bg-gradient-to-br from-red-500 to-amber-600',
                 'stock_status' => 'in_stock',
             ]
@@ -236,7 +236,7 @@ class DatabaseSeeder extends Seeder
             ['vendor_id' => $vendor3->id, 'name' => 'Masala Garlic Choma Fries'],
             [
                 'description'  => 'Fries tossed in our secret spicy wet masala tomato glaze and fresh garlic flakes.',
-                'price'        => 400.00,
+                'price'        => 1.00,
                 'image_url'    => 'bg-gradient-to-br from-yellow-400 to-amber-600',
                 'stock_status' => 'in_stock',
             ]
@@ -245,7 +245,7 @@ class DatabaseSeeder extends Seeder
             ['vendor_id' => $vendor3->id, 'name' => 'Ice Cold Passion Fruit Juice (500ml Can)'],
             [
                 'description'  => '100% natural freshly squeezed local passion fruit juice, served ice-cold to beat the heat.',
-                'price'        => 350.00,
+                'price'        => 1.00,
                 'image_url'    => 'bg-gradient-to-br from-purple-400 to-pink-500',
                 'stock_status' => 'in_stock',
             ]

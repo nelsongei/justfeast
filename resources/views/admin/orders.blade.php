@@ -293,12 +293,17 @@ function renderOrdersTable() {
 
         <!-- Editable Payment Status -->
         <td>
-          <select onchange="updateOrderStatus(${o.id}, 'payment_status', this.value)" 
-                  style="padding:0.3rem 0.5rem;border-radius:10px;font-size:0.72rem;font-weight:800;border:1px solid var(--border);background:${o.payment_status==='paid'?'#ECFDF5':'#FFF8E7'};color:${o.payment_status==='paid'?'#047857':'#B45309'};cursor:pointer;">
-            <option value="pending" ${o.payment_status==='pending'?'selected':''}>Pending</option>
-            <option value="paid" ${o.payment_status==='paid'?'selected':''}>Paid</option>
-            <option value="failed" ${o.payment_status==='failed'?'selected':''}>Failed</option>
-          </select>
+          <div style="display:flex;flex-direction:column;gap:0.3rem;">
+            <select onchange="updateOrderStatus(${o.id}, 'payment_status', this.value)" 
+                    style="padding:0.3rem 0.5rem;border-radius:10px;font-size:0.72rem;font-weight:800;border:1px solid var(--border);background:${o.payment_status==='paid'?'#ECFDF5':'#FFF8E7'};color:${o.payment_status==='paid'?'#047857':'#B45309'};cursor:pointer;">
+              <option value="pending" ${o.payment_status==='pending'?'selected':''}>Pending</option>
+              <option value="paid" ${o.payment_status==='paid'?'selected':''}>Paid</option>
+              <option value="failed" ${o.payment_status==='failed'?'selected':''}>Failed</option>
+            </select>
+            <span style="font-size:0.65rem;font-weight:900;padding:0.15rem 0.4rem;border-radius:6px;width:fit-content;${o.payment_method==='loop_paybill'?'background:#F3E8FF;color:#6B21A8;border:1px solid #E9D5FF;':'background:#ECFDF5;color:#047857;border:1px solid #A7F3D0;'}">
+              ${o.payment_method === 'loop_paybill' ? 'LOOP Paybill' : 'M-Pesa Express'}
+            </span>
+          </div>
         </td>
 
         <!-- Actions -->
