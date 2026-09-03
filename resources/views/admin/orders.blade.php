@@ -195,18 +195,18 @@
 <script>
 let allOrders = [];
 let filteredOrdersList = [];
-let runnersList = [];
+let allRunners = [];
 let currentPage = 1;
 const entriesPerPage = 10;
 let activePayOrder = null;
 
 window.addEventListener('DOMContentLoaded', () => {
-  loadRunnersList();
+  loadRunners();
   loadOrdersTab();
   setInterval(loadOrdersTab, 5000);
 });
 
-async function loadRunnersList() {
+async function loadRunners() {
   try {
     const res = await fetch(`${API_BASE}/admin/users?role=runner&per_page=100`, {
       headers: {
@@ -216,8 +216,10 @@ async function loadRunnersList() {
     });
     if (res.ok) {
       const data = await res.json();
-      runnersList = data.users ? (data.users.data || data.users) : (Array.isArray(data) ? data : []);
-      if (allOrders.length) renderOrdersTable();
+      allRunners = data.users?.data || data.users || (Array.isArray(data) ? data : []);
+      if (filteredOrdersList.length) {
+        renderOrdersTable();
+      }
     }
   } catch(e) {}
 }
@@ -281,10 +283,6 @@ function renderOrdersTable() {
       const currentRunnerId = o.runner_id || o.runner?.id || o.delivery?.runner_id || o.delivery?.runner?.id || '';
       const custContact = o.user?.phone || (isGenuineEmail(o.user?.email) ? o.user.email : '—');
 
-      const runnerSelectOptions = runnersList.map(r => 
-        `<option value="${r.id}" ${currentRunnerId == r.id ? 'selected' : ''}>🏃 ${escapeHtml(r.name)}</option>`
-      ).join('');
-
       return `<tr>
         <td style="font-weight:800;color:var(--brand)">
           #${o.id}
@@ -300,9 +298,12 @@ function renderOrdersTable() {
         <!-- Editable Runner Assignment Dropdown -->
         <td>
           <select onchange="updateOrderStatus(${o.id}, 'runner_id', this.value)" 
-                  style="padding:0.3rem 0.5rem;border-radius:10px;font-size:0.72rem;font-weight:800;border:1px solid ${currentRunnerId ? '#93C5FD' : 'var(--border)'};background:${currentRunnerId ? '#EFF6FF' : 'var(--surface2)'};color:${currentRunnerId ? '#1D4ED8' : 'var(--text)'};cursor:pointer;">
-            <option value="">Unassigned</option>
-            ${runnerSelectOptions}
+                  style="padding:0.35rem 0.5rem;border-radius:10px;font-size:0.72rem;font-weight:800;border:1px solid var(--border);background:${currentRunnerId ? '#ECFDF5' : '#F8FAFC'};color:${currentRunnerId ? '#047857' : 'var(--text)'};cursor:pointer;">
+            <option value="">🏃 Unassigned</option>
+            ${allRunners.map(r => {
+              const isSelected = Number(currentRunnerId) === Number(r.id);
+              return `<option value="${r.id}" ${isSelected ? 'selected' : ''}>🏃 ${r.name}</option>`;
+            }).join('')}
           </select>
         </td>
 

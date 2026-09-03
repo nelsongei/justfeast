@@ -183,24 +183,34 @@ class AdminController extends Controller
                 $updateData['paid_at'] = now();
             }
         }
-        if ($request->has('runner_id')) {
-            $rawRunnerId = $request->input('runner_id');
-            $runnerId = ($rawRunnerId !== null && $rawRunnerId !== '') ? (int) $rawRunnerId : null;
-            $updateData['runner_id'] = $runnerId;
 
-            if ($runnerId && in_array($order->order_status, ['created', 'accepted', 'preparing', 'ready'])) {
-                $updateData['order_status'] = 'runner_assigned';
+        if (array_key_exists('runner_id', $validated)) {
+            $runnerId = filter_var($validated['runner_id'], FILTER_VALIDATE_INT);
+            if ($runnerId && $runnerId > 0) {
+                $runner = User::where('role', 'runner')->find($runnerId);
+                if ($runner) {
+                    $updateData['runner_id'] = $runner->id;
+                    if (empty($validated['order_status']) || in_array($validated['order_status'], ['created', 'accepted', 'preparing', 'ready'], true)) {
+                        $updateData['order_status'] = 'runner_assigned';
+                    }
+
+                    $pin = (string) random_int(100000, 999999);
+                    Delivery::updateOrCreate(
+                        ['order_id' => $order->id],
+                        [
+                            'runner_id'             => $runner->id,
+                            'verification_pin'      => $pin,
+                            'verification_pin_hash' => Hash::make($pin),
+                            'verification_attempts' => 0,
+                            'pin_expires_at'        => now()->addHours(2),
+                            'status'                => 'pending',
+                        ]
+                    );
+                }
+            } else {
+                $updateData['runner_id'] = null;
+                Delivery::where('order_id', $order->id)->update(['runner_id' => null]);
             }
-
-            $delivery = Delivery::firstOrCreate(
-                ['order_id' => $order->id],
-                [
-                    'verification_pin'      => (string) random_int(100000, 999999),
-                    'verification_pin_hash' => Hash::make('123456'),
-                    'status'                => 'pending',
-                ]
-            );
-            $delivery->update(['runner_id' => $runnerId]);
         }
 
         if (!empty($updateData)) {

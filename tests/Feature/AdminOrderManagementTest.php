@@ -137,7 +137,8 @@ class AdminOrderManagementTest extends TestCase
     {
         $runner = User::create([
             'name'     => 'Runner Alex',
-            'email'    => 'runner@test.com',
+            'email'    => 'alex@runner.com',
+            'phone'    => '0700112233',
             'role'     => 'runner',
             'password' => bcrypt('password'),
         ]);
