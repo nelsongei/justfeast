@@ -37,7 +37,7 @@ class MpesaDarajaService
      */
     public function getBaseUrl(): string
     {
-        return $this->env === 'live'
+        return in_array($this->env, ['live', 'production'], true)
             ? rtrim(config('mpesa.live_base_url', 'https://api.safaricom.co.ke'), '/')
             : rtrim(config('mpesa.sandbox_base_url', 'https://sandbox.safaricom.co.ke'), '/');
     }
