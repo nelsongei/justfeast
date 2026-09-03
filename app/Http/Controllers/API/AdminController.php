@@ -652,6 +652,42 @@ class AdminController extends Controller
         ], 201);
     }
 
+    public function updateProduct(Request $request, $productId)
+    {
+        $product = Product::findOrFail($productId);
+
+        $validated = $request->validate([
+            'name'         => 'required|string|max:255',
+            'price'        => 'required|numeric|min:0',
+            'description'  => 'nullable|string',
+            'stock_status' => 'nullable|string|in:in_stock,out_of_stock',
+            'image'        => 'nullable|image|max:4096',
+            'image_url'    => 'nullable|string',
+        ]);
+
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $filename = time() . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '_', $file->getClientOriginalName());
+            $file->move(public_path('images/uploads'), $filename);
+            $product->image_url = '/images/uploads/' . $filename;
+        } elseif ($request->filled('image_url')) {
+            $product->image_url = $validated['image_url'];
+        }
+
+        $product->update([
+            'name'         => $validated['name'],
+            'price'        => $validated['price'],
+            'description'  => $validated['description'] ?? null,
+            'stock_status' => $validated['stock_status'] ?? $product->stock_status,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => "Menu item '{$product->name}' updated successfully.",
+            'product' => $product,
+        ]);
+    }
+
     public function deleteProduct($productId)
     {
         $product = Product::findOrFail($productId);

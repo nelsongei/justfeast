@@ -736,11 +736,11 @@
     </div>
   </div>
 
-  <!-- Add Vendor Menu Product Modal -->
+  <!-- Add/Edit Vendor Menu Product Modal -->
   <div class="modal-overlay" id="product-modal-overlay" onclick="if(event.target===this) closeAddProductModal()">
     <div class="modal-card" style="max-width:540px;">
       <div class="modal-header">
-        <h3 style="font-size:1.1rem;font-weight:900;color:var(--text);display:flex;align-items:center;gap:0.5rem;">
+        <h3 id="product-modal-title" style="font-size:1.1rem;font-weight:900;color:var(--text);display:flex;align-items:center;gap:0.5rem;">
           <i class="fas fa-utensils" style="color:var(--brand)"></i>
           Add Stall Menu Item
         </h3>
@@ -750,6 +750,7 @@
       </div>
 
       <form id="add-product-form" onsubmit="handleRegisterProduct(event)" enctype="multipart/form-data">
+        <input type="hidden" id="p-product-id" name="product_id">
         <input type="hidden" id="p-vendor-id" name="vendor_id">
         <div class="modal-body" style="display:flex;flex-direction:column;gap:1.25rem;">
           
@@ -799,7 +800,7 @@
             <button type="button" class="btn-sync" onclick="closeAddProductModal()">Cancel</button>
             <button type="submit" class="btn-register-vendor" id="btn-submit-product" style="background:#05A357;">
               <i class="fas fa-check-circle"></i>
-              <span>Add Menu Item</span>
+              <span id="btn-submit-product-text">Add Menu Item</span>
             </button>
           </div>
 
@@ -976,6 +977,9 @@ function renderVendorsUI(vendors) {
                     <span class="status-pill ${p.stock_status === 'out_of_stock' ? 'pill-inactive' : 'pill-active'}" style="padding:1px 6px;font-size:0.58rem;">
                       ${p.stock_status === 'out_of_stock' ? 'Sold Out' : 'In Stock'}
                     </span>
+                    <button type="button" onclick="openEditProductModal(${p.id}, ${v.id}, '${escapeJs(v.business_name)}', '${escapeJs(p.name)}', ${p.price}, '${escapeJs(p.description || '')}', '${p.stock_status || 'in_stock'}', '${escapeJs(p.image_url || '')}')" title="Edit Menu Item" style="padding:2px 6px;font-size:0.65rem;background:#EFF6FF;color:#1D4ED8;border:1px solid #93C5FD;border-radius:6px;cursor:pointer;font-weight:700;">
+                      <i class="fas fa-edit"></i>
+                    </button>
                     <button type="button" onclick="deleteVendorProduct(${p.id})" title="Delete Menu Item" style="padding:2px 6px;font-size:0.65rem;background:#FEF2F2;color:#991B1B;border:1px solid #FCA5A5;border-radius:6px;cursor:pointer;font-weight:700;">
                       <i class="fas fa-trash"></i>
                     </button>
@@ -1188,13 +1192,48 @@ async function handleRegisterVendor(event) {
 
 function openAddProductModal(vendorId, businessName) {
   const modal = document.getElementById('product-modal-overlay');
+  const productIdInput = document.getElementById('p-product-id');
   const vendorIdInput = document.getElementById('p-vendor-id');
   const vendorNameInput = document.getElementById('p-vendor-name');
+  const modalTitle = document.getElementById('product-modal-title');
+  const btnText = document.getElementById('btn-submit-product-text');
   const form = document.getElementById('add-product-form');
   
   if (form) form.reset();
+  if (productIdInput) productIdInput.value = '';
   if (vendorIdInput) vendorIdInput.value = vendorId;
   if (vendorNameInput) vendorNameInput.value = businessName;
+  if (modalTitle) modalTitle.innerHTML = '<i class="fas fa-utensils" style="color:var(--brand)"></i> Add Stall Menu Item';
+  if (btnText) btnText.textContent = 'Add Menu Item';
+  if (modal) modal.classList.add('is-active');
+}
+
+function openEditProductModal(productId, vendorId, businessName, name, price, description, stockStatus, imageUrl) {
+  const modal = document.getElementById('product-modal-overlay');
+  const productIdInput = document.getElementById('p-product-id');
+  const vendorIdInput = document.getElementById('p-vendor-id');
+  const vendorNameInput = document.getElementById('p-vendor-name');
+  const nameInput = document.getElementById('p-name');
+  const priceInput = document.getElementById('p-price');
+  const descInput = document.getElementById('p-desc');
+  const stockSelect = document.getElementById('p-stock');
+  const imageUrlInput = document.getElementById('p-image-url');
+  const modalTitle = document.getElementById('product-modal-title');
+  const btnText = document.getElementById('btn-submit-product-text');
+  const form = document.getElementById('add-product-form');
+
+  if (form) form.reset();
+  if (productIdInput) productIdInput.value = productId;
+  if (vendorIdInput) vendorIdInput.value = vendorId;
+  if (vendorNameInput) vendorNameInput.value = businessName;
+  if (nameInput) nameInput.value = name;
+  if (priceInput) priceInput.value = price;
+  if (descInput) descInput.value = description || '';
+  if (stockSelect) stockSelect.value = stockStatus || 'in_stock';
+  if (imageUrlInput) imageUrlInput.value = imageUrl || '';
+
+  if (modalTitle) modalTitle.innerHTML = '<i class="fas fa-edit" style="color:var(--brand)"></i> Edit Stall Menu Item';
+  if (btnText) btnText.textContent = 'Save Changes';
   if (modal) modal.classList.add('is-active');
 }
 
@@ -1207,17 +1246,24 @@ async function handleRegisterProduct(event) {
   event.preventDefault();
   const form = document.getElementById('add-product-form');
   const submitBtn = document.getElementById('btn-submit-product');
+  const productId = document.getElementById('p-product-id').value;
   const vendorId = document.getElementById('p-vendor-id').value;
   if (!form || !submitBtn || !vendorId) return;
 
   const originalHtml = submitBtn.innerHTML;
   submitBtn.disabled = true;
-  submitBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Adding Menu Item...`;
+  submitBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${productId ? 'Updating' : 'Adding'} Menu Item...`;
 
   const formData = new FormData(form);
+  let targetUrl = `${API_BASE}/admin/vendors/${vendorId}/products`;
+
+  if (productId) {
+    targetUrl = `${API_BASE}/admin/products/${productId}`;
+    formData.append('_method', 'PUT');
+  }
 
   try {
-    const res = await fetch(`${API_BASE}/admin/vendors/${vendorId}/products`, {
+    const res = await fetch(targetUrl, {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -1230,7 +1276,7 @@ async function handleRegisterProduct(event) {
     const data = await res.json();
 
     if (res.ok && (data.success || data.status === 'success')) {
-      showNotification(data.message || 'Menu item added successfully!', 'success');
+      showNotification(data.message || (productId ? 'Menu item updated successfully!' : 'Menu item added successfully!'), 'success');
       closeAddProductModal();
       await loadVendorsTab();
       // Expand vendor's drawer automatically
@@ -1239,11 +1285,11 @@ async function handleRegisterProduct(event) {
       if (menu) menu.style.display = 'block';
       if (arrow) arrow.className = 'fas fa-chevron-up';
     } else {
-      const errMsg = data.message || (data.errors ? Object.values(data.errors).flat().join(', ') : 'Failed to add menu item.');
+      const errMsg = data.message || (data.errors ? Object.values(data.errors).flat().join(', ') : 'Failed to save menu item.');
       showNotification(errMsg, 'error');
     }
   } catch (e) {
-    showNotification('Network error while adding menu item', 'error');
+    showNotification('Network error while saving menu item', 'error');
   } finally {
     submitBtn.disabled = false;
     submitBtn.innerHTML = originalHtml;

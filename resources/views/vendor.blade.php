@@ -888,7 +888,7 @@
                         </div>
                     </div>
                     <div class="flex justify-end gap-2 pt-2 border-t border-[#F1F5F9]">
-                        <button type="button" onclick="openEditProductForm(${p.id}, '${escName}', ${p.price}, '${escDesc}')" class="px-3.5 py-1 bg-[#F1F5F9] hover:bg-[#E2E8F0] text-[#0F172A] text-[10px] font-extrabold rounded-full transition flex items-center gap-1">
+                        <button type="button" onclick="openEditProductForm(${p.id}, '${escName}', ${p.price}, '${escDesc}', '${p.category || 'Mains'}', '${p.stock_status || 'in_stock'}')" class="px-3.5 py-1 bg-[#F1F5F9] hover:bg-[#E2E8F0] text-[#0F172A] text-[10px] font-extrabold rounded-full transition flex items-center gap-1">
                             <i class="fas fa-pen text-[8px] text-[#A31D1D]"></i> Edit
                         </button>
                         <button type="button" onclick="handleDeleteProduct(${p.id})" class="px-3.5 py-1 bg-[#FEF2F2] hover:bg-[#FEE2E2] text-[#991B1B] text-[10px] font-extrabold rounded-full transition flex items-center gap-1">
@@ -983,12 +983,16 @@
 
                 if (res.ok) {
                     closeProductForm();
+                    showToast(id ? 'Menu item updated successfully!' : 'Menu item added successfully!', 'success');
                     const response = await fetch(`${API_BASE}/vendors`);
                     if (response.ok) {
                         vendors = await response.json();
                     }
                     renderStockControls();
                     renderMenuManagement();
+                } else {
+                    const data = await res.json();
+                    showToast(data.message || 'Failed to save menu item', 'danger');
                 }
             } catch(e) {}
         }

@@ -1547,7 +1547,7 @@
         if (!vendors || !vendors.length) return;
 
         heroVendorAdIds = [];
-        vendors.slice(0, 3).forEach((v, index) => {
+        vendors.slice(0, 4).forEach((v, index) => {
             heroVendorAdIds[index] = v.id;
 
             const nameEl = document.getElementById(`hero-ad-name-${index}`);
