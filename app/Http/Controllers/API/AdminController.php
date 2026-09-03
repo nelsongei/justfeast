@@ -170,6 +170,7 @@ class AdminController extends Controller
         $validated = $request->validate([
             'order_status'   => 'nullable|string|in:created,accepted,preparing,ready,runner_assigned,enroute,delivered,cancelled',
             'payment_status' => 'nullable|string|in:pending,paid,failed',
+            'runner_id'      => 'nullable',
         ]);
 
         $updateData = [];
@@ -182,6 +183,25 @@ class AdminController extends Controller
                 $updateData['paid_at'] = now();
             }
         }
+        if ($request->has('runner_id')) {
+            $rawRunnerId = $request->input('runner_id');
+            $runnerId = ($rawRunnerId !== null && $rawRunnerId !== '') ? (int) $rawRunnerId : null;
+            $updateData['runner_id'] = $runnerId;
+
+            if ($runnerId && in_array($order->order_status, ['created', 'accepted', 'preparing', 'ready'])) {
+                $updateData['order_status'] = 'runner_assigned';
+            }
+
+            $delivery = Delivery::firstOrCreate(
+                ['order_id' => $order->id],
+                [
+                    'verification_pin'      => (string) random_int(100000, 999999),
+                    'verification_pin_hash' => Hash::make('123456'),
+                    'status'                => 'pending',
+                ]
+            );
+            $delivery->update(['runner_id' => $runnerId]);
+        }
 
         if (!empty($updateData)) {
             $order->update($updateData);
@@ -189,7 +209,7 @@ class AdminController extends Controller
 
         return response()->json([
             'status'  => 'success',
-            'message' => "Order #{$order->id} status updated successfully.",
+            'message' => "Order #{$order->id} updated successfully.",
             'order'   => $order->fresh(['vendor', 'user', 'items.product', 'runner', 'delivery']),
         ]);
     }

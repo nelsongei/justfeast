@@ -195,14 +195,32 @@
 <script>
 let allOrders = [];
 let filteredOrdersList = [];
+let runnersList = [];
 let currentPage = 1;
 const entriesPerPage = 10;
 let activePayOrder = null;
 
 window.addEventListener('DOMContentLoaded', () => {
+  loadRunnersList();
   loadOrdersTab();
   setInterval(loadOrdersTab, 5000);
 });
+
+async function loadRunnersList() {
+  try {
+    const res = await fetch(`${API_BASE}/admin/users?role=runner&per_page=100`, {
+      headers: {
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    });
+    if (res.ok) {
+      const data = await res.json();
+      runnersList = data.users ? (data.users.data || data.users) : (Array.isArray(data) ? data : []);
+      if (allOrders.length) renderOrdersTable();
+    }
+  } catch(e) {}
+}
 
 async function loadOrdersTab() {
   try {
@@ -230,7 +248,8 @@ function filterOrders() {
     const email = (o.user?.email || '').toLowerCase();
     const phone = (o.user?.phone || '').toLowerCase();
     const vendor = (o.vendor?.business_name || '').toLowerCase();
-    const matchQuery = name.includes(q) || email.includes(q) || phone.includes(q) || vendor.includes(q) || String(o.id).includes(q);
+    const runner = (o.runner?.name || o.delivery?.runner?.name || '').toLowerCase();
+    const matchQuery = name.includes(q) || email.includes(q) || phone.includes(q) || vendor.includes(q) || runner.includes(q) || String(o.id).includes(q);
     const matchOStatus = oStatus === '' || o.order_status === oStatus;
     const matchPStatus = pStatus === '' || o.payment_status === pStatus;
     return matchQuery && matchOStatus && matchPStatus;
@@ -259,8 +278,12 @@ function renderOrdersTable() {
       const time = new Date(o.created_at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
       const dateStr = new Date(o.created_at).toLocaleDateString([], {month:'short',day:'numeric'});
 
-      const runnerName = o.runner?.name || o.delivery?.runner?.name || 'Unassigned';
+      const currentRunnerId = o.runner_id || o.runner?.id || o.delivery?.runner_id || o.delivery?.runner?.id || '';
       const custContact = o.user?.phone || (isGenuineEmail(o.user?.email) ? o.user.email : '—');
+
+      const runnerSelectOptions = runnersList.map(r => 
+        `<option value="${r.id}" ${currentRunnerId == r.id ? 'selected' : ''}>🏃 ${escapeHtml(r.name)}</option>`
+      ).join('');
 
       return `<tr>
         <td style="font-weight:800;color:var(--brand)">
@@ -273,7 +296,16 @@ function renderOrdersTable() {
         </td>
         <td><strong style="color:var(--text)">${o.vendor?.business_name || '—'}</strong></td>
         <td style="font-size:.75rem;color:var(--muted);max-width:140px;word-break:break-word;">${seat}</td>
-        <td><span style="font-size:.75rem;font-weight:700;color:var(--text)">${runnerName}</span></td>
+        
+        <!-- Editable Runner Assignment Dropdown -->
+        <td>
+          <select onchange="updateOrderStatus(${o.id}, 'runner_id', this.value)" 
+                  style="padding:0.3rem 0.5rem;border-radius:10px;font-size:0.72rem;font-weight:800;border:1px solid ${currentRunnerId ? '#93C5FD' : 'var(--border)'};background:${currentRunnerId ? '#EFF6FF' : 'var(--surface2)'};color:${currentRunnerId ? '#1D4ED8' : 'var(--text)'};cursor:pointer;">
+            <option value="">Unassigned</option>
+            ${runnerSelectOptions}
+          </select>
+        </td>
+
         <td style="font-weight:900;color:#05A357">Ksh ${Number(o.total_amount).toLocaleString()}</td>
         
         <!-- Editable Order Status -->

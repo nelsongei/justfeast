@@ -132,4 +132,35 @@ class AdminOrderManagementTest extends TestCase
             'mpesa_checkout_request_id' => 'ws_CO_ADMIN_001',
         ]);
     }
+
+    public function test_admin_can_assign_runner_to_order(): void
+    {
+        $runner = User::create([
+            'name'     => 'Runner Alex',
+            'email'    => 'runner@test.com',
+            'role'     => 'runner',
+            'password' => bcrypt('password'),
+        ]);
+
+        $response = $this->actingAs($this->admin, 'sanctum')
+            ->patchJson("/api/admin/orders/{$this->order->id}/status", [
+                'runner_id' => $runner->id,
+            ]);
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'status' => 'success',
+            ]);
+
+        $this->assertDatabaseHas('orders', [
+            'id'           => $this->order->id,
+            'runner_id'    => $runner->id,
+            'order_status' => 'runner_assigned',
+        ]);
+
+        $this->assertDatabaseHas('deliveries', [
+            'order_id'  => $this->order->id,
+            'runner_id' => $runner->id,
+        ]);
+    }
 }
