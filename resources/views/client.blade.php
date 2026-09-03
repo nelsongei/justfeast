@@ -546,6 +546,26 @@
             <!-- Marketplace Section -->
             <section id="vendors" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                 <div class="lg:col-span-8 xl:col-span-9 space-y-6 min-w-0">
+                    <!-- Dynamic Vendors List (Renders Top restaurants & stalls + filter chips) -->
+                    <div id="vendor-list-container" class="space-y-8"></div>
+
+                    <!-- Live Event Promo Banner -->
+                    <div class="relative overflow-hidden rounded-[36px] bg-[#A31D1D] p-6 md:p-7 flex flex-col md:flex-row md:items-center justify-between gap-5 text-white shadow-xl shadow-[#A31D1D]/20 border border-white/10">
+                        <div class="absolute -right-8 -top-10 text-[180px] opacity-10 pointer-events-none">🎤</div>
+                        <div class="relative z-10 space-y-2">
+                            <span class="inline-flex items-center gap-1.5 bg-[#FFC244] text-[#0F172A] text-[9.5px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-sm">
+                                <i class="fas fa-bolt text-[10px]"></i> Live Event Special
+                            </span>
+                            <h3 class="font-black text-2xl md:text-3xl tracking-tight text-white">Don’t miss the headliner set!</h3>
+                            <p class="text-white/80 text-xs md:text-sm max-w-xl font-medium">Order before the next artist performance for express runner dispatch.</p>
+                        </div>
+                        <button onclick="openSeatModal()"
+                                class="relative z-10 bg-white hover:bg-[#FFC244] text-[#0F172A] px-6 py-3.5 rounded-full text-xs font-black transition-all shadow-lg self-start md:self-auto">
+                            Set Delivery Location
+                        </button>
+                    </div>
+
+                    <!-- Event Marketplace Card (Positioned below Top restaurants and stalls) -->
                     <div class="jf-card rounded-[28px] sm:rounded-[36px] p-4 sm:p-6 space-y-4 sm:space-y-5">
                         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 sm:gap-4">
                             <div>
@@ -594,25 +614,6 @@
                         <!-- Featured Food & Drinks Container (Positioned inside Event Marketplace card) -->
                         <div id="featured-food-container" class="mt-3 pt-3 border-t border-slate-100/90"></div>
                     </div>
-
-                    <!-- Live Event Promo Banner -->
-                    <div class="relative overflow-hidden rounded-[36px] bg-[#A31D1D] p-6 md:p-7 flex flex-col md:flex-row md:items-center justify-between gap-5 text-white shadow-xl shadow-[#A31D1D]/20 border border-white/10">
-                        <div class="absolute -right-8 -top-10 text-[180px] opacity-10 pointer-events-none">🎤</div>
-                        <div class="relative z-10 space-y-2">
-                            <span class="inline-flex items-center gap-1.5 bg-[#FFC244] text-[#0F172A] text-[9.5px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-sm">
-                                <i class="fas fa-bolt text-[10px]"></i> Live Event Special
-                            </span>
-                            <h3 class="font-black text-2xl md:text-3xl tracking-tight text-white">Don’t miss the headliner set!</h3>
-                            <p class="text-white/80 text-xs md:text-sm max-w-xl font-medium">Order before the next artist performance for express runner dispatch.</p>
-                        </div>
-                        <button onclick="openSeatModal()"
-                                class="relative z-10 bg-white hover:bg-[#FFC244] text-[#0F172A] px-6 py-3.5 rounded-full text-xs font-black transition-all shadow-lg self-start md:self-auto">
-                            Set Delivery Location
-                        </button>
-                    </div>
-
-                    <!-- Dynamic Vendors List -->
-                    <div id="vendor-list-container" class="space-y-8"></div>
                 </div>
 
                 <!-- Right Sticky Cart Sidebar -->
