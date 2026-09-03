@@ -947,16 +947,16 @@
                 <p class="text-3xl font-black text-[#A31D1D]" id="mpesa-amount-display">Ksh 0</p>
 
                 <!-- Payment Method Selector Tabs -->
-                <div class="grid grid-cols-2 gap-1.5 p-1.5 bg-slate-100 rounded-2xl border border-slate-200/80 mt-2">
-                    <button type="button" id="pay-tab-intasend" onclick="switchPaymentMethodTab('intasend')"
-                            class="py-2 px-2 rounded-xl text-[11px] font-black transition-all flex items-center justify-center gap-1 bg-[#05A357] text-white shadow-xs cursor-pointer truncate">
-                        <span class="bg-white text-[#05A357] text-[8px] px-1.5 py-0.5 rounded font-black shrink-0">INTASEND</span>
-                        <span class="truncate">IntaSend (Live)</span>
+                <div class="grid grid-cols-1 gap-1.5 p-1.5 bg-slate-100 rounded-2xl border border-slate-200/80 mt-2">
+                    <button type="button" id="pay-tab-mpesa" onclick="switchPaymentMethodTab('mpesa')"
+                            class="py-2.5 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 bg-white text-[#0F172A] shadow-xs cursor-pointer truncate">
+                        <img src="{{ asset('images/logo/mpesa.png') }}" alt="M-Pesa" class="h-4 w-auto object-contain shrink-0">
+                        <span class="truncate">M-Pesa Express (STK Push)</span>
                     </button>
-{{--                    <button type="button" id="pay-tab-mpesa" onclick="switchPaymentMethodTab('mpesa')"--}}
+{{--                    <button type="button" id="pay-tab-intasend" onclick="switchPaymentMethodTab('intasend')"--}}
 {{--                            class="py-2 px-2 rounded-xl text-[11px] font-black transition-all flex items-center justify-center gap-1 text-slate-500 hover:text-slate-800 cursor-pointer truncate">--}}
-{{--                        <img src="{{ asset('images/logo/mpesa.png') }}" alt="M-Pesa" class="h-3.5 w-auto object-contain shrink-0">--}}
-{{--                        <span class="truncate">Daraja Sandbox</span>--}}
+{{--                        <span class="bg-[#05A357] text-white text-[8px] px-1 py-0.5 rounded font-black shrink-0">INTASEND</span>--}}
+{{--                        <span class="truncate">IntaSend</span>--}}
 {{--                    </button>--}}
                 </div>
             </div>
@@ -2230,7 +2230,7 @@
     // ─── Payment Integration Flow (M-Pesa STK Push & LOOP Paybill) ────────────
     let currentOrderId = null;       // order ID pending payment
     let paymentPollTimer = null;     // polling interval for payment confirmation
-    let activePaymentMethod = 'intasend'; // 'mpesa', 'intasend', or 'loop'
+    let activePaymentMethod = 'mpesa'; // 'mpesa', 'intasend', or 'loop'
 
     function switchPaymentMethodTab(method) {
         activePaymentMethod = method;
@@ -2320,7 +2320,7 @@
             loopPhoneInput.value = currentUser.phone || '';
         }
 
-        switchPaymentMethodTab('intasend');
+        switchPaymentMethodTab('mpesa');
         showMpesaState('input');
         document.getElementById('mpesa-payment-overlay').classList.remove('hidden');
     }
