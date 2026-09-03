@@ -160,6 +160,10 @@
             animation-delay: 1.6s;
         }
 
+        .floating-food:nth-child(4) {
+            animation-delay: 2.4s;
+        }
+
         @keyframes floaty {
             0%, 100% {
                 transform: translateY(0) rotate(-1.5deg);
@@ -447,28 +451,36 @@
                                 </div>
                             </div>
 
-                            <!-- Floating interactive items (Dynamic Vendor Adverts) -->
-                            <div onclick="selectHeroVendorAd(0)" class="floating-food absolute left-1 sm:left-2 top-4 sm:top-8 bg-white/95 text-[#0F172A] rounded-2xl sm:rounded-[26px] p-2.5 sm:p-3.5 shadow-2xl flex items-center gap-2 sm:gap-3 border border-white/60 z-20 cursor-pointer hover:scale-105 transition-all" id="hero-ad-card-0">
-                                <span class="text-xl sm:text-3xl" id="hero-ad-logo-0">🍔</span>
+                            <!-- Floating interactive items (4 Dynamic Vendor Adverts) -->
+                            <div onclick="selectHeroVendorAd(0)" class="floating-food absolute left-1 sm:left-2 top-2 sm:top-6 bg-white/95 text-[#0F172A] rounded-2xl sm:rounded-[26px] p-2.5 sm:p-3.5 shadow-2xl flex items-center gap-2 sm:gap-3 border border-white/60 z-20 cursor-pointer hover:scale-105 transition-all" id="hero-ad-card-0">
+                                <span class="text-xl sm:text-3xl" id="hero-ad-logo-0">🥟</span>
                                 <div>
-                                    <p class="text-[11px] sm:text-xs font-black truncate max-w-[110px] sm:max-w-[130px]" id="hero-ad-name-0">Smash Burgers</p>
-                                    <p class="text-[9px] sm:text-[10px] text-[#05A357] font-extrabold" id="hero-ad-sub-0">from Ksh 450</p>
+                                    <p class="text-[11px] sm:text-xs font-black truncate max-w-[110px] sm:max-w-[130px]" id="hero-ad-name-0">Samosa World</p>
+                                    <p class="text-[9px] sm:text-[10px] text-[#05A357] font-extrabold" id="hero-ad-sub-0">from Ksh 40</p>
                                 </div>
                             </div>
 
-                            <div onclick="selectHeroVendorAd(1)" class="floating-food absolute right-1 sm:right-2 top-16 sm:top-24 bg-white/95 text-[#0F172A] rounded-2xl sm:rounded-[26px] p-2.5 sm:p-3.5 shadow-2xl flex items-center gap-2 sm:gap-3 border border-white/60 z-20 cursor-pointer hover:scale-105 transition-all" id="hero-ad-card-1">
-                                <span class="text-xl sm:text-3xl" id="hero-ad-logo-1">🥤</span>
+                            <div onclick="selectHeroVendorAd(1)" class="floating-food absolute right-1 sm:right-2 top-2 sm:top-6 bg-white/95 text-[#0F172A] rounded-2xl sm:rounded-[26px] p-2.5 sm:p-3.5 shadow-2xl flex items-center gap-2 sm:gap-3 border border-white/60 z-20 cursor-pointer hover:scale-105 transition-all" id="hero-ad-card-1">
+                                <span class="text-xl sm:text-3xl" id="hero-ad-logo-1">☕</span>
                                 <div>
-                                    <p class="text-[11px] sm:text-xs font-black truncate max-w-[110px] sm:max-w-[130px]" id="hero-ad-name-1">Ice Cold Drinks</p>
-                                    <p class="text-[9px] sm:text-[10px] text-[#05A357] font-extrabold" id="hero-ad-sub-1">Chilled & Fast</p>
+                                    <p class="text-[11px] sm:text-xs font-black truncate max-w-[110px] sm:max-w-[130px]" id="hero-ad-name-1">Tai Coffee</p>
+                                    <p class="text-[9px] sm:text-[10px] text-[#05A357] font-extrabold" id="hero-ad-sub-1">from Ksh 150</p>
                                 </div>
                             </div>
 
-                            <div onclick="selectHeroVendorAd(2)" class="floating-food absolute bottom-6 sm:bottom-8 left-4 sm:left-8 bg-white/95 text-[#0F172A] rounded-2xl sm:rounded-[26px] p-2.5 sm:p-3.5 shadow-2xl flex items-center gap-2 sm:gap-3 border border-white/60 z-20 cursor-pointer hover:scale-105 transition-all" id="hero-ad-card-2">
-                                <span class="text-xl sm:text-3xl" id="hero-ad-logo-2">🍿</span>
+                            <div onclick="selectHeroVendorAd(2)" class="floating-food absolute bottom-2 sm:bottom-6 left-1 sm:left-2 bg-white/95 text-[#0F172A] rounded-2xl sm:rounded-[26px] p-2.5 sm:p-3.5 shadow-2xl flex items-center gap-2 sm:gap-3 border border-white/60 z-20 cursor-pointer hover:scale-105 transition-all" id="hero-ad-card-2">
+                                <span class="text-xl sm:text-3xl" id="hero-ad-logo-2">🐟</span>
                                 <div>
-                                    <p class="text-[11px] sm:text-xs font-black truncate max-w-[110px] sm:max-w-[130px]" id="hero-ad-name-2">Event Snacks</p>
-                                    <p class="text-[9px] sm:text-[10px] text-[#05A357] font-extrabold" id="hero-ad-sub-2">Queue-free</p>
+                                    <p class="text-[11px] sm:text-xs font-black truncate max-w-[110px] sm:max-w-[130px]" id="hero-ad-name-2">Global Tilapia</p>
+                                    <p class="text-[9px] sm:text-[10px] text-[#05A357] font-extrabold" id="hero-ad-sub-2">from Ksh 200</p>
+                                </div>
+                            </div>
+
+                            <div onclick="selectHeroVendorAd(3)" class="floating-food absolute bottom-2 sm:bottom-6 right-1 sm:right-2 bg-white/95 text-[#0F172A] rounded-2xl sm:rounded-[26px] p-2.5 sm:p-3.5 shadow-2xl flex items-center gap-2 sm:gap-3 border border-white/60 z-20 cursor-pointer hover:scale-105 transition-all" id="hero-ad-card-3">
+                                <span class="text-xl sm:text-3xl" id="hero-ad-logo-3">🍖</span>
+                                <div>
+                                    <p class="text-[11px] sm:text-xs font-black truncate max-w-[110px] sm:max-w-[130px]" id="hero-ad-name-3">Carnivore Smokehouse</p>
+                                    <p class="text-[9px] sm:text-[10px] text-[#05A357] font-extrabold" id="hero-ad-sub-3">from Ksh 350</p>
                                 </div>
                             </div>
 
