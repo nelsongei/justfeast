@@ -495,6 +495,33 @@
             } catch(e) {}
         }
 
+        function formatOrderTimestamp(dateStr) {
+            if (!dateStr) return '';
+            const date = new Date(dateStr);
+            if (isNaN(date.getTime())) return '';
+
+            const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const diffSecs = Math.floor((new Date() - date) / 1000);
+
+            let agoStr = '';
+            if (diffSecs < 60) {
+                agoStr = 'Just now';
+            } else if (diffSecs < 3600) {
+                const mins = Math.floor(diffSecs / 60);
+                agoStr = `${mins}m ago`;
+            } else if (diffSecs < 86400) {
+                const hrs = Math.floor(diffSecs / 3600);
+                agoStr = `${hrs}h ago`;
+            } else {
+                const days = Math.floor(diffSecs / 86400);
+                agoStr = `${days}d ago`;
+            }
+
+            return `<span class="inline-flex items-center gap-1 bg-[#F8FAFC] border border-[#CBD5E1] text-[#334155] px-2 py-0.5 rounded-md font-extrabold text-[10px] shadow-2xs" title="${date.toLocaleString()}">
+                <i class="far fa-clock text-[#64748B] text-[9px]"></i> ${timeStr} <span class="text-[#2563EB]">(${agoStr})</span>
+            </span>`;
+        }
+
         function renderAvailableOrders(orders) {
             const container = document.getElementById('runner-available-card-container');
             const badge = document.getElementById('stat-available-count-badge');
@@ -520,6 +547,9 @@
                 return;
             }
 
+            // Always order newest first by created_at timestamp
+            orders.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+
             container.innerHTML = '';
             orders.forEach(o => {
                 const loc = o.seat_location || {};
@@ -539,9 +569,10 @@
                                 🛒
                             </div>
                             <div>
-                                <div class="flex items-center gap-2">
+                                <div class="flex items-center gap-2 flex-wrap">
                                     <span class="text-[10px] text-[#D97706] font-black">Order #${o.id}</span>
                                     <span class="text-[10px] bg-[#ECFDF5] text-[#047857] px-2 py-0.5 rounded-md font-bold uppercase">${(o.order_status || 'CREATED').replace('_', ' ')}</span>
+                                    ${formatOrderTimestamp(o.created_at)}
                                 </div>
                                 <h4 class="text-xs font-black text-[#0F172A] mt-0.5">${o.user ? o.user.name : 'Customer'}</h4>
                             </div>
@@ -633,13 +664,14 @@
                             <h4 class="text-sm font-bold text-[#0F172A]">Awaiting Kitchen Dispatches</h4>
                             <p class="text-xs text-[#64748B]">Newly prepared orders from stalls will appear here automatically.</p>
                         </div>
-                    </div>
-                `;
-                if (mapGuide) mapGuide.classList.add('hidden');
-                return;
-            }
+                           if (mapGuide) mapGuide.classList.remove('hidden');
 
-            if (mapGuide) mapGuide.classList.remove('hidden');
+            // Always order newest first by created_at timestamp
+            deliveries.sort((a, b) => {
+                const timeA = new Date((a.order && a.order.created_at) ? a.order.created_at : (a.created_at || 0));
+                const timeB = new Date((b.order && b.order.created_at) ? b.order.created_at : (b.created_at || 0));
+                return timeB - timeA;
+            });
 
             // Set navigation tag for active delivery
             const activeFirst = deliveries.find(d => d.status !== 'delivered') || deliveries[0];
@@ -727,9 +759,10 @@
                                 👤
                             </div>
                             <div>
-                                <div class="flex items-center gap-2">
+                                <div class="flex items-center gap-2 flex-wrap">
                                     <span class="text-[10px] text-[#A31D1D] font-black">Delivery #${del.id}</span>
                                     <span class="text-[10px] bg-[#F1F5F9] text-[#475569] px-2 py-0.5 rounded-md font-bold">Order #${o.id || ''}</span>
+                                    ${formatOrderTimestamp(o.created_at || del.created_at)}
                                 </div>
                                 <h4 class="text-sm font-black text-[#0F172A] mt-0.5">${o.user ? o.user.name : 'Customer'}</h4>
                             </div>
