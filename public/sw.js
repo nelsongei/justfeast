@@ -1,6 +1,7 @@
-const CACHE_NAME = 'justfeast-cache-v1';
+const CACHE_NAME = 'justfeast-cache-v2';
 const ASSETS_TO_CACHE = [
   '/',
+  '/offline.html',
   '/manifest.json',
   'https://cdn.tailwindcss.com',
   'https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap'
@@ -32,47 +33,62 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Fetch events intercepting with Network-First strategy for APIs, Cache-First for assets
+// Fetch events intercepting with Network-First strategy for APIs & Pages, Cache-First for assets
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
-  // If it's a backend API call, try network first, then fallback to cache
-  if (url.pathname.startsWith('/api/')) {
+  // 1. Navigation / HTML Page Request Strategy (Network-First, fallback to cached / or /offline.html)
+  if (event.request.mode === 'navigate') {
     event.respondWith(
       fetch(event.request)
         .then((response) => {
-          // Cache successful API responses
           if (response.status === 200) {
             const responseClone = response.clone();
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(event.request, responseClone);
-            });
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
           }
           return response;
         })
         .catch(() => {
-          // Fallback to cache if network is down
+          return caches.match(event.request).then((cachedResp) => {
+            return cachedResp || caches.match('/offline.html');
+          });
+        })
+    );
+    return;
+  }
+
+  // 2. Backend API calls (Network-First, fallback to cached API response)
+  if (url.pathname.startsWith('/api/')) {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          if (response.status === 200) {
+            const responseClone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
+          }
+          return response;
+        })
+        .catch(() => {
           return caches.match(event.request);
         })
     );
-  } else {
-    // Standard asset caching (Cache-First)
-    event.respondWith(
-      caches.match(event.request).then((cachedResponse) => {
-        if (cachedResponse) {
-          return cachedResponse;
-        }
-        return fetch(event.request).then((response) => {
-          if (!response || response.status !== 200 || response.type !== 'basic') {
-            return response;
-          }
-          const responseToCache = response.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseToCache);
-          });
-          return response;
-        });
-      })
-    );
+    return;
   }
+
+  // 3. Static Assets (Cache-First)
+  event.respondWith(
+    caches.match(event.request).then((cachedResponse) => {
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+      return fetch(event.request).then((response) => {
+        if (!response || response.status !== 200 || response.type !== 'basic') {
+          return response;
+        }
+        const responseToCache = response.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseToCache));
+        return response;
+      });
+    })
+  );
 });

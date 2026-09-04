@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Offline | JustFeast Festival</title>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0B0F19">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Outfit', 'sans-serif'] },
+          colors: {
+            brand: { 500: '#E11D48', 600: '#BE123C', 700: '#9F1239' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background-color: #0B0F19; color: #F9FAFB; font-family: 'Outfit', sans-serif; }
+    .glass-card {
+      background: rgba(17, 24, 39, 0.75);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between items-center p-6 text-center">
+
+  <!-- Header -->
+  <header class="w-full max-w-md pt-4 flex justify-between items-center">
+    <div class="flex items-center gap-2">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 to-amber-500 flex items-center justify-center font-bold text-white shadow-lg shadow-brand-500/20 text-lg">
+        J
+      </div>
+      <span class="text-xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-100 to-gray-400">
+        JustFeast
+      </span>
+    </div>
+    <span class="px-3 py-1 text-xs font-semibold rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center gap-1.5">
+      <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+      Offline Mode
+    </span>
+  </header>
+
+  <!-- Main Content -->
+  <main class="w-full max-w-md my-auto py-8">
+    <div class="glass-card rounded-3xl p-8 shadow-2xl space-y-6">
+      
+      <div class="w-20 h-20 mx-auto rounded-3xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 text-4xl shadow-inner">
+        ⚡
+      </div>
+
+      <div class="space-y-2">
+        <h1 class="text-2xl font-bold tracking-tight text-white">No Internet Connection</h1>
+        <p class="text-sm text-gray-400 leading-relaxed">
+          Cellular signal is congested or unavailable in this area. Connect to free venue Wi-Fi to load menus and process M-Pesa STK payments immediately.
+        </p>
+      </div>
+
+      <!-- Venue Wi-Fi Callout -->
+      <div class="bg-gradient-to-r from-amber-500/15 via-brand-500/15 to-transparent border border-amber-500/30 rounded-2xl p-4 text-left space-y-2">
+        <div class="flex items-center gap-2 text-amber-300 font-bold text-sm">
+          <svg class="w-5 h-5 text-amber-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"/>
+          </svg>
+          Rhema Feast Free Wi-Fi
+        </div>
+        <p class="text-xs text-gray-300">
+          Connect to network: <span class="font-bold text-white bg-white/10 px-2 py-0.5 rounded border border-white/20">JustFeast-Orders</span> (No password required).
+        </p>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="space-y-3 pt-2">
+        <button onclick="window.location.reload()" class="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-brand-600 to-amber-500 hover:from-brand-500 hover:to-amber-400 text-white font-bold shadow-lg shadow-brand-600/30 transition-all active:scale-[0.98] flex items-center justify-center gap-2 text-sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+          </svg>
+          Try Reconnecting
+        </button>
+
+        <button onclick="history.back()" class="w-full py-3 px-6 rounded-2xl bg-white/5 hover:bg-white/10 text-gray-300 font-semibold border border-white/10 transition-all text-sm">
+          Go Back
+        </button>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer Info -->
+  <footer class="w-full max-w-md pb-4 text-xs text-gray-500 space-y-1">
+    <p>M-Pesa STK Push works over cellular GSM even with 0 MB mobile data.</p>
+    <p>© 2026 JustFeast Ltd. All rights reserved.</p>
+  </footer>
+
+  <script>
+    // Auto-reload when connection comes back online
+    window.addEventListener('online', () => {
+      window.location.reload();
+    });
+  </script>
+
+</body>
+</html>

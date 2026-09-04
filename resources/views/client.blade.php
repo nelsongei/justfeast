@@ -368,6 +368,29 @@
         </div>
     </header>
 
+    <!-- Venue Wi-Fi & Crowd Connectivity Alert Banner -->
+    <div id="venue-wifi-banner" class="hidden mb-6 bg-gradient-to-r from-amber-900/90 via-slate-900/90 to-amber-900/90 border border-amber-500/40 rounded-2xl p-3.5 sm:p-4 text-white backdrop-blur-md shadow-2xl transition-all relative z-30">
+        <div class="flex items-center justify-between gap-3 flex-wrap">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 font-bold shrink-0 text-base animate-pulse">
+                    ⚡
+                </div>
+                <div>
+                    <p class="text-xs sm:text-sm font-extrabold text-amber-200 flex items-center gap-2">
+                        <span>Crowd Connectivity Mode Active</span>
+                        <span class="text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full font-black uppercase">Low Internet</span>
+                    </p>
+                    <p class="text-[11px] sm:text-xs text-slate-300 font-medium mt-0.5">
+                        Cellular data slow? Connect to free venue Wi-Fi: <span class="font-extrabold text-white bg-white/10 px-2 py-0.5 rounded border border-white/20">JustFeast-Orders</span> to process your order immediately.
+                    </p>
+                </div>
+            </div>
+            <button onclick="dismissVenueWifiBanner()" class="text-xs font-extrabold text-slate-400 hover:text-white px-2 py-1 rounded-lg hover:bg-white/10 transition-all">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+
     <!-- Customer Main Wrapper -->
     <main class="flex-1">
         <div id="cust-main" class="hidden space-y-8 pb-12">
@@ -1462,6 +1485,9 @@
 
         pollingInterval = setInterval(syncActiveOrder, 2000);
         checkPWAPrompt();
+        restoreBasketFromStorage();
+        renderBasket();
+        initNetworkListeners();
     });
 
     function updateAuthHeader() {
@@ -2427,8 +2453,17 @@
 
         } catch (e) {
             currentOrderId = null;
+            queueOfflineOrder(phone);
             showMpesaState('error');
-            document.getElementById('mpesa-error-msg').textContent = 'Network error during payment initiation. Please try again.';
+            const errEl = document.getElementById('mpesa-error-msg');
+            if (errEl) {
+                errEl.innerHTML = `
+                    <div class="space-y-2 text-left">
+                        <p class="font-bold text-amber-400 flex items-center gap-1.5"><i class="fas fa-wifi"></i> Network Connection Signal Weak</p>
+                        <p class="text-xs text-slate-300">Your order has been saved offline. Connect to venue Wi-Fi: <span class="font-extrabold text-white bg-black/40 px-1.5 py-0.5 rounded border border-white/20">JustFeast-Orders</span> or wait a moment while we auto-sync STK Push.</p>
+                    </div>
+                `;
+            }
         }
     }
 
@@ -2903,6 +2938,120 @@
     function dismissPWABanner() {
         document.getElementById('pwa-install-banner').classList.add('hidden');
     }
+
+    function dismissVenueWifiBanner() {
+        const banner = document.getElementById('venue-wifi-banner');
+        if (banner) banner.classList.add('hidden');
+    }
+
+    function saveBasketToStorage() {
+        try {
+            localStorage.setItem('justfeast_saved_basket', JSON.stringify(basket));
+            localStorage.setItem('justfeast_saved_seat', JSON.stringify(selectedSeat));
+        } catch (e) {}
+    }
+
+    function restoreBasketFromStorage() {
+        try {
+            const savedBasket = localStorage.getItem('justfeast_saved_basket');
+            if (savedBasket) {
+                const parsed = JSON.parse(savedBasket);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    basket = parsed;
+                }
+            }
+            const savedSeat = localStorage.getItem('justfeast_saved_seat');
+            if (savedSeat) {
+                const parsedSeat = JSON.parse(savedSeat);
+                if (parsedSeat && parsedSeat.type) {
+                    selectedSeat = parsedSeat;
+                    applySeatToUI(selectedSeat);
+                }
+            }
+        } catch (e) {}
+    }
+
+    function queueOfflineOrder(phone) {
+        if (!basket || basket.length === 0) return;
+        try {
+            const queue = JSON.parse(localStorage.getItem('justfeast_offline_orders_queue') || '[]');
+            const pendingOrder = {
+                id: 'offline_' + Date.now(),
+                phone: phone,
+                seat_location: selectedSeat,
+                items: basket.map(i => ({product_id: i.id, quantity: i.quantity, price: i.price, name: i.name})),
+                timestamp: Date.now()
+            };
+            queue.push(pendingOrder);
+            localStorage.setItem('justfeast_offline_orders_queue', JSON.stringify(queue));
+            showToast("Order saved offline! Auto-syncing when network pings...", "info");
+        } catch (e) {}
+    }
+
+    async function syncOfflineOrders() {
+        if (!navigator.onLine) return;
+        try {
+            const queue = JSON.parse(localStorage.getItem('justfeast_offline_orders_queue') || '[]');
+            if (queue.length === 0) return;
+
+            console.log('Syncing offline queued orders...', queue);
+            const remainingQueue = [];
+
+            for (const item of queue) {
+                try {
+                    const payload = {
+                        seat_location: item.seat_location,
+                        items: item.items.map(i => ({product_id: i.product_id, quantity: i.quantity}))
+                    };
+                    const orderRes = await authFetch(`${API_BASE}/orders`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(payload)
+                    });
+                    if (orderRes.ok) {
+                        const orderData = await orderRes.json();
+                        const orderId = orderData.order.id;
+                        if (item.phone) {
+                            await authFetch(`${API_BASE}/orders/${orderId}/pay`, {
+                                method: 'POST',
+                                headers: {'Content-Type': 'application/json'},
+                                body: JSON.stringify({ phone: item.phone })
+                            });
+                            showToast(`STK Push prompt sent for queued order #${orderId}!`, "success");
+                        }
+                    } else {
+                        remainingQueue.push(item);
+                    }
+                } catch(err) {
+                    remainingQueue.push(item);
+                }
+            }
+
+            localStorage.setItem('justfeast_offline_orders_queue', JSON.stringify(remainingQueue));
+        } catch (e) {}
+    }
+
+    function initNetworkListeners() {
+        const updateNetworkState = () => {
+            const isOnline = navigator.onLine;
+            const wifiBanner = document.getElementById('venue-wifi-banner');
+            if (wifiBanner) {
+                if (!isOnline) {
+                    wifiBanner.classList.remove('hidden');
+                }
+            }
+            if (isOnline) {
+                syncOfflineOrders();
+            }
+        };
+
+        window.addEventListener('online', updateNetworkState);
+        window.addEventListener('offline', updateNetworkState);
+        updateNetworkState();
+
+        // Check offline sync queue every 10s
+        setInterval(syncOfflineOrders, 10000);
+    }
 </script>
 
 <script>
@@ -3365,6 +3514,7 @@
         if (mobileFeeEl) mobileFeeEl.textContent = feeText;
         if (document.getElementById('cart-tray-total')) document.getElementById('cart-tray-total').textContent = grandTotalText;
         if (document.getElementById('desktop-cart-tray-total')) document.getElementById('desktop-cart-tray-total').textContent = grandTotalText;
+        saveBasketToStorage();
     }
 
     // Policy Documents Modal Handlers
