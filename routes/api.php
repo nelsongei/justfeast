@@ -68,6 +68,8 @@ Route::middleware('auth:sanctum,web')->group(function () {
     // ── Runner ────────────────────────────────────────────────────────────────
     Route::middleware('role:runner')->prefix('runner')->group(function () {
         Route::get('/deliveries',                                [RunnerController::class, 'index']);
+        Route::get('/available-orders',                          [RunnerController::class, 'availableOrders']);
+        Route::post('/orders/{order}/claim',                     [RunnerController::class, 'claimOrder']);
         Route::patch('/deliveries/{delivery}/status',            [RunnerController::class, 'updateStatus']);
         Route::patch('/deliveries/{delivery}/location',          [RunnerController::class, 'updateLocation'])
             ->middleware('throttle:location');

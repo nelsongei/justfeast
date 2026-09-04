@@ -8,10 +8,93 @@ use App\Models\Delivery;
 use App\Events\RunnerLocationUpdated;
 use App\Services\GeospatialService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class RunnerController extends Controller
 {
+    /**
+     * GET /api/runner/available-orders
+     * Fetch unassigned active orders available for runners to claim.
+     */
+    public function availableOrders(Request $request)
+    {
+        $orders = Order::query()
+            ->whereNull('runner_id')
+            ->whereNotIn('order_status', ['cancelled', 'delivered'])
+            ->with(['vendor:id,business_name,logo_url', 'user:id,name,phone', 'items.product', 'delivery'])
+            ->latest()
+            ->get();
+
+        return response()->json([
+            'status' => 'success',
+            'orders' => $orders,
+        ]);
+    }
+
+    /**
+     * POST /api/runner/orders/{order}/claim
+     * Claim an available unassigned order for the authenticated runner.
+     */
+    public function claimOrder(Request $request, $id)
+    {
+        $runner = $request->user();
+
+        return DB::transaction(function () use ($runner, $id) {
+            $order = Order::whereKey($id)->lockForUpdate()->first();
+
+            if (!$order) {
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => 'Order not found.',
+                ], 404);
+            }
+
+            if ($order->runner_id !== null && $order->runner_id != $runner->id) {
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => 'This order has already been claimed by another runner.',
+                ], 422);
+            }
+
+            if (in_array($order->order_status, ['cancelled', 'delivered'], true)) {
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => 'Cannot claim a cancelled or delivered order.',
+                ], 422);
+            }
+
+            // Update order assignment
+            $order->update([
+                'runner_id'    => $runner->id,
+                'order_status' => 'runner_assigned',
+            ]);
+
+            // Retrieve or generate verification pin
+            $delivery = Delivery::where('order_id', $order->id)->first();
+            $pin = $delivery && $delivery->verification_pin ? $delivery->verification_pin : (string) random_int(100000, 999999);
+
+            $delivery = Delivery::updateOrCreate(
+                ['order_id' => $order->id],
+                [
+                    'runner_id'             => $runner->id,
+                    'verification_pin'      => $pin,
+                    'verification_pin_hash' => Hash::make($pin),
+                    'verification_attempts' => $delivery->verification_attempts ?? 0,
+                    'status'                => 'pending',
+                    'pin_expires_at'        => now()->addHours(2),
+                ]
+            );
+
+            return response()->json([
+                'status'   => 'success',
+                'message'  => "Order #{$order->id} claimed successfully!",
+                'order'    => $order->fresh(['vendor', 'user', 'items.product', 'delivery']),
+                'delivery' => $delivery->fresh(['order.items.product', 'order.vendor', 'order.user']),
+            ]);
+        });
+    }
+
     public function index(Request $request)
     {
         $perPage = min($request->integer('per_page', 25), 100);

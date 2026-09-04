@@ -151,27 +151,53 @@
                     <span class="text-base sm:text-xl font-black text-[#A31D1D]" id="stat-active-count">0 Active</span>
                 </div>
                 <div class="bg-white border border-[#E2E8F0] p-3.5 sm:p-4 rounded-2xl shadow-sm relative overflow-hidden">
+                    <div class="absolute top-0 left-0 right-0 h-1 bg-[#FFC244]"></div>
+                    <span class="text-[8px] sm:text-[9px] uppercase tracking-wider text-[#64748B] block font-extrabold mb-0.5">Available to Claim</span>
+                    <span class="text-base sm:text-xl font-black text-[#D97706]" id="stat-available-count">0 Available</span>
+                </div>
+                <div class="bg-white border border-[#E2E8F0] p-3.5 sm:p-4 rounded-2xl shadow-sm relative overflow-hidden">
                     <div class="absolute top-0 left-0 right-0 h-1 bg-[#05A357]"></div>
                     <span class="text-[8px] sm:text-[9px] uppercase tracking-wider text-[#64748B] block font-extrabold mb-0.5">Completed Today</span>
                     <span class="text-base sm:text-xl font-black text-[#05A357]" id="stat-completed-count">0 Delivered</span>
                 </div>
                 <div class="bg-white border border-[#E2E8F0] p-3.5 sm:p-4 rounded-2xl shadow-sm relative overflow-hidden">
-                    <div class="absolute top-0 left-0 right-0 h-1 bg-[#FFC244]"></div>
-                    <span class="text-[8px] sm:text-[9px] uppercase tracking-wider text-[#64748B] block font-extrabold mb-0.5">Delivery Fees</span>
-                    <span class="text-base sm:text-xl font-black text-[#D97706]" id="stat-earnings-amount">Ksh 0</span>
-                </div>
-                <div class="bg-white border border-[#E2E8F0] p-3.5 sm:p-4 rounded-2xl shadow-sm relative overflow-hidden">
                     <div class="absolute top-0 left-0 right-0 h-1 bg-[#2563EB]"></div>
-                    <span class="text-[8px] sm:text-[9px] uppercase tracking-wider text-[#64748B] block font-extrabold mb-0.5">Runner Score</span>
-                    <span class="text-base sm:text-xl font-black text-[#2563EB]">5.0 ★</span>
+                    <span class="text-[8px] sm:text-[9px] uppercase tracking-wider text-[#64748B] block font-extrabold mb-0.5">Delivery Fees</span>
+                    <span class="text-base sm:text-xl font-black text-[#2563EB]" id="stat-earnings-amount">Ksh 0</span>
                 </div>
             </div>
 
             <!-- Workspace Grid -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-start">
                 
-                <!-- Left Column: Assigned Delivery List (7 Cols) -->
+                <!-- Left Column: Available & Assigned Delivery Lists (7 Cols) -->
                 <div class="lg:col-span-7 space-y-4">
+                    <!-- Available Orders to Claim Section -->
+                    <div class="bg-white border border-[#E2E8F0] p-4 sm:p-5 rounded-2xl shadow-sm space-y-4">
+                        <div class="flex items-center justify-between pb-3 border-b border-[#E2E8F0]">
+                            <h3 class="text-xs font-black text-[#0F172A] uppercase tracking-wider flex items-center gap-2">
+                                <i class="fas fa-hand-holding-hand text-[#D97706]"></i> Available Festival Orders
+                            </h3>
+                            <span id="stat-available-count-badge" class="text-[10px] bg-[#FFF8E7] text-[#D97706] border border-[#F7E5B2] px-2.5 py-1 rounded-full font-bold">
+                                0 Available to Claim
+                            </span>
+                        </div>
+
+                        <!-- Available orders card container -->
+                        <div id="runner-available-card-container" class="space-y-4">
+                            <div class="text-center py-6 text-[#64748B] space-y-2">
+                                <div class="w-12 h-12 bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl flex items-center justify-center mx-auto text-xl text-[#94A3B8]">
+                                    <i class="fas fa-inbox"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-xs font-bold text-[#0F172A]">No Unassigned Orders</h4>
+                                    <p class="text-[11px] text-[#64748B]">All active customer orders are currently assigned to runners.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Assigned Delivery Tasks Section -->
                     <div class="bg-white border border-[#E2E8F0] p-4 sm:p-5 rounded-2xl shadow-sm space-y-4">
                         <div class="flex items-center justify-between pb-3 border-b border-[#E2E8F0]">
                             <h3 class="text-xs font-black text-[#0F172A] uppercase tracking-wider flex items-center gap-2">
@@ -430,6 +456,7 @@
         }
 
         let lastDeliveriesHash = '';
+        let lastAvailableHash = '';
         async function syncDeliveries() {
             if (!currentUser) return;
             // Skip re-rendering while user is actively typing in a PIN input field!
@@ -440,19 +467,139 @@
             if (document.hidden) return;
 
             try {
-                const res = await authFetch(`${API_BASE}/runner/deliveries?all=1`);
-                if (res.ok) {
-                    const rawData = await res.json();
+                const [delRes, availRes] = await Promise.all([
+                    authFetch(`${API_BASE}/runner/deliveries?all=1`),
+                    authFetch(`${API_BASE}/runner/available-orders`)
+                ]);
+
+                if (delRes.ok) {
+                    const rawData = await delRes.json();
                     const deliveries = Array.isArray(rawData) ? rawData : (rawData.data || []);
                     
-                    // Performance Optimization: Only touch the DOM if data has actually changed!
                     const currentHash = JSON.stringify(deliveries);
                     if (currentHash !== lastDeliveriesHash) {
                         lastDeliveriesHash = currentHash;
                         renderDeliveries(deliveries);
                     }
                 }
+
+                if (availRes.ok) {
+                    const availData = await availRes.json();
+                    const availableOrders = availData.orders || [];
+                    const availHash = JSON.stringify(availableOrders);
+                    if (availHash !== lastAvailableHash) {
+                        lastAvailableHash = availHash;
+                        renderAvailableOrders(availableOrders);
+                    }
+                }
             } catch(e) {}
+        }
+
+        function renderAvailableOrders(orders) {
+            const container = document.getElementById('runner-available-card-container');
+            const badge = document.getElementById('stat-available-count-badge');
+            const statEl = document.getElementById('stat-available-count');
+
+            if (badge) badge.textContent = `${orders.length} Available to Claim`;
+            if (statEl) statEl.textContent = `${orders.length} Available`;
+
+            if (!container) return;
+
+            if (orders.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-6 text-[#64748B] space-y-2">
+                        <div class="w-12 h-12 bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl flex items-center justify-center mx-auto text-xl text-[#94A3B8]">
+                            <i class="fas fa-inbox"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-bold text-[#0F172A]">No Unassigned Orders</h4>
+                            <p class="text-[11px] text-[#64748B]">All active customer orders are currently assigned to runners.</p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '';
+            orders.forEach(o => {
+                const loc = o.seat_location || {};
+                const locText = (loc.type === 'gps' || loc.latitude)
+                    ? `GPS Pin: ${loc.description || (parseFloat(loc.latitude).toFixed(4) + ', ' + parseFloat(loc.longitude).toFixed(4))}`
+                    : `${loc.section || 'Seat'}, Row ${loc.row || ''}, Seat ${loc.seat || ''}`;
+
+                const itemsText = (o.items || []).map(i => `<span class="inline-flex items-center gap-1 bg-[#F8FAFC] border border-[#CBD5E1] text-[#1E293B] px-3 py-1.5 rounded-xl text-xs font-bold mr-1.5 mb-1.5 shadow-2xs"><i class="fas fa-utensils text-[10px] text-[#A31D1D]"></i> ${i.quantity}x ${i.product ? i.product.name : 'Item'}</span>`).join('');
+
+                const card = document.createElement('div');
+                card.className = 'bg-[#FFFDF9] border border-[#F7E5B2] border-l-4 border-l-[#FFC244] p-4 rounded-3xl space-y-3 shadow-2xs hover:shadow-md transition-all';
+
+                card.innerHTML = `
+                    <div class="flex flex-wrap justify-between items-center gap-2 pb-2.5 border-b border-[#E2E8F0]">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-2xl bg-[#FFF8E7] border border-[#F7E5B2] flex items-center justify-center text-base text-[#D97706] shadow-2xs shrink-0">
+                                🛒
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-[10px] text-[#D97706] font-black">Order #${o.id}</span>
+                                    <span class="text-[10px] bg-[#ECFDF5] text-[#047857] px-2 py-0.5 rounded-md font-bold uppercase">${(o.order_status || 'CREATED').replace('_', ' ')}</span>
+                                </div>
+                                <h4 class="text-xs font-black text-[#0F172A] mt-0.5">${o.user ? o.user.name : 'Customer'}</h4>
+                            </div>
+                        </div>
+                        <button onclick="claimRunnerOrder(${o.id})" class="px-4 py-2 bg-[#FFC244] hover:bg-[#E5AC3A] text-black font-extrabold text-xs rounded-2xl shadow-md transition flex items-center justify-center gap-1.5 shrink-0">
+                            <i class="fas fa-bolt text-xs"></i> Claim Order
+                        </button>
+                    </div>
+
+                    <div class="bg-white border border-[#E2E8F0] rounded-2xl p-3 grid grid-cols-1 md:grid-cols-2 gap-2.5">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-7 h-7 rounded-xl bg-[#FFF8E7] border border-[#F7E5B2] flex items-center justify-center text-xs shrink-0">
+                                🏪
+                            </div>
+                            <div>
+                                <span class="text-[8px] font-extrabold text-[#64748B] uppercase tracking-wider block">Pickup Stall</span>
+                                <strong class="text-xs font-black text-[#0F172A]">${o.vendor ? o.vendor.business_name : 'Stall'}</strong>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-2.5 border-t md:border-t-0 md:border-l border-[#E2E8F0] pt-2 md:pt-0 md:pl-2.5">
+                            <div class="w-7 h-7 rounded-xl bg-[#FEF2F2] border border-[#FCA5A5] flex items-center justify-center text-xs shrink-0">
+                                📍
+                            </div>
+                            <div>
+                                <span class="text-[8px] font-extrabold text-[#991B1B] uppercase tracking-wider block">Target Location</span>
+                                <strong class="text-xs font-black text-[#A31D1D]">${locText}</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <span class="text-[9px] uppercase font-extrabold text-[#64748B] block mb-1 tracking-wider">Order Items</span>
+                        <div class="flex flex-wrap">${itemsText}</div>
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        async function claimRunnerOrder(orderId) {
+            playSound('success');
+            try {
+                const res = await authFetch(`${API_BASE}/runner/orders/${orderId}/claim`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await res.json();
+                if (res.ok && data.status === 'success') {
+                    showToast(data.message || `Order #${orderId} claimed successfully!`, 'success');
+                    syncDeliveries();
+                } else {
+                    showToast(data.message || 'Unable to claim order.', 'danger');
+                }
+            } catch(e) {
+                showToast('Network error claiming order.', 'danger');
+            }
         }
 
         function renderDeliveries(deliveriesList) {
