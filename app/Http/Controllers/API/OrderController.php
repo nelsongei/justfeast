@@ -48,10 +48,13 @@ class OrderController extends Controller
         $idempotencyKey = $request->header('Idempotency-Key') ?: $request->input('idempotency_key');
         $userId         = $request->user()->id;
 
-        if ($idempotencyKey) {
+        if (!empty($idempotencyKey)) {
             $existingOrder = Order::query()
                 ->where('user_id', $userId)
-                ->where('idempotency_key', $idempotencyKey)
+                ->where(function ($q) use ($idempotencyKey) {
+                    $q->where('idempotency_key', $idempotencyKey)
+                      ->orWhere('idempotency_key', 'LIKE', "{$idempotencyKey}-v%");
+                })
                 ->first();
 
             if ($existingOrder) {
@@ -129,9 +132,12 @@ class OrderController extends Controller
                 $vTotal = $vSubtotal + $vFee;
                 $vIndex++;
 
-                $vendorIdempotencyKey = ($uniqueVendorCount > 1) 
-                    ? "{$idempotencyKey}-v{$vId}"
-                    : $idempotencyKey;
+                $vendorIdempotencyKey = null;
+                if (!empty($idempotencyKey)) {
+                    $vendorIdempotencyKey = ($uniqueVendorCount > 1) 
+                        ? "{$idempotencyKey}-v{$vId}"
+                        : $idempotencyKey;
+                }
 
                 $order = Order::create([
                     'user_id'         => $userId,
@@ -196,6 +202,12 @@ class OrderController extends Controller
             throw $ve;
         } catch (\Exception $e) {
             DB::rollBack();
+            if (str_contains($e->getMessage(), 'Duplicate entry') || $e->getCode() == 23000) {
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => 'An order with this reference has already been created. Please check your active orders.',
+                ], 409);
+            }
             return response()->json([
                 'status'  => 'error',
                 'message' => $e->getMessage(),
