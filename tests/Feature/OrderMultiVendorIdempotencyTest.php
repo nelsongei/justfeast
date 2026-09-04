@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\Vendor;
 use App\Models\Venue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -86,14 +87,14 @@ class OrderMultiVendorIdempotencyTest extends TestCase
         $res1 = $this->postJson('/api/orders', $payload);
         $res1->assertStatus(200);
 
-        // Verify idempotency keys for created orders are NULL (not '-v1' or '-v2')
+        // Verify idempotency keys for created orders have unique batch keys
         $orders1 = Order::where('user_id', $this->customer->id)->get();
         $this->assertCount(2, $orders1);
         foreach ($orders1 as $o) {
-            $this->assertNull($o->idempotency_key);
+            $this->assertStringStartsWith('batch_', $o->idempotency_key);
         }
 
-        // Place second multi-vendor order without idempotency key (should succeed cleanly without SQL duplicate entry error)
+        // Place second multi-vendor order without idempotency key
         $res2 = $this->postJson('/api/orders', $payload);
         $res2->assertStatus(200);
 
@@ -125,5 +126,45 @@ class OrderMultiVendorIdempotencyTest extends TestCase
         $res2 = $this->postJson('/api/orders', $payload, $headers);
         $res2->assertStatus(200)
              ->assertJsonPath('message', 'Order already placed.');
+    }
+
+    public function test_multi_vendor_orders_pay_calculates_full_batch_amount(): void
+    {
+        Http::fake([
+            '*/oauth/v1/generate*' => Http::response([
+                'access_token' => 'fake_access_token_123',
+                'expires_in'   => '3599',
+            ], 200),
+            '*/mpesa/stkpush/v1/processrequest*' => Http::response([
+                'MerchantRequestID'   => 'MERCHANT_REQ_100',
+                'CheckoutRequestID'   => 'ws_CO_29082026_001',
+                'ResponseCode'        => '0',
+                'ResponseDescription' => 'Success. Request accepted for processing',
+                'CustomerMessage'     => 'Success. Request accepted for processing',
+            ], 200),
+        ]);
+
+        Sanctum::actingAs($this->customer);
+
+        $payload = [
+            'seat_location' => ['section' => 'VIP A', 'row' => '1', 'seat' => '5'],
+            'items'         => [
+                ['product_id' => $this->product1->id, 'quantity' => 2], // 200 + 30 fee = 230
+                ['product_id' => $this->product2->id, 'quantity' => 1], // 50 + 15 fee = 65
+            ],
+        ];
+
+        $res1 = $this->postJson('/api/orders', $payload);
+        $res1->assertStatus(200);
+
+        $primaryOrderId = $res1->json('order.id');
+
+        $payRes = $this->postJson("/api/orders/{$primaryOrderId}/pay", ['phone' => '0712345678']);
+
+        $expectedTotal = (float) Order::where('user_id', $this->customer->id)->sum('total_amount');
+
+        // Full batch sum (200 + 1.0 fee for vendor 1 + 50 + 0.5 fee for vendor 2 = 251.50) must be passed to pay
+        $payRes->assertStatus(200);
+        $this->assertEquals($expectedTotal, (float) $payRes->json('total_amount'));
     }
 }

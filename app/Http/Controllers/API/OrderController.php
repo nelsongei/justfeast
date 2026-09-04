@@ -47,6 +47,7 @@ class OrderController extends Controller
 
         $idempotencyKey = $request->header('Idempotency-Key') ?: $request->input('idempotency_key');
         $userId         = $request->user()->id;
+        $batchKey       = !empty($idempotencyKey) ? $idempotencyKey : ('batch_' . (string) \Illuminate\Support\Str::uuid());
 
         if (!empty($idempotencyKey)) {
             $existingOrder = Order::query()
@@ -132,12 +133,7 @@ class OrderController extends Controller
                 $vTotal = $vSubtotal + $vFee;
                 $vIndex++;
 
-                $vendorIdempotencyKey = null;
-                if (!empty($idempotencyKey)) {
-                    $vendorIdempotencyKey = ($uniqueVendorCount > 1) 
-                        ? "{$idempotencyKey}-v{$vId}"
-                        : $idempotencyKey;
-                }
+                $vendorIdempotencyKey = "{$batchKey}-v{$vId}";
 
                 $order = Order::create([
                     'user_id'         => $userId,
@@ -188,6 +184,8 @@ class OrderController extends Controller
 
             DB::commit();
 
+            $batchTotalAmount = collect($createdOrders)->sum('total_amount');
+
             return response()->json([
                 'status'        => 'success',
                 'message'       => 'Order created successfully. Please complete payment.',
@@ -195,6 +193,7 @@ class OrderController extends Controller
                 'orders_count'  => count($createdOrders),
                 'delivery_fee'  => $totalDeliveryFee,
                 'vendor_count'  => $uniqueVendorCount,
+                'total_amount'  => $batchTotalAmount,
             ]);
 
         } catch (ValidationException $ve) {
@@ -213,6 +212,27 @@ class OrderController extends Controller
                 'message' => $e->getMessage(),
             ], 400);
         }
+    }
+
+    /**
+     * Get all pending sibling orders belonging to the same checkout batch.
+     */
+    protected function getBatchOrders(Order $order)
+    {
+        if (empty($order->idempotency_key)) {
+            return collect([$order]);
+        }
+
+        $baseKey = explode('-v', $order->idempotency_key)[0];
+
+        $siblings = Order::query()
+            ->where('user_id', $order->user_id)
+            ->where('payment_status', 'pending')
+            ->where('idempotency_key', 'LIKE', "{$baseKey}-v%")
+            ->with(['items.product', 'vendor', 'user'])
+            ->get();
+
+        return $siblings->isNotEmpty() ? $siblings : collect([$order]);
     }
 
     /**
@@ -260,14 +280,26 @@ class OrderController extends Controller
 
         $user   = $request->user();
         $phone  = MpesaDarajaService::formatPhone($request->input('phone', $user->phone ?? '0700000000'));
-        $result = $mpesaService->initiateStkPush($order, $phone);
+
+        $batchOrders = $this->getBatchOrders($order);
+        $totalAmount = $batchOrders->sum('total_amount');
+
+        $clonedOrder = clone $order;
+        $clonedOrder->total_amount = $totalAmount;
+
+        $result = $mpesaService->initiateStkPush($clonedOrder, $phone);
 
         if ($result['success'] && isset($result['checkout_request_id'])) {
-            $order->update([
-                'payment_method'            => 'mpesa',
-                'mpesa_checkout_request_id' => $result['checkout_request_id'],
-                'mpesa_merchant_request_id' => $result['merchant_request_id'] ?? null,
-            ]);
+            foreach ($batchOrders->values() as $index => $bOrder) {
+                $checkoutId = $index === 0
+                    ? $result['checkout_request_id']
+                    : $result['checkout_request_id'] . '-batch-' . ($index + 1);
+                $bOrder->update([
+                    'payment_method'            => 'mpesa',
+                    'mpesa_checkout_request_id' => $checkoutId,
+                    'mpesa_merchant_request_id' => $result['merchant_request_id'] ?? null,
+                ]);
+            }
         }
 
         return response()->json([
@@ -275,6 +307,7 @@ class OrderController extends Controller
             'message'             => $result['message'],
             'checkout_request_id' => $result['checkout_request_id'] ?? null,
             'order_id'            => $order->id,
+            'total_amount'        => $totalAmount,
         ]);
     }
 
@@ -292,21 +325,30 @@ class OrderController extends Controller
         $firstName = explode(' ', trim($user->name ?? 'Customer'))[0] ?? 'Customer';
         $lastName  = explode(' ', trim($user->name ?? 'User'))[1] ?? 'Order';
 
-        $result = $intasendService->initiateSTKPush($order, $phone, $email, $firstName, $lastName);
+        $batchOrders = $this->getBatchOrders($order);
+        $totalAmount = $batchOrders->sum('total_amount');
+
+        $clonedOrder = clone $order;
+        $clonedOrder->total_amount = $totalAmount;
+
+        $result = $intasendService->initiateSTKPush($clonedOrder, $phone, $email, $firstName, $lastName);
 
         if ($result['success'] && !empty($result['invoice_id'])) {
-            $order->update([
-                'payment_method'      => 'intasend',
-                'intasend_invoice_id' => $result['invoice_id'],
-                'intasend_ref'        => $result['api_ref'] ?? ('order-' . $order->id),
-            ]);
+            foreach ($batchOrders as $bOrder) {
+                $bOrder->update([
+                    'payment_method'      => 'intasend',
+                    'intasend_invoice_id' => $result['invoice_id'],
+                    'intasend_ref'        => $result['api_ref'] ?? ('order-' . $order->id),
+                ]);
+            }
         }
 
         return response()->json([
-            'status'     => $result['success'] ? 'success' : 'error',
-            'message'    => $result['message'],
-            'invoice_id' => $result['invoice_id'] ?? null,
-            'order_id'   => $order->id,
+            'status'       => $result['success'] ? 'success' : 'error',
+            'message'      => $result['message'],
+            'invoice_id'   => $result['invoice_id'] ?? null,
+            'order_id'     => $order->id,
+            'total_amount' => $totalAmount,
         ]);
     }
 

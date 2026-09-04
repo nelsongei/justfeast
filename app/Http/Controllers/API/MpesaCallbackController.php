@@ -78,35 +78,37 @@ class MpesaCallbackController extends Controller
         if ((int) $resultCode === 0) {
             try {
                 DB::transaction(function () use ($checkoutRequestId, $merchantRequestId, $amount, $mpesaReceiptNumber) {
-                    $order = Order::query()
+                    $orders = Order::query()
                         ->lockForUpdate()
                         ->where('mpesa_checkout_request_id', $checkoutRequestId)
+                        ->orWhere('mpesa_checkout_request_id', 'LIKE', "{$checkoutRequestId}-batch-%")
                         ->orWhere('mpesa_merchant_request_id', $merchantRequestId)
-                        ->first();
+                        ->get();
 
-                    if (!$order) {
+                    if ($orders->isEmpty()) {
                         throw new \RuntimeException("Order not found for checkout_request_id {$checkoutRequestId}");
                     }
 
-                    if ($order->payment_status === 'paid') {
-                        return;
+                    $batchTotal  = (float) $orders->sum('total_amount');
+                    $expectedInt = (int) ceil($batchTotal);
+
+                    if ($amount !== null && (int) $amount !== $expectedInt && bccomp((string) $amount, (string) $batchTotal, 2) !== 0) {
+                        throw new \RuntimeException("Payment amount mismatch: received {$amount} vs expected {$expectedInt} / {$batchTotal}");
                     }
 
-                    // Precise amount validation matching STK push ceil amount or total amount
-                    $expectedInt = (int) ceil($order->total_amount);
-                    if ($amount !== null && (int) $amount !== $expectedInt && bccomp((string) $amount, (string) $order->total_amount, 2) !== 0) {
-                        throw new \RuntimeException("Payment amount mismatch: received {$amount} vs expected {$expectedInt} / {$order->total_amount}");
+                    foreach ($orders as $order) {
+                        if ($order->payment_status !== 'paid') {
+                            $order->update([
+                                'payment_status'       => 'paid',
+                                'order_status'         => 'accepted',
+                                'paid_at'              => now(),
+                                'payment_reference'    => $mpesaReceiptNumber ?: $checkoutRequestId,
+                                'mpesa_receipt_number' => $mpesaReceiptNumber,
+                            ]);
+
+                            event(new \App\Events\PaymentStatusUpdated($order->fresh(), 'paid', 'accepted'));
+                        }
                     }
-
-                    $order->update([
-                        'payment_status'       => 'paid',
-                        'order_status'         => 'accepted',
-                        'paid_at'              => now(),
-                        'payment_reference'    => $mpesaReceiptNumber ?: $checkoutRequestId,
-                        'mpesa_receipt_number' => $mpesaReceiptNumber,
-                    ]);
-
-                    event(new \App\Events\PaymentStatusUpdated($order->fresh(), 'paid', 'accepted'));
                 });
 
                 $webhookEvent->update(['status' => 'processed']);
@@ -126,14 +128,28 @@ class MpesaCallbackController extends Controller
             // ResultCode != 0: Transaction cancelled / failed / timed out
             try {
                 DB::transaction(function () use ($checkoutRequestId, $merchantRequestId) {
-                    $order = Order::query()
+                    $orders = Order::query()
                         ->lockForUpdate()
                         ->where('mpesa_checkout_request_id', $checkoutRequestId)
+                        ->orWhere('mpesa_checkout_request_id', 'LIKE', "{$checkoutRequestId}-batch-%")
                         ->orWhere('mpesa_merchant_request_id', $merchantRequestId)
-                        ->first();
+                        ->with('items.product')
+                        ->get();
 
-                    if ($order && $order->payment_status === 'pending') {
-                        $order->update(['payment_status' => 'failed']);
+                    foreach ($orders as $order) {
+                        if ($order->payment_status === 'pending') {
+                            $order->update(['payment_status' => 'failed']);
+
+                            // Restore stock
+                            foreach ($order->items as $item) {
+                                if ($item->product) {
+                                    $item->product->increment('stock_quantity', $item->quantity);
+                                    if ($item->product->fresh()->stock_quantity > 0) {
+                                        $item->product->update(['stock_status' => 'in_stock']);
+                                    }
+                                }
+                            }
+                        }
                     }
                 });
 

@@ -79,42 +79,38 @@ class IntaSendWebhookController extends Controller
 
             try {
                 DB::transaction(function () use ($invoiceId, $apiRef, $value) {
-                    // Query order by intasend_invoice_id (or fallback api_ref) with lockForUpdate
-                    $query = Order::query()->lockForUpdate();
+                    $orders = Order::query()->lockForUpdate()
+                        ->where('intasend_invoice_id', $invoiceId)
+                        ->get();
 
-                    $order = null;
-                    if ($invoiceId) {
-                        $order = $query->where('intasend_invoice_id', $invoiceId)->first();
+                    if ($orders->isEmpty() && $apiRef && preg_match('/^order-(\d+)$/', $apiRef, $matches)) {
+                        $orders = Order::query()->lockForUpdate()->where('id', (int) $matches[1])->get();
                     }
 
-                    if (!$order && $apiRef && preg_match('/^order-(\d+)$/', $apiRef, $matches)) {
-                        $order = Order::query()->lockForUpdate()->find((int) $matches[1]);
-                    }
-
-                    if (!$order) {
+                    if ($orders->isEmpty()) {
                         throw new \RuntimeException("Order not found for invoice_id {$invoiceId}");
                     }
 
-                    // Already paid check
-                    if ($order->payment_status === 'paid') {
-                        return;
-                    }
+                    $batchTotal = (string) $orders->sum('total_amount');
 
                     // Precise amount validation using bccomp
-                    if (bccomp((string) $value, (string) $order->total_amount, 2) !== 0) {
-                        throw new \RuntimeException("Payment amount mismatch: received {$value} vs order total {$order->total_amount}");
+                    if (bccomp((string) $value, $batchTotal, 2) !== 0) {
+                        throw new \RuntimeException("Payment amount mismatch: received {$value} vs order total {$batchTotal}");
                     }
 
-                    // Validated payment transition
-                    $order->update([
-                        'payment_status'    => 'paid',
-                        'order_status'      => 'accepted',
-                        'paid_at'           => now(),
-                        'payment_method'    => 'intasend',
-                        'payment_reference' => $invoiceId,
-                    ]);
+                    foreach ($orders as $order) {
+                        if ($order->payment_status !== 'paid') {
+                            $order->update([
+                                'payment_status'    => 'paid',
+                                'order_status'      => 'accepted',
+                                'paid_at'           => now(),
+                                'payment_method'    => 'intasend',
+                                'payment_reference' => $invoiceId,
+                            ]);
 
-                    event(new \App\Events\PaymentStatusUpdated($order->fresh(), 'paid', 'accepted'));
+                            event(new \App\Events\PaymentStatusUpdated($order->fresh(), 'paid', 'accepted'));
+                        }
+                    }
                 });
 
                 $webhookEvent->update(['status' => 'processed']);
@@ -133,15 +129,29 @@ class IntaSendWebhookController extends Controller
         } elseif ($state === 'FAILED') {
             try {
                 DB::transaction(function () use ($invoiceId, $apiRef) {
-                    $query = Order::query()->lockForUpdate();
-                    $order = $invoiceId ? $query->where('intasend_invoice_id', $invoiceId)->first() : null;
+                    $orders = Order::query()->lockForUpdate()
+                        ->where('intasend_invoice_id', $invoiceId)
+                        ->with('items.product')
+                        ->get();
 
-                    if (!$order && $apiRef && preg_match('/^order-(\d+)$/', $apiRef, $matches)) {
-                        $order = Order::query()->lockForUpdate()->find((int) $matches[1]);
+                    if ($orders->isEmpty() && $apiRef && preg_match('/^order-(\d+)$/', $apiRef, $matches)) {
+                        $orders = Order::query()->lockForUpdate()->where('id', (int) $matches[1])->with('items.product')->get();
                     }
 
-                    if ($order && $order->payment_status === 'pending') {
-                        $order->update(['payment_status' => 'failed']);
+                    foreach ($orders as $order) {
+                        if ($order->payment_status === 'pending') {
+                            $order->update(['payment_status' => 'failed']);
+
+                            // Restore stock
+                            foreach ($order->items as $item) {
+                                if ($item->product) {
+                                    $item->product->increment('stock_quantity', $item->quantity);
+                                    if ($item->product->fresh()->stock_quantity > 0) {
+                                        $item->product->update(['stock_status' => 'in_stock']);
+                                    }
+                                }
+                            }
+                        }
                     }
                 });
 
